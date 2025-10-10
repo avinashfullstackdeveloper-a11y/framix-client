@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, Shield } from "lucide-react";
+import { User, LogOut, Settings, Shield, Heart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +32,8 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
     }
   };
 
-  const displayName = user.name || user.username || user.email;
+  // Prioritize username over name for display
+  const displayName = user.username || user.name || user.email;
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
@@ -58,17 +59,16 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-neutral-800" />
-        <DropdownMenuItem className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => navigate("/settings/personal")}
+          className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
+        >
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer">
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer">
-          <Shield className="mr-2 h-4 w-4" />
-          <span>Security</span>
+          <Heart className="mr-2 h-4 w-4" />
+          <span>Favourite</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-800" />
         <DropdownMenuItem
