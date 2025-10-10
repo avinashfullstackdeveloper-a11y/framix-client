@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { UserAccountMenu } from "@/components/UserAccountMenu";
+import { useSession } from "@/lib/auth-client";
 
 // A reusable NavLink component to keep the main navigation clean
 // and handle the active/hover animation logic.
@@ -27,11 +29,13 @@ const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) =>
 };
 
 const Navigation = () => {
+  const { data: session, isPending } = useSession();
+
   return (
     <nav className="bg-[#111111] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
+
           {/* LOGO UPDATED HERE */}
           <Link to="/" className="flex items-center">
             <img src="/fremix.png" alt="Framix Logo" className="h-9 w-auto" />
@@ -47,15 +51,24 @@ const Navigation = () => {
             <NavLink to="/pricing">Pricing</NavLink>
           </div>
 
-          {/* CTA Button with updated styles */}
-          <Link to="/signin">
-            <Button
-              variant="default"
-              className="bg-[#E84288] text-black font-semibold hover:bg-[#E84288]/90 rounded-lg"
-            >
-              Explore Now
-            </Button>
-          </Link>
+          {/* Show user menu if logged in, otherwise show Explore Now button */}
+          {isPending ? (
+            // Loading state - show a skeleton or nothing
+            <div className="h-10 w-10 rounded-full bg-neutral-800 animate-pulse" />
+          ) : session?.user ? (
+            // User is logged in - show account menu
+            <UserAccountMenu user={session.user} />
+          ) : (
+            // User is not logged in - show Explore Now button
+            <Link to="/signin">
+              <Button
+                variant="default"
+                className="bg-[#E84288] text-black font-semibold hover:bg-[#E84288]/90 rounded-lg"
+              >
+                Explore Now
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

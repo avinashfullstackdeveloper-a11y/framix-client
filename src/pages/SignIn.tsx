@@ -3,23 +3,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { authClient } from "@/lib/auth-client";
 
 const SignIn: React.FC = () => {
-  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   // Handle Email/Password Login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     try {
-      await login(email, password);
-      alert("Login successful");
+      const result = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      console.log("SignIn result:", result);
+
+      if (result.error) {
+        setError(result.error.message || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // Navigate to components page on successful login
+      console.log("Navigating to /components");
+
+      // Small delay to ensure session is set
+      setTimeout(() => {
+        navigate("/components", { replace: true });
+      }, 100);
     } catch (err: any) {
-      alert(err.message);
+      console.error("SignIn error:", err);
+      setError(err.message || "An error occurred");
+      setIsLoading(false);
     }
   };
 
@@ -31,8 +56,15 @@ const SignIn: React.FC = () => {
           <CardTitle className="text-3xl font-bold mb-2">Sign in</CardTitle>
           <p className="text-muted-foreground">Sign in with open account</p>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Email/Password Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
@@ -63,8 +95,8 @@ const SignIn: React.FC = () => {
               <Link to="/forgot-password" className="text-primary text-sm hover:underline">Forgot password ?</Link>
             </div>
 
-            <Button type="submit" className="w-full h-12 bg-gradient-primary hover:opacity-90 border-0 mt-6">
-              Sign in
+            <Button type="submit" disabled={isLoading} className="w-full h-12 bg-gradient-primary hover:opacity-90 border-0 mt-6">
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 

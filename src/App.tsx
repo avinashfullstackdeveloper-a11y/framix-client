@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Components from "./pages/Components";
 import Projects from "./pages/Projects";
@@ -26,10 +27,26 @@ const App: React.FC = () => {
           <Sonner />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/components" element={<Components />} />
-            <Route path="/components/:type/:id" element={<ComponentDetail />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/components" element={
+              <ProtectedRoute>
+                <Components />
+              </ProtectedRoute>
+            } />
+            <Route path="/components/:type/:id" element={
+              <ProtectedRoute>
+                <ComponentDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/projects" element={
+              <ProtectedRoute>
+                <Projects />
+              </ProtectedRoute>
+            } />
+            <Route path="/projects/:id" element={
+              <ProtectedRoute>
+                <ProjectDetail />
+              </ProtectedRoute>
+            } />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/signin" element={<SignIn />} />
