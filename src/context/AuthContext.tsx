@@ -1,20 +1,18 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "@/firebase";
-import { 
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithPopup,
-  User 
-} from "firebase/auth";
+import React, { createContext, useContext, useState } from "react";
+
+type User = {
+  uid: string;
+  email: string | null;
+  username?: string;
+};
 
 type AuthContextType = {
   user: User | null;
-  login: (email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
-  googleSignIn: () => Promise<any>;
+  googleSignIn: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -22,21 +20,45 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
-    return unsubscribe;
-  }, []);
+  const login = async (email: string, password: string) => {
+    // TODO: Implement your custom authentication logic here
+    // Example: API call to your backend
+    console.log("Login attempt:", { email, password });
 
-  const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
-  const logout = () => signOut(auth);
+    // Mock user for now
+    setUser({
+      uid: "mock-user-id",
+      email: email,
+    });
+  };
 
-  const googleSignIn = () => {
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+  const register = async (email: string, password: string, username: string) => {
+    // TODO: Implement your custom registration logic here
+    // Example: API call to your backend
+    console.log("Register attempt:", { email, password, username });
+
+    // Mock user for now
+    setUser({
+      uid: "mock-user-id",
+      email: email,
+      username: username,
+    });
+  };
+
+  const logout = async () => {
+    // TODO: Implement your custom logout logic here
+    console.log("Logout");
+    setUser(null);
+  };
+
+  const googleSignIn = async () => {
+    // TODO: Implement your custom Google Sign-In logic here
+    console.log("Google sign-in attempt");
+    throw new Error("Google Sign-In not implemented yet");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, googleSignIn }}>
+    <AuthContext.Provider value={{ user, login, register, logout, googleSignIn }}>
       {children}
     </AuthContext.Provider>
   );

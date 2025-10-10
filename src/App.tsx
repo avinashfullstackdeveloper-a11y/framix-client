@@ -10,6 +10,7 @@ import Projects from "./pages/Projects";
 import Blogs from "./pages/Blogs";
 import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
+import Register from "./pages/Register";
 import ProjectDetail from "./pages/ProjectDetail";
 import ComponentDetail from "./pages/ComponentDetail";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,7 @@ const App: React.FC = () => {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/register" element={<Register />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
