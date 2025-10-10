@@ -1,14 +1,18 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { useNavigate } from "react-router-dom";
 
 type User = {
-  uid: string;
-  email: string | null;
+  id: string;
+  email: string;
   username?: string;
+  name?: string;
 };
 
 type AuthContextType = {
   user: User | null;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -19,46 +23,101 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: session } = await authClient.getSession();
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            username: session.user.username,
+            name: session.user.name,
+          });
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const login = async (email: string, password: string) => {
-    // TODO: Implement your custom authentication logic here
-    // Example: API call to your backend
-    console.log("Login attempt:", { email, password });
+    try {
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    // Mock user for now
-    setUser({
-      uid: "mock-user-id",
-      email: email,
-    });
+      if (error) {
+        throw new Error(error.message || "Login failed");
+      }
+
+      if (data?.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.username,
+          name: data.user.name,
+        });
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      throw error;
+    }
   };
 
   const register = async (email: string, password: string, username: string) => {
-    // TODO: Implement your custom registration logic here
-    // Example: API call to your backend
-    console.log("Register attempt:", { email, password, username });
+    try {
+      const { data, error } = await authClient.signUp.email({
+        email,
+        password,
+        name: username,
+        username,
+      });
 
-    // Mock user for now
-    setUser({
-      uid: "mock-user-id",
-      email: email,
-      username: username,
-    });
+      if (error) {
+        throw new Error(error.message || "Registration failed");
+      }
+
+      if (data?.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.username,
+          name: data.user.name,
+        });
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      throw error;
+    }
   };
 
   const logout = async () => {
-    // TODO: Implement your custom logout logic here
-    console.log("Logout");
-    setUser(null);
+    try {
+      await authClient.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    }
   };
 
   const googleSignIn = async () => {
-    // TODO: Implement your custom Google Sign-In logic here
+    // TODO: Implement Google Sign-In when configured
     console.log("Google sign-in attempt");
     throw new Error("Google Sign-In not implemented yet");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, googleSignIn }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, googleSignIn }}>
       {children}
     </AuthContext.Provider>
   );
