@@ -53,13 +53,6 @@ const SignIn: React.FC = () => {
     }
   };
 
-  // Redirect when signed in
-  React.useEffect(() => {
-    if (signedIn) {
-      navigate("/components", { replace: true });
-    }
-  }, [signedIn, navigate]);
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Sign In Card */}

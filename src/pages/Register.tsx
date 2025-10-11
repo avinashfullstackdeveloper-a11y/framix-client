@@ -61,13 +61,6 @@ const Register: React.FC = () => {
     }
   };
 
-  // Redirect when registered
-  React.useEffect(() => {
-    if (registered) {
-      navigate("/components", { replace: true });
-    }
-  }, [registered, navigate]);
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Registration Card */}
