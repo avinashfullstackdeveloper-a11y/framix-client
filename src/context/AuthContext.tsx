@@ -16,6 +16,7 @@ type AuthContextType = {
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
   googleSignIn: () => Promise<void>;
+  refetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             id: result.user.id,
             email: result.user.email,
             name: result.user.name,
+            username: result.user.name, // Use name as username for display
           });
         }
       } catch (error) {
@@ -62,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
+          username: result.user.name, // Use name as username for display
         });
       }
     } catch (error: any) {
@@ -87,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
+          username: result.user.name, // Use name as username for display
         });
       }
     } catch (error: any) {
@@ -111,8 +115,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     throw new Error("Google Sign-In not implemented yet");
   };
 
+  const refetchUser = async () => {
+    try {
+      const result = await authClient.getSession();
+      if (result.user) {
+        setUser({
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          username: result.user.name, // Use name as username for display
+        });
+      }
+    } catch (error) {
+      console.error("Failed to refetch user:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, googleSignIn }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, googleSignIn, refetchUser }}>
       {children}
     </AuthContext.Provider>
   );

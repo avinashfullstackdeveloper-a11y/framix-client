@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 interface UserAccountMenuProps {
@@ -22,10 +22,11 @@ interface UserAccountMenuProps {
 
 export function UserAccountMenu({ user }: UserAccountMenuProps) {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleSignOut = async () => {
     try {
-      await authClient.logout();
+      await logout();
       navigate("/signin");
     } catch (error) {
       console.error("Sign out failed:", error);

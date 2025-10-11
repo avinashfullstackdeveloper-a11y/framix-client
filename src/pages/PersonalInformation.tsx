@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,13 +10,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function PersonalInformation() {
-  const { data: session, isPending, refetch } = useSession();
-  const user = session?.user;
+  const { user, isLoading, refetchUser } = useAuth();
   const { toast } = useToast();
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
 
-  const [username, setUsername] = useState(user?.username || "");
+  const [username, setUsername] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -27,10 +27,10 @@ export default function PersonalInformation() {
 
   // Update username state when user data changes
   useEffect(() => {
-    if (user?.username) {
-      setUsername(user.username);
+    if (user?.username || user?.name) {
+      setUsername(user.username || user.name || "");
     }
-  }, [user?.username]);
+  }, [user?.username, user?.name]);
 
   const handleUsernameUpdate = async () => {
     try {
@@ -45,7 +45,7 @@ export default function PersonalInformation() {
       if (!response.ok) throw new Error("Failed to update username");
 
       // Refresh the session to get updated user data
-      await refetch();
+      await refetchUser();
 
       toast({
         title: "Success",
@@ -99,7 +99,7 @@ export default function PersonalInformation() {
     }
   };
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
         <div className="text-neutral-400">Loading...</div>
@@ -176,7 +176,7 @@ export default function PersonalInformation() {
                   <Button
                     onClick={() => {
                       setIsEditingUsername(false);
-                      setUsername(user?.username || "");
+                      setUsername(user?.username || user?.name || "");
                     }}
                     variant="outline"
                     className="bg-transparent border-neutral-700 text-white hover:bg-neutral-800"

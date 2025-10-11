@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { UserAccountMenu } from "@/components/UserAccountMenu";
-import { useSession } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
 
 // A reusable NavLink component to keep the main navigation clean
 // and handle the active/hover animation logic.
@@ -29,7 +29,7 @@ const NavLink = ({ to, children }: { to: string; children: React.ReactNode }) =>
 };
 
 const Navigation = () => {
-  const { data: session, isPending } = useSession();
+  const { user, isLoading } = useAuth();
 
   return (
     <nav className="bg-[#111111] sticky top-0 z-50">
@@ -52,12 +52,12 @@ const Navigation = () => {
           </div>
 
           {/* Show user menu if logged in, otherwise show Explore Now button */}
-          {isPending ? (
+          {isLoading ? (
             // Loading state - show a skeleton or nothing
             <div className="h-10 w-10 rounded-full bg-neutral-800 animate-pulse" />
-          ) : session?.user ? (
+          ) : user ? (
             // User is logged in - show account menu
-            <UserAccountMenu user={session.user} />
+            <UserAccountMenu user={user} />
           ) : (
             // User is not logged in - show Explore Now button
             <Link to="/signin">
