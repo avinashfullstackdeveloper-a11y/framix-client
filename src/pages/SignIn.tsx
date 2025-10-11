@@ -48,10 +48,17 @@ const SignIn: React.FC = () => {
       setShouldNavigate(true);
     } catch (err: any) {
       console.error("SignIn error:", err);
-      setError(err.message || "An error occurred");
+      setError((err as Error).message || "An error occurred");
       setIsLoading(false);
     }
   };
+
+  // Redirect when signed in
+  React.useEffect(() => {
+    if (signedIn) {
+      navigate("/components", { replace: true });
+    }
+  }, [signedIn, navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

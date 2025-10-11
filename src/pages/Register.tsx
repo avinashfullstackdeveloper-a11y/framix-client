@@ -42,7 +42,6 @@ const Register: React.FC = () => {
         email,
         password,
         name: username,
-        username,
       });
 
       console.log("SignUp result:", result);
@@ -57,10 +56,17 @@ const Register: React.FC = () => {
       setShouldNavigate(true);
     } catch (err: any) {
       console.error("SignUp error:", err);
-      setError(err.message || "An error occurred");
+      setError((err as Error).message || "An error occurred");
       setIsLoading(false);
     }
   };
+
+  // Redirect when registered
+  React.useEffect(() => {
+    if (registered) {
+      navigate("/components", { replace: true });
+    }
+  }, [registered, navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
