@@ -15,6 +15,7 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [registered, setRegistered] = useState(false);
 
   // Handle Email/Password Registration
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +33,6 @@ const Register: React.FC = () => {
         email,
         password,
         name: username,
-        username,
       });
 
       console.log("SignUp result:", result);
@@ -43,19 +43,22 @@ const Register: React.FC = () => {
         return;
       }
 
-      // Navigate to components page on successful registration
-      console.log("Navigating to /components");
-
-      // Small delay to ensure session is set
-      setTimeout(() => {
-        navigate("/components", { replace: true });
-      }, 100);
-    } catch (err: any) {
+      // Mark as registered, let useEffect handle redirect
+      setRegistered(true);
+      setIsLoading(false);
+    } catch (err) {
       console.error("SignUp error:", err);
-      setError(err.message || "An error occurred");
+      setError((err as Error).message || "An error occurred");
       setIsLoading(false);
     }
   };
+
+  // Redirect when registered
+  React.useEffect(() => {
+    if (registered) {
+      navigate("/components", { replace: true });
+    }
+  }, [registered, navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

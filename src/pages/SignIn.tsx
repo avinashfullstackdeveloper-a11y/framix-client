@@ -13,6 +13,7 @@ const SignIn: React.FC = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [signedIn, setSignedIn] = useState(false);
 
   // Handle Email/Password Login
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,19 +35,22 @@ const SignIn: React.FC = () => {
         return;
       }
 
-      // Navigate to components page on successful login
-      console.log("Navigating to /components");
-
-      // Small delay to ensure session is set
-      setTimeout(() => {
-        navigate("/components", { replace: true });
-      }, 100);
-    } catch (err: any) {
+      // Mark as signed in, let useEffect handle redirect
+      setSignedIn(true);
+      setIsLoading(false);
+    } catch (err) {
       console.error("SignIn error:", err);
-      setError(err.message || "An error occurred");
+      setError((err as Error).message || "An error occurred");
       setIsLoading(false);
     }
   };
+
+  // Redirect when signed in
+  React.useEffect(() => {
+    if (signedIn) {
+      navigate("/components", { replace: true });
+    }
+  }, [signedIn, navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
