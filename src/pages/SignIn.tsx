@@ -4,15 +4,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import React, { useState, useEffect } from "react";
+import { authClient, useSession } from "@/lib/auth-client";
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
+  const { data: session } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [shouldNavigate, setShouldNavigate] = useState(false);
+
+  // Navigate to components page once session is established
+  useEffect(() => {
+    if (shouldNavigate && session?.user) {
+      console.log("Session established, navigating to /components");
+      navigate("/components", { replace: true });
+    }
+  }, [session, shouldNavigate, navigate]);
 
   // Handle Email/Password Login
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,13 +44,8 @@ const SignIn: React.FC = () => {
         return;
       }
 
-      // Navigate to components page on successful login
-      console.log("Navigating to /components");
-
-      // Small delay to ensure session is set
-      setTimeout(() => {
-        navigate("/components", { replace: true });
-      }, 100);
+      // Set flag to navigate once session is established
+      setShouldNavigate(true);
     } catch (err: any) {
       console.error("SignIn error:", err);
       setError(err.message || "An error occurred");
