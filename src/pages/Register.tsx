@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -38,6 +40,12 @@ const Register: React.FC = () => {
       setError((err as Error).message || "An error occurred");
       setIsLoading(false);
     }
+  };
+
+  // Handle OAuth Login
+  const handleOAuthLogin = (provider: 'google' | 'github') => {
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    window.location.href = `${apiUrl}/api/auth/${provider}`;
   };
 
   return (
@@ -111,6 +119,38 @@ const Register: React.FC = () => {
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-neutral-700"></span>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#1a1a1a] px-2 text-neutral-500">Or continue with</span>
+            </div>
+          </div>
+
+          {/* OAuth Buttons */}
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOAuthLogin('google')}
+              className="h-12 bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Google
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOAuthLogin('github')}
+              className="h-12 bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
+            >
+              <FaGithub className="mr-2 h-5 w-5" />
+              GitHub
+            </Button>
+          </div>
 
           {/* Sign In Link */}
           <div className="text-center text-sm text-muted-foreground">
