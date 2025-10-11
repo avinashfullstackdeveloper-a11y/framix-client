@@ -9,7 +9,7 @@ import { authClient, useSession } from "@/lib/auth-client";
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { data: session } = useSession();
+  const { data: session, refetch } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -31,18 +31,21 @@ const SignIn: React.FC = () => {
     setError("");
 
     try {
-      const result = await authClient.signIn.email({
+      const result = await authClient.login({
         email,
         password,
       });
 
       console.log("SignIn result:", result);
 
-      if (result.error) {
-        setError(result.error.message || "Login failed");
+      if (!result.success) {
+        setError(result.error || result.message || "Login failed");
         setIsLoading(false);
         return;
       }
+
+      // Refetch session to get the newly created session
+      await refetch();
 
       // Set flag to navigate once session is established
       setShouldNavigate(true);

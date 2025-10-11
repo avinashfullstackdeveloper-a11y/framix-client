@@ -9,7 +9,7 @@ import { authClient, useSession } from "@/lib/auth-client";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { data: session } = useSession();
+  const { data: session, refetch } = useSession();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,19 +38,22 @@ const Register: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const result = await authClient.signUp.email({
+      const result = await authClient.register({
+        name: username,
         email,
         password,
-        name: username,
       });
 
       console.log("SignUp result:", result);
 
-      if (result.error) {
-        setError(result.error.message || "Registration failed");
+      if (!result.success) {
+        setError(result.error || result.message || "Registration failed");
         setIsLoading(false);
         return;
       }
+
+      // Refetch session to get the newly created session
+      await refetch();
 
       // Set flag to navigate once session is established
       setShouldNavigate(true);

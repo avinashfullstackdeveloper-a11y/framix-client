@@ -1,7 +1,6 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { useNavigate } from "react-router-dom";
 
 type User = {
   id: string;
@@ -29,13 +28,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const { data: session } = await authClient.getSession();
-        if (session?.user) {
+        const result = await authClient.getSession();
+        if (result.user) {
           setUser({
-            id: session.user.id,
-            email: session.user.email,
-            username: session.user.username,
-            name: session.user.name,
+            id: result.user.id,
+            email: result.user.email,
+            name: result.user.name,
           });
         }
       } catch (error) {
@@ -50,21 +48,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     try {
-      const { data, error } = await authClient.signIn.email({
+      const result = await authClient.login({
         email,
         password,
       });
 
-      if (error) {
-        throw new Error(error.message || "Login failed");
+      if (!result.success) {
+        throw new Error(result.error || result.message || "Login failed");
       }
 
-      if (data?.user) {
+      if (result.user) {
         setUser({
-          id: data.user.id,
-          email: data.user.email,
-          username: data.user.username,
-          name: data.user.name,
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
         });
       }
     } catch (error: any) {
@@ -75,23 +72,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string, username: string) => {
     try {
-      const { data, error } = await authClient.signUp.email({
+      const result = await authClient.register({
+        name: username,
         email,
         password,
-        name: username,
-        username,
       });
 
-      if (error) {
-        throw new Error(error.message || "Registration failed");
+      if (!result.success) {
+        throw new Error(result.error || result.message || "Registration failed");
       }
 
-      if (data?.user) {
+      if (result.user) {
         setUser({
-          id: data.user.id,
-          email: data.user.email,
-          username: data.user.username,
-          name: data.user.name,
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
         });
       }
     } catch (error: any) {
@@ -102,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await authClient.signOut();
+      await authClient.logout();
       setUser(null);
     } catch (error) {
       console.error("Logout error:", error);
