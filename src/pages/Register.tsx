@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
@@ -15,7 +16,9 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -65,6 +68,28 @@ const Register: React.FC = () => {
             </div>
           )}
 
+          {/* OAuth Buttons Above Form */}
+          <div className="flex flex-col gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOAuthLogin('google')}
+              className="h-12 bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Google
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOAuthLogin('github')}
+              className="h-12 bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
+            >
+              <FaGithub className="mr-2 h-5 w-5" />
+              GitHub
+            </Button>
+          </div>
+
           {/* Registration Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
@@ -93,29 +118,53 @@ const Register: React.FC = () => {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-muted-foreground text-sm uppercase tracking-wide">PASSWORD</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 bg-secondary border-border focus:ring-primary"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 bg-secondary border-border focus:ring-primary pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-muted-foreground text-sm uppercase tracking-wide">CONFIRM PASSWORD</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="h-12 bg-secondary border-border focus:ring-primary"
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="h-12 bg-secondary border-border focus:ring-primary pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
 
-            <Button type="submit" disabled={isLoading} className="w-full h-12 bg-gradient-primary hover:opacity-90 border-0 mt-6">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-white text-black rounded-full border border-neutral-300 shadow mt-6 transition hover:bg-neutral-100"
+            >
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
           </form>
@@ -131,26 +180,7 @@ const Register: React.FC = () => {
           </div>
 
           {/* OAuth Buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOAuthLogin('google')}
-              className="h-12 bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
-            >
-              <FcGoogle className="mr-2 h-5 w-5" />
-              Google
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOAuthLogin('github')}
-              className="h-12 bg-transparent border-neutral-700 text-white hover:bg-neutral-800"
-            >
-              <FaGithub className="mr-2 h-5 w-5" />
-              GitHub
-            </Button>
-          </div>
+          {/* Removed: now above the form */}
 
           {/* Sign In Link */}
           <div className="text-center text-sm text-muted-foreground">

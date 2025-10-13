@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
@@ -14,6 +15,7 @@ const SignIn: React.FC = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -58,53 +60,8 @@ const SignIn: React.FC = () => {
             </div>
           )}
 
-          {/* Email/Password Form */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-muted-foreground text-sm uppercase tracking-wide">EMAIL</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-12 bg-secondary border-border focus:ring-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-muted-foreground text-sm uppercase tracking-wide">PASSWORD</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 bg-secondary border-border focus:ring-primary"
-              />
-            </div>
-
-            <div className="text-right">
-              <Link to="/forgot-password" className="text-primary text-sm hover:underline">Forgot password ?</Link>
-            </div>
-
-            <Button type="submit" disabled={isLoading} className="w-full h-12 bg-gradient-primary hover:opacity-90 border-0 mt-6">
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-neutral-700"></span>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#1a1a1a] px-2 text-neutral-500">Or continue with</span>
-            </div>
-          </div>
-
-          {/* OAuth Buttons */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* OAuth Buttons Above Form */}
+          <div className="flex flex-col gap-4">
             <Button
               type="button"
               variant="outline"
@@ -124,6 +81,68 @@ const SignIn: React.FC = () => {
               GitHub
             </Button>
           </div>
+
+          {/* Email/Password Form */}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-muted-foreground text-sm uppercase tracking-wide">EMAIL</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-12 bg-secondary border-border focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-muted-foreground text-sm uppercase tracking-wide">PASSWORD</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 bg-secondary border-border focus:ring-primary pr-10"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <Link to="/forgot-password" className="text-primary text-sm hover:underline">Forgot password ?</Link>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-white text-black rounded-full border border-neutral-300 shadow mt-6 transition hover:bg-neutral-100"
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-neutral-700"></span>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#1a1a1a] px-2 text-neutral-500">Or continue with</span>
+            </div>
+          </div>
+
+          {/* OAuth Buttons */}
+          {/* Removed: now above the form */}
 
           {/* Sign Up Link */}
           <div className="text-center text-sm text-muted-foreground">
