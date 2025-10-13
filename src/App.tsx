@@ -17,6 +17,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import PersonalInformation from "./pages/PersonalInformation";
 import NotFound from "./pages/NotFound";
 import AdminComponentUpload from "./pages/AdminComponentUpload";
+import ComponentDetail from "./pages/ComponentDetail";
 
 const queryClient = new QueryClient();
 
@@ -34,11 +35,11 @@ const App: React.FC = () => {
                 <Components />
               </ProtectedRoute>
             } />
-            {/* <Route path="/components/:type/:id" element={
+            <Route path="/components/:type/:id" element={
               <ProtectedRoute>
                 <ComponentDetail />
               </ProtectedRoute>
-            } /> */}
+            } />
             <Route path="/admin-component-upload" element={
               <ProtectedRoute>
                 <AdminComponentUpload />

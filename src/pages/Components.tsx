@@ -58,10 +58,10 @@ const Components = () => {
           {loading ? (
             <div className="col-span-3 text-center text-lg">Loading...</div>
           ) : (
-            components.map((item: { id: string | number; title: string; type: string; preview?: string }) => (
+            components.map((item: { _id: string; title: string; type: string; preview?: string }) => (
               <div
-                key={item.id}
-                onClick={() => navigate(`/components/${item.type}/${item.id}`)}
+                key={item._id}
+                onClick={() => navigate(`/components/${item.type}/${item._id}`)}
                 className="cursor-pointer"
               >
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 group">

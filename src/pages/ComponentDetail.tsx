@@ -15,59 +15,44 @@ type ComponentData = {
 
 const ComponentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [component, setComponent] = useState<ComponentData | null>(null);
+  const [component, setComponent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState<string>("");
 
   useEffect(() => {
-    fetch(`/components/${id}`)
+    fetch(`/api/components/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setComponent(data);
+        setCode(data.code || "");
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, [id]);
 
-  useEffect(() => {
-    if (component) {
-      if (component.react) {
-        setCode(component.react);
-      } else {
-        setCode(
-          [
-            component.html || "",
-            component.css ? `<style>${component.css}</style>` : "",
-            component.js ? `<script>${component.js}</script>` : "",
-          ]
-            .filter(Boolean)
-            .join("\n")
-        );
-      }
-    }
-  }, [component]);
+  // Remove unused effect, code is set in fetch above
 
   if (loading) return <div>Loading...</div>;
   if (!component) return <div>Component not found.</div>;
 
   const renderPreview = () => {
-    if (component?.react) {
+    if (component?.language?.toLowerCase() === "react") {
       return (
-        <LiveProvider code={code} noInline>
+        <LiveProvider code={code}>
           <LivePreview />
           <LiveError />
         </LiveProvider>
       );
     }
-    if (component?.html || component?.css || component?.js) {
+    if (component?.language?.toLowerCase() === "html" || component?.language?.toLowerCase() === "css" || component?.language?.toLowerCase() === "javascript") {
       const srcDoc = `
         <html>
           <head>
-            <style>${component.css || ""}</style>
+            <style>${component.language?.toLowerCase() === "css" ? code : ""}</style>
           </head>
           <body>
-            ${component.html || ""}
-            <script>${component.js || ""}</script>
+            ${component.language?.toLowerCase() === "html" ? code : ""}
+            <script>${component.language?.toLowerCase() === "javascript" ? code : ""}</script>
           </body>
         </html>
       `;
@@ -98,9 +83,11 @@ const ComponentDetail: React.FC = () => {
             height: "400px",
             fontFamily: "monospace",
             fontSize: "1rem",
-            border: "1px solid #ccc",
+            border: "1px solid #333",
             padding: "1rem",
-            background: "#fafafa",
+            background: "#222",
+            color: "#fafafa",
+            resize: "vertical",
           }}
         />
       </div>
