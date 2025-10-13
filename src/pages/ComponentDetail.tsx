@@ -71,14 +71,26 @@ const ComponentDetail: React.FC = () => {
       );
     }
 
+    if (component?.language?.toLowerCase() === "multi") {
+      return (
+        <div className="preview-container">
+          <iframe
+            title="Live Preview"
+            srcDoc={component.code}
+            className="preview-iframe"
+          />
+        </div>
+      );
+    }
+
     if (["html", "css", "javascript"].includes(component?.language?.toLowerCase())) {
       const srcDoc = `
         <!DOCTYPE html>
         <html>
           <head>
             <style>
-              body { 
-                margin: 0; 
+              body {
+                margin: 0;
                 padding: 20px;
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                 background: transparent;
@@ -113,6 +125,7 @@ const ComponentDetail: React.FC = () => {
 
   const getLanguageForHighlighting = () => {
     const lang = component?.language?.toLowerCase();
+    if (lang === "multi") return "html";
     if (lang === "javascript") return "javascript";
     if (lang === "html") return "html";
     if (lang === "css") return "css";
@@ -160,21 +173,21 @@ const ComponentDetail: React.FC = () => {
       {/* Main Content */}
       <div className="component-content" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         {/* Preview Panel Side */}
-        <div className="preview-panel active" style={{ height: "auto" }}>
+        <div className="preview-panel active max-h-[32rem] overflow-auto" style={{ height: "auto" }}>
           <div className="panel-header">
             <h3>Preview</h3>
           </div>
-          <div className="panel-content">
+          <div className="panel-content max-h-[28rem] overflow-auto">
             {renderPreview()}
           </div>
         </div>
 
         {/* Code Panel Side */}
-        <div className="code-panel active" style={{ height: "auto" }}>
+        <div className="code-panel active max-h-[32rem] overflow-auto" style={{ height: "auto" }}>
           <div className="panel-header">
             <h3>Code</h3>
           </div>
-          <div className="panel-content">
+          <div className="panel-content max-h-[28rem] overflow-auto">
             <div className="code-editor">
               <div className="editor-header">
                 <span className="file-name">{component.name}.{getLanguageForHighlighting()}</span>
@@ -186,19 +199,21 @@ const ComponentDetail: React.FC = () => {
                   📄
                 </button>
               </div>
-              <SyntaxHighlighter
-                language={getLanguageForHighlighting()}
-                style={vscDarkPlus}
-                customStyle={{
-                  margin: 0,
-                  borderRadius: "0 0 12px 12px",
-                  fontSize: "14px",
-                  lineHeight: "1.5",
-                }}
-                showLineNumbers
-              >
-                {code}
-              </SyntaxHighlighter>
+              <div style={{ maxHeight: "24rem", overflow: "auto" }}>
+                <SyntaxHighlighter
+                  language={getLanguageForHighlighting()}
+                  style={vscDarkPlus}
+                  customStyle={{
+                    margin: 0,
+                    borderRadius: "0 0 12px 12px",
+                    fontSize: "14px",
+                    lineHeight: "1.5",
+                  }}
+                  showLineNumbers
+                >
+                  {code}
+                </SyntaxHighlighter>
+              </div>
             </div>
             
             {/* Editable Code Area (Hidden by default, can be toggled) */}
@@ -210,6 +225,7 @@ const ComponentDetail: React.FC = () => {
                   onChange={e => setCode(e.target.value)}
                   className="code-textarea"
                   spellCheck="false"
+                  style={{ maxHeight: "12rem", overflow: "auto" }}
                 />
               </details>
             </div>

@@ -13,9 +13,12 @@ const AdminComponentUpload: React.FC = () => {
   const [form, setForm] = useState({
     title: "",
     type: "",
-    language: "",
-    code: "",
+    language: "html",
+    html: "",
+    css: "",
+    js: "",
   });
+  const [activeTab, setActiveTab] = useState<"html" | "css" | "js">("html");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -35,6 +38,11 @@ const AdminComponentUpload: React.FC = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleTabChange = (tab: "html" | "css" | "js") => {
+    setActiveTab(tab);
+    setForm((prev) => ({ ...prev, language: tab }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -42,14 +50,21 @@ const AdminComponentUpload: React.FC = () => {
     setSuccess(false);
 
     try {
-      let res: Response;
+      // Determine if multiple code fields are filled
+      const codeFields = [form.html, form.css, form.js].filter(Boolean);
+      const multiLang = codeFields.length > 1;
       const jsonBody = {
         title: form.title,
         type: form.type,
-        language: form.language,
-        code: form.code,
+        language: multiLang ? "multi" : form.language,
+        code: multiLang
+          ? `${form.html}\n<style>${form.css}</style>\n<script>${form.js}</script>`
+          : form.html || form.css || form.js,
+        html: form.html,
+        css: form.css,
+        js: form.js,
       };
-      res = await fetch("/api/components", {
+      const res = await fetch("/api/components", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(jsonBody),
@@ -63,8 +78,10 @@ const AdminComponentUpload: React.FC = () => {
       setForm({
         title: "",
         type: "",
-        language: "",
-        code: "",
+        language: "html",
+        html: "",
+        css: "",
+        js: "",
       });
     } catch (err) {
       if (err instanceof Error) {
@@ -109,32 +126,82 @@ const AdminComponentUpload: React.FC = () => {
             className="bg-gray-50 border border-gray-300 text-gray-900"
           />
         </div>
-        <div>
-          <Label htmlFor="language" className="text-gray-800 mb-1 block">
-            Language
-          </Label>
-          <Input
-            id="language"
-            name="language"
-            value={form.language}
-            onChange={handleChange}
-            required
-            className="bg-gray-50 border border-gray-300 text-gray-900"
-          />
+        {/* Dynamic Editor Tabs */}
+        <div className="mb-2 flex gap-2">
+          <Button
+            type="button"
+            variant={activeTab === "html" ? "default" : "outline"}
+            onClick={() => handleTabChange("html")}
+            className={activeTab === "html" ? "bg-primary text-white" : ""}
+          >
+            HTML
+          </Button>
+          <Button
+            type="button"
+            variant={activeTab === "css" ? "default" : "outline"}
+            onClick={() => handleTabChange("css")}
+            className={activeTab === "css" ? "bg-primary text-white" : ""}
+          >
+            CSS
+          </Button>
+          <Button
+            type="button"
+            variant={activeTab === "js" ? "default" : "outline"}
+            onClick={() => handleTabChange("js")}
+            className={activeTab === "js" ? "bg-primary text-white" : ""}
+          >
+            JavaScript
+          </Button>
         </div>
         <div>
-          <Label htmlFor="code" className="text-gray-800 mb-1 block">
-            Code
-          </Label>
-          <Textarea
-            id="code"
-            name="code"
-            value={form.code}
-            onChange={handleChange}
-            required
-            rows={8}
-            className="bg-gray-50 border border-gray-300 text-gray-900"
-          />
+          {activeTab === "html" && (
+            <>
+              <Label htmlFor="html" className="text-gray-800 mb-1 block">
+                HTML Code
+              </Label>
+              <Textarea
+                id="html"
+                name="html"
+                value={form.html}
+                onChange={handleChange}
+                rows={8}
+                className="bg-gray-50 border border-gray-300 text-gray-900"
+                required={activeTab === "html"}
+              />
+            </>
+          )}
+          {activeTab === "css" && (
+            <>
+              <Label htmlFor="css" className="text-gray-800 mb-1 block">
+                CSS Code
+              </Label>
+              <Textarea
+                id="css"
+                name="css"
+                value={form.css}
+                onChange={handleChange}
+                rows={8}
+                className="bg-gray-50 border border-gray-300 text-gray-900"
+                required={activeTab === "css"}
+              />
+            </>
+          )}
+          {activeTab === "js" && (
+            <>
+              <Label htmlFor="js" className="text-gray-800 mb-1 block">
+                JavaScript Code
+              </Label>
+              <Textarea
+                id="js"
+                name="js"
+                value={form.js}
+                onChange={handleChange}
+                rows={8}
+                className="bg-gray-50 border border-gray-300 text-gray-900"
+                required={activeTab === "js"}
+              />
+            </>
+          )}
         </div>
         {error && <div className="text-red-500 font-semibold">{error}</div>}
         {success && (

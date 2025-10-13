@@ -110,6 +110,12 @@ const Components = () => {
                             <LiveError className="live-error" />
                           </LiveProvider>
                         </div>
+                      ) : item.language.toLowerCase() === "multi" ? (
+                        <iframe
+                          title="Preview"
+                          srcDoc={item.code}
+                          className="w-full aspect-square min-h-[6rem] rounded-lg border overflow-auto"
+                        />
                       ) : (
                         <iframe
                           title="Preview"
