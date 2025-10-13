@@ -1,10 +1,11 @@
 // ComponentDetail.tsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "../index.css";
+import { Button } from "@/components/ui/button";
 
 type ComponentData = {
   id: string;
@@ -21,6 +22,7 @@ type ComponentData = {
 
 const ComponentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [component, setComponent] = useState<ComponentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState<string>("");
@@ -141,13 +143,41 @@ const ComponentDetail: React.FC = () => {
   };
 
   return (
-    <div className={`component-detail ${isFullscreen ? "fullscreen" : ""}`}>
+    <div className={`component-detail ${isFullscreen ? "fullscreen" : ""}`} style={{ position: "relative" }}>
+      {/* Go Back Button */}
+      <div
+        style={{
+          position: "absolute",
+          top: "2rem",
+          left: "2rem",
+          zIndex: 10,
+        }}
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate(-1)}
+          aria-label="Go Back"
+          style={{
+            background: "#222",
+            color: "#fff",
+            border: "none",
+            fontWeight: "bold",
+            fontSize: "1.1rem",
+            borderRadius: "8px",
+            padding: "0.5rem 1.25rem",
+            cursor: "pointer",
+            transition: "transform 0.15s",
+          }}
+        >
+          ← Go Back
+        </Button>
+      </div>
       {/* Header */}
       <header className="component-header">
         <div className="header-content">
           <h1 className="component-title">{component.name}</h1>
           <div className="component-meta">
-            <span className="language-badge">{component.language}</span>
             {component.tags && component.tags.length > 0 && (
               <div className="tags">
                 {component.tags.map((tag, index) => (
@@ -159,12 +189,29 @@ const ComponentDetail: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="header-actions">
+        <div
+          className="header-actions"
+          style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+        >
+          <span
+            className="language-badge"
+            style={{
+              fontWeight: "bold",
+              fontSize: "1rem",
+              color: "#6366f1",
+              background: "#eef2ff",
+              borderRadius: "8px",
+              padding: "0.25rem 0.75rem",
+              marginRight: "0.5rem",
+            }}
+          >
+            {component.language}
+          </span>
           <button
             className="copy-button"
             onClick={() => navigator.clipboard.writeText(code)}
           >
-            📋 Copy Code
+            Copy Code
           </button>
         </div>
       </header>
@@ -213,7 +260,14 @@ const ComponentDetail: React.FC = () => {
             style={{ maxHeight: "36rem", overflow: "auto" }}
           >
             <div className="code-editor">
-              <div className="editor-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div
+                className="editor-header"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <span className="file-name">
                   {component.name}.{getLanguageForHighlighting()}
                 </span>
@@ -274,6 +328,20 @@ const ComponentDetail: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+      {/* Horizontal Action Bar */}
+      <div
+        className="component-action-bar"
+        style={{
+          gridColumn: "1 / span 2",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "1rem",
+          padding: "1.25rem 0 0 0",
+        }}
+      >
+        <Button variant="default">Save to Favourite</Button>
+        <Button variant="outline">Export</Button>
       </div>
     </div>
   );
