@@ -4,8 +4,12 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminComponentUpload: React.FC = () => {
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
     type: "",
@@ -15,6 +19,13 @@ const AdminComponentUpload: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Redirect non-admin users
+  React.useEffect(() => {
+    if (!isLoading && (!user || user.role !== "admin")) {
+      navigate("/");
+    }
+  }, [user, isLoading, navigate]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

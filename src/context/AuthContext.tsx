@@ -7,6 +7,7 @@ type User = {
   email: string;
   username?: string;
   name?: string;
+  role?: string;
 };
 
 type AuthContextType = {
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: result.user.email,
             name: result.user.name,
             username: result.user.name, // Use name as username for display
+            role: result.user.role,
           });
         }
       } catch (error) {
