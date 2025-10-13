@@ -18,6 +18,7 @@ import PersonalInformation from "./pages/PersonalInformation";
 import NotFound from "./pages/NotFound";
 import AdminComponentUpload from "./pages/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
+import Favourite from "./pages/Favourite";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,11 @@ const App: React.FC = () => {
             <Route path="/settings/personal" element={
               <ProtectedRoute>
                 <PersonalInformation />
+              </ProtectedRoute>
+            } />
+            <Route path="/favourite" element={
+              <ProtectedRoute>
+                <Favourite />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

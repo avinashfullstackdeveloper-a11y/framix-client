@@ -6,6 +6,8 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import "../index.css";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 type ComponentData = {
   id: string;
@@ -30,8 +32,26 @@ const ComponentDetail: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Favourites state
+  const [isFavourited, setIsFavourited] = useState(false);
+  const [savingFavourite, setSavingFavourite] = useState(false);
+
+  const { toast } = useToast();
+  // Use only user from AuthContext, get token from user if available
+  const { user } = useAuth();
+  // Get token from user context or localStorage if available
+  const token =
+    // Try user.token, fallback to localStorage, avoid 'any' type
+    ("token" in (user ?? {}) ? (user as { token?: string }).token : undefined) ||
+    localStorage.getItem("token") ||
+    "";
+
   useEffect(() => {
-    fetch(`/api/components/${id}`)
+    fetch(`/api/components/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setComponent(data);
@@ -39,7 +59,93 @@ const ComponentDetail: React.FC = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [id]);
+  }, [id, token]);
+
+  // Check if already favourited
+  useEffect(() => {
+    if (!id || !user) return;
+    // Instead of GET /api/favourites/:id, fetch all and check if current id is favourited
+    fetch(`/api/favourites`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch favourites");
+        return res.json();
+      })
+      .then((data) => {
+        // data is array of favourites, check if any matches current id
+        const found = Array.isArray(data) && data.some(fav => fav.component && (fav.component._id === id || fav.component === id));
+        setIsFavourited(found);
+      })
+      .catch(() => setIsFavourited(false));
+  }, [id, user, token]);
+
+  // Toggle Favourite handler
+  const handleToggleFavourite = async () => {
+    if (!id || !user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to manage favourites.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSavingFavourite(true);
+    try {
+      if (!isFavourited) {
+        // Add to favourites
+        const res = await fetch("/api/favourites", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ component: id }),
+        });
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to save favourite");
+        }
+        setIsFavourited(true);
+        toast({
+          title: "Saved!",
+          description: "Component added to your favourites.",
+          variant: "default",
+        });
+      } else {
+        // Remove from favourites
+        const res = await fetch(`/api/favourites/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to remove favourite");
+        }
+        setIsFavourited(false);
+        toast({
+          title: "Removed!",
+          description: "Component removed from your favourites.",
+          variant: "default",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description:
+          err instanceof Error
+            ? err.message
+            : "Could not update favourite. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingFavourite(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -65,10 +171,37 @@ const ComponentDetail: React.FC = () => {
   const renderPreview = () => {
     if (component?.language?.toLowerCase() === "react") {
       return (
-        <div className="preview-container">
+        <div
+          className="preview-container"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            width: "100%",
+          }}
+        >
           <LiveProvider code={code}>
-            <div className="live-preview-wrapper">
-              <LivePreview />
+            <div
+              className="live-preview-wrapper"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <LivePreview
+                style={{
+                  margin: 0,
+                  width: "auto",
+                  height: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              />
             </div>
             <LiveError className="live-error" />
           </LiveProvider>
@@ -78,11 +211,26 @@ const ComponentDetail: React.FC = () => {
 
     if (component?.language?.toLowerCase() === "multi") {
       return (
-        <div className="preview-container">
+        <div
+          className="preview-container"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            width: "100%",
+          }}
+        >
           <iframe
             title="Live Preview"
             srcDoc={component.code}
             className="preview-iframe"
+            style={{
+              display: "block",
+              margin: 0,
+              maxWidth: "100%",
+              maxHeight: "100%",
+            }}
           />
         </div>
       );
@@ -114,11 +262,26 @@ const ComponentDetail: React.FC = () => {
         </html>
       `;
       return (
-        <div className="preview-container">
+        <div
+          className="preview-container"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            width: "100%",
+          }}
+        >
           <iframe
             title="Live Preview"
             srcDoc={srcDoc}
             className="preview-iframe"
+            style={{
+              display: "block",
+              margin: 0,
+              maxWidth: "100%",
+              maxHeight: "100%",
+            }}
           />
         </div>
       );
@@ -143,7 +306,10 @@ const ComponentDetail: React.FC = () => {
   };
 
   return (
-    <div className={`component-detail ${isFullscreen ? "fullscreen" : ""}`} style={{ position: "relative" }}>
+    <div
+      className={`component-detail ${isFullscreen ? "fullscreen" : ""}`}
+      style={{ position: "relative" }}
+    >
       {/* Go Back Button */}
       <div
         style={{
@@ -340,7 +506,17 @@ const ComponentDetail: React.FC = () => {
           padding: "1.25rem 0 0 0",
         }}
       >
-        <Button variant="default">Save to Favourite</Button>
+        <Button
+          variant="default"
+          disabled={savingFavourite}
+          onClick={handleToggleFavourite}
+        >
+          {savingFavourite
+            ? "Saving..."
+            : isFavourited
+            ? "Unfavourite"
+            : "Save to Favourite"}
+        </Button>
         <Button variant="outline">Export</Button>
       </div>
     </div>
