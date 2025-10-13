@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +12,19 @@ const Components = () => {
   const [components, setComponents] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleDelete = async (id: string) => {
+    if (!user || user.role !== "admin") return;
+    if (!window.confirm("Are you sure you want to delete this component?")) return;
+    try {
+      const res = await fetch(`/api/components/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete component");
+      setComponents((prev: any[]) => prev.filter((c) => c._id !== id));
+    } catch (err) {
+      alert("Error deleting component");
+    }
+  };
 
   useEffect(() => {
     fetch("/api/components")
@@ -97,6 +111,18 @@ const Components = () => {
                           className="w-24 h-24 rounded-lg border"
                         />
                       )
+                    )}
+                    {/* Admin delete button */}
+                    {user?.role === "admin" && (
+                      <button
+                        className="mt-4 px-3 py-1 bg-red-600 text-white rounded text-xs"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleDelete(item._id);
+                        }}
+                      >
+                        Delete
+                      </button>
                     )}
                   </CardContent>
                 </Card>
