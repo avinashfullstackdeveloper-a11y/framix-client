@@ -13,9 +13,10 @@ import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import ProjectDetail from "./pages/ProjectDetail";
-import ComponentDetail from "./pages/ComponentDetail";
+// import ComponentDetail from "./pages/ComponentDetail";
 import PersonalInformation from "./pages/PersonalInformation";
 import NotFound from "./pages/NotFound";
+import AdminComponentUpload from "./pages/AdminComponentUpload";
 
 const queryClient = new QueryClient();
 
@@ -33,9 +34,14 @@ const App: React.FC = () => {
                 <Components />
               </ProtectedRoute>
             } />
-            <Route path="/components/:type/:id" element={
+            {/* <Route path="/components/:type/:id" element={
               <ProtectedRoute>
                 <ComponentDetail />
+              </ProtectedRoute>
+            } /> */}
+            <Route path="/admin-component-upload" element={
+              <ProtectedRoute>
+                <AdminComponentUpload />
               </ProtectedRoute>
             } />
             <Route path="/projects" element={
