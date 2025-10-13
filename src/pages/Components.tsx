@@ -9,7 +9,14 @@ import { useNavigate } from "react-router-dom";
 
 const Components = () => {
   const filterTabs = ["ALL", "HTML", "CSS", "Figma", "JavaScript"];
-  const [components, setComponents] = useState([]);
+  type ComponentItem = {
+    _id: string;
+    title: string;
+    type: string;
+    code?: string;
+    language?: string;
+  };
+  const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -20,7 +27,7 @@ const Components = () => {
     try {
       const res = await fetch(`/api/components/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete component");
-      setComponents((prev: any[]) => prev.filter((c) => c._id !== id));
+      setComponents((prev: ComponentItem[]) => prev.filter((c) => c._id !== id));
     } catch (err) {
       alert("Error deleting component");
     }
@@ -48,6 +55,17 @@ const Components = () => {
             dashboards — in both design and code.
           </p>
         </div>
+        {/* Admin Upload Button */}
+        {user?.role === "admin" && (
+          <div className="flex justify-center mb-8">
+            <button
+              className="px-4 py-2 bg-primary text-white rounded shadow hover:bg-primary/80 transition"
+              onClick={() => navigate("/admin-component-upload")}
+            >
+              Upload New Component
+            </button>
+          </div>
+        )}
 
         {/* Filter Tabs */}
         <div className="flex justify-center mb-12">
@@ -86,7 +104,7 @@ const Components = () => {
                     {/* Preview based on code and language */}
                     {item.language && item.code && (
                       item.language.toLowerCase() === "react" ? (
-                        <div className="w-full h-24 flex items-center justify-center bg-neutral-900 rounded-lg overflow-hidden">
+                        <div className="w-full aspect-square flex items-center justify-center bg-neutral-900 rounded-lg overflow-auto">
                           <LiveProvider code={item.code}>
                             <LivePreview />
                             <LiveError className="live-error" />
@@ -108,7 +126,7 @@ const Components = () => {
                                 <script>${item.language.toLowerCase() === "javascript" ? item.code : ""}</script>
                               </body>
                             </html>`}
-                          className="w-24 h-24 rounded-lg border"
+                          className="w-full aspect-square min-h-[6rem] rounded-lg border overflow-auto"
                         />
                       )
                     )}
