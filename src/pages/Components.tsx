@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
+import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -58,7 +59,7 @@ const Components = () => {
           {loading ? (
             <div className="col-span-3 text-center text-lg">Loading...</div>
           ) : (
-            components.map((item: { _id: string; title: string; type: string; preview?: string }) => (
+            components.map((item: { _id: string; title: string; type: string; code?: string; language?: string }) => (
               <div
                 key={item._id}
                 onClick={() => navigate(`/components/${item.type}/${item._id}`)}
@@ -68,12 +69,34 @@ const Components = () => {
                   <CardContent className="p-8 aspect-square flex flex-col items-center justify-center">
                     <div className="mb-4 text-xl font-semibold">{item.title}</div>
                     <div className="mb-2 text-sm text-muted-foreground">{item.type}</div>
-                    {item.preview && (
-                      <img
-                        src={item.preview}
-                        alt={item.title}
-                        className="w-24 h-24 object-contain rounded-lg border"
-                      />
+                    {/* Preview based on code and language */}
+                    {item.language && item.code && (
+                      item.language.toLowerCase() === "react" ? (
+                        <div className="w-full h-24 flex items-center justify-center bg-neutral-900 rounded-lg overflow-hidden">
+                          <LiveProvider code={item.code}>
+                            <LivePreview />
+                            <LiveError className="live-error" />
+                          </LiveProvider>
+                        </div>
+                      ) : (
+                        <iframe
+                          title="Preview"
+                          srcDoc={`<!DOCTYPE html>
+                            <html>
+                              <head>
+                                <style>
+                                  body { margin: 0; padding: 10px; background: #f8f9fa; }
+                                  ${item.language.toLowerCase() === "css" ? item.code : ""}
+                                </style>
+                              </head>
+                              <body>
+                                ${item.language.toLowerCase() === "html" ? item.code : ""}
+                                <script>${item.language.toLowerCase() === "javascript" ? item.code : ""}</script>
+                              </body>
+                            </html>`}
+                          className="w-24 h-24 rounded-lg border"
+                        />
+                      )
                     )}
                   </CardContent>
                 </Card>
