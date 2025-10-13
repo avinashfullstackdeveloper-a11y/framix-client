@@ -2,6 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from "@/components/ui/dialog";
+import AdminComponentUpload from "./AdminComponentUpload";
+
 import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, { useEffect, useState } from "react";
@@ -18,8 +25,20 @@ const Components = () => {
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const fetchComponents = () => {
+    setLoading(true);
+    fetch("/api/components")
+      .then((res) => res.json())
+      .then((data) => {
+        setComponents(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
 
   const handleDelete = async (id: string) => {
     if (!user || user.role !== "admin") return;
@@ -34,13 +53,7 @@ const Components = () => {
   };
 
   useEffect(() => {
-    fetch("/api/components")
-      .then((res) => res.json())
-      .then((data) => {
-        setComponents(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    fetchComponents();
   }, []);
 
   return (
@@ -58,12 +71,21 @@ const Components = () => {
         {/* Admin Upload Button */}
         {user?.role === "admin" && (
           <div className="flex justify-center mb-8">
-            <button
-              className="px-4 py-2 bg-primary text-white rounded shadow hover:bg-primary/80 transition"
-              onClick={() => navigate("/admin-component-upload")}
-            >
-              Upload New Component
-            </button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="px-4 py-2 bg-primary text-white rounded shadow hover:bg-primary/80 transition">
+                  Upload New Component
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <AdminComponentUpload
+                  onUploadSuccess={() => {
+                    setDialogOpen(false);
+                    fetchComponents();
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         )}
 
