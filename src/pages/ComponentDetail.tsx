@@ -158,43 +158,27 @@ const ComponentDetail: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <div className="component-content">
-        {/* Preview Panel */}
-        <div className={`preview-panel ${activeTab === "preview" ? "active" : ""}`}>
+      <div className="component-content" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+        {/* Preview Panel Side */}
+        <div className="preview-panel active" style={{ height: "auto" }}>
           <div className="panel-header">
             <h3>Preview</h3>
-            <div className="panel-actions">
-              <button 
-                className="tab-button"
-                onClick={() => setActiveTab("code")}
-              >
-                View Code →
-              </button>
-            </div>
           </div>
           <div className="panel-content">
             {renderPreview()}
           </div>
         </div>
 
-        {/* Code Panel */}
-        <div className={`code-panel ${activeTab === "code" ? "active" : ""}`}>
+        {/* Code Panel Side */}
+        <div className="code-panel active" style={{ height: "auto" }}>
           <div className="panel-header">
             <h3>Code</h3>
-            <div className="panel-actions">
-              <button 
-                className="tab-button"
-                onClick={() => setActiveTab("preview")}
-              >
-                ← Back to Preview
-              </button>
-            </div>
           </div>
           <div className="panel-content">
             <div className="code-editor">
               <div className="editor-header">
                 <span className="file-name">{component.name}.{getLanguageForHighlighting()}</span>
-                <button 
+                <button
                   className="copy-icon"
                   onClick={() => navigator.clipboard.writeText(code)}
                   title="Copy code"

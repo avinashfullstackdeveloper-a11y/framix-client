@@ -11,8 +11,6 @@ const AdminComponentUpload: React.FC = () => {
     type: "",
     language: "",
     code: "",
-    previewUrl: "",
-    previewFile: null as File | null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,20 +21,7 @@ const AdminComponentUpload: React.FC = () => {
   ) => {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement;
     const { name, value } = target;
-    if (
-      name === "previewFile" &&
-      "files" in target &&
-      target.files &&
-      target.files[0]
-    ) {
-      setForm((prev) => ({
-        ...prev,
-        previewFile: target.files![0],
-        previewUrl: "",
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    }
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,31 +32,17 @@ const AdminComponentUpload: React.FC = () => {
 
     try {
       let res: Response;
-      if (form.previewFile) {
-        const formData = new FormData();
-        formData.append("title", form.title);
-        formData.append("type", form.type);
-        formData.append("language", form.language);
-        formData.append("code", form.code);
-        formData.append("preview", form.previewFile);
-        res = await fetch("/api/components", {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        const jsonBody = {
-          title: form.title,
-          type: form.type,
-          language: form.language,
-          code: form.code,
-          preview: form.previewUrl,
-        };
-        res = await fetch("/api/components", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(jsonBody),
-        });
-      }
+      const jsonBody = {
+        title: form.title,
+        type: form.type,
+        language: form.language,
+        code: form.code,
+      };
+      res = await fetch("/api/components", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jsonBody),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to upload component");
@@ -83,8 +54,6 @@ const AdminComponentUpload: React.FC = () => {
         type: "",
         language: "",
         code: "",
-        previewUrl: "",
-        previewFile: null,
       });
     } catch (err) {
       if (err instanceof Error) {
@@ -153,33 +122,6 @@ const AdminComponentUpload: React.FC = () => {
             onChange={handleChange}
             required
             rows={8}
-            className="bg-gray-50 border border-gray-300 text-gray-900"
-          />
-        </div>
-        <div>
-          <Label htmlFor="previewUrl" className="text-gray-800 mb-1 block">
-            Preview (URL)
-          </Label>
-          <Input
-            id="previewUrl"
-            name="previewUrl"
-            value={form.previewUrl}
-            onChange={handleChange}
-            type="url"
-            placeholder="Optional: Preview URL"
-            className="bg-gray-50 border border-gray-300 text-gray-900"
-          />
-        </div>
-        <div>
-          <Label htmlFor="previewFile" className="text-gray-800 mb-1 block">
-            Preview (File)
-          </Label>
-          <Input
-            id="previewFile"
-            name="previewFile"
-            type="file"
-            accept="image/*,video/*"
-            onChange={handleChange}
             className="bg-gray-50 border border-gray-300 text-gray-900"
           />
         </div>
