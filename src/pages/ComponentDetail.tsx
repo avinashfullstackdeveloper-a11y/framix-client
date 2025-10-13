@@ -25,6 +25,7 @@ const ComponentDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
+  const [isEditing, setIsEditing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -52,7 +53,9 @@ const ComponentDetail: React.FC = () => {
       <div className="error-container">
         <div className="error-icon">⚠️</div>
         <h2>Component not found</h2>
-        <p>The component you're looking for doesn't exist or has been removed.</p>
+        <p>
+          The component you're looking for doesn't exist or has been removed.
+        </p>
       </div>
     );
   }
@@ -83,7 +86,9 @@ const ComponentDetail: React.FC = () => {
       );
     }
 
-    if (["html", "css", "javascript"].includes(component?.language?.toLowerCase())) {
+    if (
+      ["html", "css", "javascript"].includes(component?.language?.toLowerCase())
+    ) {
       const srcDoc = `
         <!DOCTYPE html>
         <html>
@@ -100,7 +105,9 @@ const ComponentDetail: React.FC = () => {
           </head>
           <body>
             ${component.language?.toLowerCase() === "html" ? code : ""}
-            <script>${component.language?.toLowerCase() === "javascript" ? code : ""}</script>
+            <script>${
+              component.language?.toLowerCase() === "javascript" ? code : ""
+            }</script>
           </body>
         </html>
       `;
@@ -144,21 +151,19 @@ const ComponentDetail: React.FC = () => {
             {component.tags && component.tags.length > 0 && (
               <div className="tags">
                 {component.tags.map((tag, index) => (
-                  <span key={index} className="tag">#{tag}</span>
+                  <span key={index} className="tag">
+                    #{tag}
+                  </span>
                 ))}
               </div>
             )}
           </div>
         </div>
         <div className="header-actions">
-          <button 
-            className="icon-button"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          <button
+            className="copy-button"
+            onClick={() => navigator.clipboard.writeText(code)}
           >
-            {isFullscreen ? "⤵️" : "⤴️"}
-          </button>
-          <button className="copy-button" onClick={() => navigator.clipboard.writeText(code)}>
             📋 Copy Code
           </button>
         </div>
@@ -171,63 +176,101 @@ const ComponentDetail: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <div className="component-content" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
+      <div
+        className="component-content"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "2rem",
+          minHeight: "32rem",
+          maxHeight: "40rem",
+        }}
+      >
         {/* Preview Panel Side */}
-        <div className="preview-panel active max-h-[32rem] overflow-auto" style={{ height: "auto" }}>
+        <div
+          className="preview-panel active"
+          style={{ height: "100%", maxHeight: "40rem", overflow: "auto" }}
+        >
           <div className="panel-header">
             <h3>Preview</h3>
           </div>
-          <div className="panel-content max-h-[28rem] overflow-auto">
+          <div
+            className="panel-content"
+            style={{ maxHeight: "36rem", overflow: "auto" }}
+          >
             {renderPreview()}
           </div>
         </div>
 
         {/* Code Panel Side */}
-        <div className="code-panel active max-h-[32rem] overflow-auto" style={{ height: "auto" }}>
-          <div className="panel-header">
-            <h3>Code</h3>
-          </div>
-          <div className="panel-content max-h-[28rem] overflow-auto">
+        <div
+          className="code-panel active"
+          style={{ height: "100%", maxHeight: "40rem", overflow: "auto" }}
+        >
+          {/* Removed code panel heading */}
+          <div
+            className="panel-content"
+            style={{ maxHeight: "36rem", overflow: "auto" }}
+          >
             <div className="code-editor">
-              <div className="editor-header">
-                <span className="file-name">{component.name}.{getLanguageForHighlighting()}</span>
-                <button
-                  className="copy-icon"
-                  onClick={() => navigator.clipboard.writeText(code)}
-                  title="Copy code"
-                >
-                  📄
-                </button>
+              <div className="editor-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span className="file-name">
+                  {component.name}.{getLanguageForHighlighting()}
+                </span>
+                <div>
+                  <button
+                    className="copy-icon"
+                    onClick={() => navigator.clipboard.writeText(code)}
+                    title="Copy code"
+                  >
+                    📄
+                  </button>
+                  <button
+                    className="edit-toggle"
+                    style={{ marginLeft: "0.5rem" }}
+                    onClick={() => setIsEditing((prev) => !prev)}
+                  >
+                    {isEditing ? "Save" : "Edit Code"}
+                  </button>
+                </div>
               </div>
-              <div style={{ maxHeight: "24rem", overflow: "auto" }}>
-                <SyntaxHighlighter
-                  language={getLanguageForHighlighting()}
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    borderRadius: "0 0 12px 12px",
-                    fontSize: "14px",
-                    lineHeight: "1.5",
-                  }}
-                  showLineNumbers
-                >
-                  {code}
-                </SyntaxHighlighter>
+              <div style={{ maxHeight: "32rem", overflow: "auto" }}>
+                {isEditing ? (
+                  <textarea
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    className="code-textarea"
+                    spellCheck="false"
+                    style={{
+                      width: "100%",
+                      height: "28rem",
+                      fontFamily: "monospace",
+                      fontSize: "14px",
+                      borderRadius: "0 0 12px 12px",
+                      padding: "1rem",
+                      boxSizing: "border-box",
+                      resize: "vertical",
+                      background: "#1e1e1e",
+                      color: "#fff",
+                      border: "1px solid #333",
+                    }}
+                  />
+                ) : (
+                  <SyntaxHighlighter
+                    language={getLanguageForHighlighting()}
+                    style={vscDarkPlus}
+                    customStyle={{
+                      margin: 0,
+                      borderRadius: "0 0 12px 12px",
+                      fontSize: "14px",
+                      lineHeight: "1.5",
+                    }}
+                    showLineNumbers
+                  >
+                    {code}
+                  </SyntaxHighlighter>
+                )}
               </div>
-            </div>
-            
-            {/* Editable Code Area (Hidden by default, can be toggled) */}
-            <div className="editable-code-section">
-              <details className="edit-details">
-                <summary>Edit Code</summary>
-                <textarea
-                  value={code}
-                  onChange={e => setCode(e.target.value)}
-                  className="code-textarea"
-                  spellCheck="false"
-                  style={{ maxHeight: "12rem", overflow: "auto" }}
-                />
-              </details>
             </div>
           </div>
         </div>
