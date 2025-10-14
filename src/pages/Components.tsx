@@ -124,7 +124,7 @@ const Components = () => {
       </div>
 
       {/* Components Grid */}
-      <div className="flex flex-wrap items-center align-content-center gap-6 w-[1286px] mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
         {loading ? (
           <div className="text-center text-lg w-full">Loading...</div>
         ) : (
@@ -134,14 +134,15 @@ const Components = () => {
               onClick={() => navigate(`/components/${item.type}/${item._id}`)}
               className="cursor-pointer"
             >
-              <div className="flex w-[411px] h-[269px] flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-[30px] border-solid border-[#3A3A3A] max-md:w-[calc(50%_-_10px)] max-sm:w-full max-sm:h-60 cursor-pointer group">
+              <div className="flex w-full sm:w-[411px] h-[269px] flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-[30px] border-solid border-[#3A3A3A] max-md:w-[calc(50%_-_10px)] max-sm:w-full max-sm:h-60 cursor-pointer group">
                 <div className="flex h-[251px] flex-col justify-center items-center shrink-0 self-stretch absolute w-[379px] bg-black px-14 py-[121px] rounded-[30px] left-4 top-2.5 max-sm:h-[220px] max-sm:px-10 max-sm:py-[100px] group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease]">
                   {/* Preview based on code and language */}
                   {item.language &&
                     item.code &&
                     (item.language.toLowerCase() === "react" ? (
-                      <div className="w-full h-full flex items-center justify-center bg-neutral-900 rounded-lg overflow-auto">
+                      <div className="w-full h-full flex items-center justify-center bg-neutral-900 rounded-lg overflow-hidden">
                         <LiveProvider code={item.code}>
+                          <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
                           <LivePreview />
                           <LiveError className="live-error" />
                         </LiveProvider>
