@@ -31,26 +31,14 @@ const App: React.FC = () => {
           <Sonner />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/components" element={
-              <ProtectedRoute>
-                <Components />
-              </ProtectedRoute>
-            } />
-            <Route path="/components/:type/:id" element={
-              <ProtectedRoute>
-                <ComponentDetail />
-              </ProtectedRoute>
-            } />
+            <Route path="/components" element={<Components />} />
+            <Route path="/components/:type/:id" element={<ComponentDetail />} />
             <Route path="/admin-component-upload" element={
               <ProtectedRoute>
                 <AdminComponentUpload />
               </ProtectedRoute>
             } />
-            <Route path="/projects" element={
-              <ProtectedRoute>
-                <Projects />
-              </ProtectedRoute>
-            } />
+            <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:id" element={
               <ProtectedRoute>
                 <ProjectDetail />
