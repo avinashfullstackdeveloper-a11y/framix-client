@@ -28,6 +28,8 @@ const Components = () => {
     type: string;
     code?: string;
     language?: string;
+    badge?: "Free" | "Pro";
+    stats?: string;
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,51 +124,38 @@ const Components = () => {
       </div>
 
       {/* Components Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="flex flex-wrap items-center align-content-center gap-6 w-[1286px] mx-auto">
         {loading ? (
-          <div className="col-span-3 text-center text-lg">Loading...</div>
+          <div className="text-center text-lg w-full">Loading...</div>
         ) : (
-          components.map(
-            (item: {
-              _id: string;
-              title: string;
-              type: string;
-              code?: string;
-              language?: string;
-            }) => (
-              <div
-                key={item._id}
-                onClick={() => navigate(`/components/${item.type}/${item._id}`)}
-                className="cursor-pointer"
-              >
-                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 group">
-                  <CardContent className="p-8 aspect-square flex flex-col items-center justify-center">
-                    <div className="mb-4 text-xl font-semibold">
-                      {item.title}
-                    </div>
-                    <div className="mb-2 text-sm text-muted-foreground">
-                      {item.type}
-                    </div>
-                    {/* Preview based on code and language */}
-                    {item.language &&
-                      item.code &&
-                      (item.language.toLowerCase() === "react" ? (
-                        <div className="w-full aspect-square flex items-center justify-center bg-neutral-900 rounded-lg overflow-auto">
-                          <LiveProvider code={item.code}>
-                            <LivePreview />
-                            <LiveError className="live-error" />
-                          </LiveProvider>
-                        </div>
-                      ) : item.language.toLowerCase() === "multi" ? (
-                        <iframe
-                          title="Preview"
-                          srcDoc={item.code}
-                          className="w-full aspect-square min-h-[6rem] rounded-lg border overflow-auto"
-                        />
-                      ) : (
-                        <iframe
-                          title="Preview"
-                          srcDoc={`<!DOCTYPE html>
+          components.map((item: ComponentItem) => (
+            <div
+              key={item._id}
+              onClick={() => navigate(`/components/${item.type}/${item._id}`)}
+              className="cursor-pointer"
+            >
+              <div className="flex w-[411px] h-[269px] flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-[30px] border-solid border-[#3A3A3A] max-md:w-[calc(50%_-_10px)] max-sm:w-full max-sm:h-60 cursor-pointer group">
+                <div className="flex h-[251px] flex-col justify-center items-center shrink-0 self-stretch absolute w-[379px] bg-black px-14 py-[121px] rounded-[30px] left-4 top-2.5 max-sm:h-[220px] max-sm:px-10 max-sm:py-[100px] group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease]">
+                  {/* Preview based on code and language */}
+                  {item.language &&
+                    item.code &&
+                    (item.language.toLowerCase() === "react" ? (
+                      <div className="w-full h-full flex items-center justify-center bg-neutral-900 rounded-lg overflow-auto">
+                        <LiveProvider code={item.code}>
+                          <LivePreview />
+                          <LiveError className="live-error" />
+                        </LiveProvider>
+                      </div>
+                    ) : item.language.toLowerCase() === "multi" ? (
+                      <iframe
+                        title="Preview"
+                        srcDoc={item.code}
+                        className="w-full h-full min-h-[6rem] rounded-lg border overflow-auto"
+                      />
+                    ) : (
+                      <iframe
+                        title="Preview"
+                        srcDoc={`<!DOCTYPE html>
                             <html>
                               <head>
                                 <style>
@@ -191,26 +180,46 @@ const Components = () => {
                                 }</script>
                               </body>
                             </html>`}
-                          className="w-full aspect-square min-h-[6rem] rounded-lg border overflow-auto"
-                        />
-                      ))}
-                    {/* Admin delete button */}
-                    {user?.role === "admin" && (
-                      <button
-                        className="mt-4 px-3 py-1 bg-red-600 text-white rounded text-xs"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(item._id);
-                        }}
+                        className="w-full h-full min-h-[6rem] rounded-lg border overflow-auto"
+                      />
+                    ))}
+                </div>
+                <div className="flex w-[359px] flex-col justify-center items-start absolute h-11 z-10 left-[26px] bottom-0 max-sm:w-[calc(100%_-_32px)] max-sm:left-4">
+                  <div className="flex justify-between items-center self-stretch mb-2.5">
+                    <h3 className="flex-[1_0_0] text-white text-base font-semibold max-sm:text-sm transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                      {item.title}
+                    </h3>
+                    <div className="flex justify-center items-center rounded pl-3 pr-[11px] pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                      <span
+                        className={`text-sm font-normal max-sm:text-xs ${
+                          item.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
+                        }`}
                       >
-                        Delete
-                      </button>
-                    )}
-                  </CardContent>
-                </Card>
+                        {item.badge || "Free"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex w-[45px] items-center gap-1.5">
+                    <span className="text-white text-[13px] font-light max-sm:text-xs">
+                      {item.stats || ""}
+                    </span>
+                  </div>
+                </div>
+                {/* Admin delete button */}
+                {user?.role === "admin" && (
+                  <button
+                    className="absolute top-2 right-2 px-3 py-1 bg-red-600 text-white rounded text-xs z-20"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(item._id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
-            )
-          )
+            </div>
+          ))
         )}
       </div>
     </div>
