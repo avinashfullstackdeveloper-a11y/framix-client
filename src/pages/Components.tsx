@@ -124,7 +124,7 @@ const Components = () => {
       </div>
 
       {/* Components Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 w-full mx-auto">
         {loading ? (
           <div className="text-center text-lg w-full">Loading...</div>
         ) : (
