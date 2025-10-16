@@ -2,9 +2,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from "@/components/ui/dialog";
 
 const Community = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [popupOpen, setPopupOpen] = useState(false);
+
+  const handleOpenPopup = () => setPopupOpen(true);
+  const handleClosePopup = () => setPopupOpen(false);
+  const handleContinuePopup = () => setPopupOpen(false);
 
   // Sample data for components
   const featuredComponents = [
@@ -208,9 +219,23 @@ const Community = () => {
           <button className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity">
             Browse components
           </button>
-          <button className="border border-primary/50 hover:bg-secondary px-8 py-3 rounded-full font-medium transition-colors">
-            Submit yours
-          </button>
+          <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
+            <DialogTrigger asChild>
+              <button
+                className="border border-primary/50 hover:bg-secondary px-8 py-3 rounded-full font-medium transition-colors"
+                onClick={handleOpenPopup}
+              >
+                Submit yours
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[897px] w-full mx-auto rounded-2xl bg-[rgba(15,15,15,1)] p-0 border-none shadow-none">
+              <ComponentSelectorPopup
+                isOpen={popupOpen}
+                onClose={handleClosePopup}
+                onContinue={handleContinuePopup}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -358,12 +383,27 @@ const Community = () => {
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
           Join thousands of creators sharing their best work with the community
         </p>
-        <button className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity">
-          Submit Component
-        </button>
+        <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
+          <DialogTrigger asChild>
+            <button
+              className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity"
+              onClick={handleOpenPopup}
+            >
+              Submit Component
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-[897px] w-full mx-auto rounded-2xl bg-[rgba(15,15,15,1)] p-0 border-none shadow-none">
+            <ComponentSelectorPopup
+              isOpen={popupOpen}
+              onClose={handleClosePopup}
+              onContinue={handleContinuePopup}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
+    {/* Popup now handled by Dialog above */}
     </div>
   );
-};
+}
 
 export default Community;
