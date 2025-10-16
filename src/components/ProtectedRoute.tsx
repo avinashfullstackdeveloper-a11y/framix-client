@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useSession } from "@/lib/auth-client";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,6 +9,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { data: session, isPending } = useSession();
   const location = useLocation();
+  const { user } = useAuth();
 
   // Show loading state while checking authentication
   if (isPending) {
@@ -22,7 +24,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Redirect to signin if not authenticated
-  if (!session?.user) {
+  // Block access if user state is null (frontend-only deletion)
+  if (!session?.user || !user) {
     // Save the attempted location so we can redirect after login
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }

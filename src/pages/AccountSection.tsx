@@ -9,12 +9,20 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
 }) => {
 
 
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, deleteAccount } = useAuth();
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
 
   // Danger Zone Handlers
+  /**
+   * Handles Delete Account confirmation.
+   * - Calls deleteAccount from AuthContext, which integrates with backend.
+   * - Waits for backend confirmation before clearing local data and logging out.
+   * - Disables UI during deletion.
+   * - Provides user feedback on error.
+   * - Redirects user to SignIn page after deletion.
+   */
   const handleDeleteAccount = async () => {
     if (confirmText !== "DELETE") {
       alert('Please type "DELETE" to confirm account deletion.');
@@ -23,13 +31,23 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
 
     setIsDeleting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      alert("Account deletion initiated. You will be logged out shortly.");
+    try {
+      // Wait for backend confirmation before clearing local data and logging out
+      await deleteAccount();
       setIsDeleting(false);
       setShowConfirmDialog(false);
       setConfirmText("");
-    }, 2000);
+      // Redirect to SignIn page or home (logged-out state)
+      window.location.href = "/signin";
+    } catch (error) {
+      // Show error from backend if available
+      let errorMsg = "Failed to delete account. Please try again.";
+      if (error instanceof Error && error.message) {
+        errorMsg = error.message;
+      }
+      alert(errorMsg);
+      setIsDeleting(false);
+    }
   };
 
   const openDeleteDialog = () => {
