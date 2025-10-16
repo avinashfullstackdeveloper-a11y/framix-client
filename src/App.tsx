@@ -14,7 +14,7 @@ import Register from "./pages/Register";
 // import ComponentDetail from "./pages/ComponentDetail";
 import PersonalInformation from "./pages/PersonalInformation";
 import SettingsPage from "./pages/SettingsPage";
-import NotFound from "./pages/NotFound";
+import NotFoundPage from "./pages/NotFoundPage";
 import AdminComponentUpload from "./pages/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
 import Favourite from "./pages/Favourite";
@@ -57,7 +57,7 @@ const App: React.FC = () => {
                 <Favourite />
               </ProtectedRoute>
             } />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>
       </TooltipProvider>
