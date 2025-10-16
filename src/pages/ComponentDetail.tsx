@@ -320,18 +320,19 @@ const ComponentDetail: React.FC = () => {
         }}
       >
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => navigate(-1)}
           aria-label="Go Back"
           style={{
-            background: "#222",
+            background: "transparent",
             color: "#fff",
             border: "none",
             fontWeight: "bold",
             fontSize: "1.1rem",
-            borderRadius: "8px",
+            borderRadius: "0",
             padding: "0.5rem 1.25rem",
+            boxShadow: "none",
             cursor: "pointer",
             transition: "transform 0.15s",
           }}
@@ -404,9 +405,7 @@ const ComponentDetail: React.FC = () => {
           className="preview-panel active"
           style={{ height: "100%", maxHeight: "40rem", overflow: "auto" }}
         >
-          <div className="panel-header">
-            <h3>Preview</h3>
-          </div>
+          <div className="panel-header"></div>
           <div
             className="panel-content"
             style={{ maxHeight: "36rem", overflow: "auto" }}
