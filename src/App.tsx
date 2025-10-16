@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import AdminComponentUpload from "./pages/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
 import Favourite from "./pages/Favourite";
+import Community from "./pages/Community";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App: React.FC = () => {
                 <ProjectDetail />
               </ProtectedRoute>
             } />
+            <Route path="/community" element={<Community />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/signin" element={<SignIn />} />
