@@ -7,12 +7,10 @@ import Layout from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Components from "./pages/Components";
-import Projects from "./pages/Projects";
 import Blogs from "./pages/Blogs";
 import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
-import ProjectDetail from "./pages/ProjectDetail";
 // import ComponentDetail from "./pages/ComponentDetail";
 import PersonalInformation from "./pages/PersonalInformation";
 import SettingsPage from "./pages/SettingsPage";
@@ -21,6 +19,8 @@ import AdminComponentUpload from "./pages/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
 import Favourite from "./pages/Favourite";
 import Community from "./pages/Community";
+import Templates from "./pages/Template";
+import TemplateDetail from "./pages/TemplateDetail";
 
 const queryClient = new QueryClient();
 
@@ -40,8 +40,8 @@ const App: React.FC = () => {
                 <AdminComponentUpload />
               </ProtectedRoute>
             } />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:id" element={<ProjectDetail />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/templates/:id" element={<TemplateDetail />} />
             <Route path="/community" element={<Community />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/pricing" element={<Pricing />} />

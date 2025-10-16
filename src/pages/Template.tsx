@@ -2,9 +2,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 
-const Projects = () => {
+const Templates = () => {
   // Updated to include video paths
-  const featuredProjects = [
+  const featuredTemplates = [
     {
       title: "Orna Villas",
       views: "55.5k",
@@ -32,7 +32,7 @@ const Projects = () => {
   ];
 
   // Updated to include video paths
-  const allProjects = [
+  const allTemplates = [
     {
       title: "Financial Dashboard",
       description: "Modern banking interface with real-time analytics",
@@ -90,13 +90,13 @@ const Projects = () => {
         <div className="mb-16">
           <h2 className="text-3xl font-bold mb-8">Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProjects.map((project, index) => (
-              <Link to={`/projects/${project.title}`} key={index}>
+            {featuredTemplates.map((template, index) => (
+              <Link to={`/templates/${template.title}`} key={index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-0">
                   <div className="aspect-video rounded-t-lg relative overflow-hidden">
                     <video 
-                      src={project.video} 
+                      src={template.video} 
                       autoPlay 
                       loop 
                       muted 
@@ -105,16 +105,16 @@ const Projects = () => {
                     />
                     <div className="absolute inset-0 bg-black/40"></div>
                     <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="font-semibold text-lg text-white">{project.title}</h3>
+                      <h3 className="font-semibold text-lg text-white">{template.title}</h3>
                     </div>
                   </div>
                   <div className="px-4 pb-4 pt-4">
                     <div className="flex items-center justify-between">
                       <Badge variant="secondary" className="bg-secondary/50">
-                        {project.category}
+                        {template.category}
                       </Badge>
                       <span className="text-sm text-muted-foreground flex items-center gap-1">
-                        👁 {project.views}
+                        👁 {template.views}
                       </span>
                     </div>
                   </div>
@@ -129,13 +129,13 @@ const Projects = () => {
         <div>
           <h2 className="text-3xl font-bold mb-8">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {allProjects.map((project, index) => (
-              <Link to={`/projects/${project.title}`} key={index}>
+            {allTemplates.map((template, index) => (
+              <Link to={`/templates/${template.title}`} key={index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-0">
                   <div className="aspect-video rounded-t-lg relative overflow-hidden">
                     <video 
-                      src={project.video} 
+                      src={template.video} 
                       autoPlay 
                       loop 
                       muted
@@ -145,10 +145,10 @@ const Projects = () => {
                   </div>
                   <div className="p-6">
                     <Badge variant="secondary" className="bg-secondary/50 mb-3">
-                      {project.category}
+                      {template.category}
                     </Badge>
-                    <h3 className="font-semibold text-xl mb-2">{project.title}</h3>
-                    <p className="text-muted-foreground text-sm">{project.description}</p>
+                    <h3 className="font-semibold text-xl mb-2">{template.title}</h3>
+                    <p className="text-muted-foreground text-sm">{template.description}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -179,4 +179,4 @@ const Projects = () => {
   );
 };
 
-export default Projects;
+export default Templates;

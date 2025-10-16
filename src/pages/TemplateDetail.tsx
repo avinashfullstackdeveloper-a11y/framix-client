@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Eye, Calendar, User } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const ProjectDetail = () => {
+const TemplateDetail = () => {
   // --- Corrected media paths ---
   const media = {
     mainVideo: "/assets/videos/pd1.mp4",
@@ -24,7 +24,7 @@ const ProjectDetail = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Link to="/projects">
+          <Link to="/templates">
             <Button variant="ghost" className="flex items-center gap-2 hover:bg-secondary">
               <ArrowLeft className="w-4 h-4" />
               Go Back
@@ -215,4 +215,4 @@ const ProjectDetail = () => {
   );
 };
 
-export default ProjectDetail;
+export default TemplateDetail;
