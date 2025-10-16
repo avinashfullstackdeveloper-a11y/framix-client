@@ -11,8 +11,6 @@ import Blogs from "./pages/Blogs";
 import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
-// import ComponentDetail from "./pages/ComponentDetail";
-import PersonalInformation from "./pages/PersonalInformation";
 import SettingsPage from "./pages/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AdminComponentUpload from "./pages/AdminComponentUpload";
@@ -21,6 +19,7 @@ import Favourite from "./pages/Favourite";
 import Community from "./pages/Community";
 import Templates from "./pages/Template";
 import TemplateDetail from "./pages/TemplateDetail";
+import ReportBug from "./pages/ReportBug";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +57,7 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFoundPage />} />
+          <Route path="/report-bug" element={<ReportBug />} />
           </Routes>
         </Layout>
       </TooltipProvider>
