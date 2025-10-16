@@ -1,10 +1,17 @@
+// PersonalInformation.tsx
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
@@ -24,12 +31,12 @@ export default function PersonalInformation() {
 
   // Profile form data
   const [profileData, setProfileData] = useState<ProfileData>({
-    name: '',
-    location: '',
-    email: '',
-    socialMedia: '',
-    website: '',
-    bio: ''
+    name: "",
+    location: "",
+    email: "",
+    socialMedia: "",
+    website: "",
+    bio: "",
   });
 
   // Password states
@@ -50,12 +57,12 @@ export default function PersonalInformation() {
   useEffect(() => {
     if (user) {
       setProfileData({
-        name: user?.username || user?.name || '',
-        location: '',
-        email: user?.email || '',
-        socialMedia: '',
-        website: '',
-        bio: ''
+        name: user?.username || user?.name || "",
+        location: "",
+        email: user?.email || "",
+        socialMedia: "",
+        website: "",
+        bio: "",
       });
     }
   }, [user]);
@@ -63,32 +70,39 @@ export default function PersonalInformation() {
   // Calculate completion percentage
   useEffect(() => {
     const fields = [
-      { key: 'name', label: 'Name' },
-      { key: 'location', label: 'Location' },
-      { key: 'email', label: 'Email' },
-      { key: 'socialMedia', label: 'Social media' },
-      { key: 'website', label: 'Website' },
-      { key: 'bio', label: 'Bio' }
+      { key: "name", label: "Name" },
+      { key: "location", label: "Location" },
+      { key: "email", label: "Email" },
+      { key: "socialMedia", label: "Social media" },
+      { key: "website", label: "Website" },
+      { key: "bio", label: "Bio" },
     ];
 
-    const filledFields = fields.filter(field => {
+    const filledFields = fields.filter((field) => {
       const value = profileData[field.key as keyof ProfileData];
-      return value && value.trim() !== '';
+      return value && value.trim() !== "";
     });
-    const completionPercentage = Math.round((filledFields.length / fields.length) * 100);
-    const missing = fields.filter(field => {
-      const value = profileData[field.key as keyof ProfileData];
-      return !value || value.trim() === '';
-    }).map(field => field.label);
+    const completionPercentage = Math.round(
+      (filledFields.length / fields.length) * 100
+    );
+    const missing = fields
+      .filter((field) => {
+        const value = profileData[field.key as keyof ProfileData];
+        return !value || value.trim() === "";
+      })
+      .map((field) => field.label);
 
     setCompletion(completionPercentage);
     setMissingFields(missing);
   }, [profileData]);
 
-  const handleProfileInputChange = (field: keyof ProfileData, value: string) => {
-    setProfileData(prev => ({
+  const handleProfileInputChange = (
+    field: keyof ProfileData,
+    value: string
+  ) => {
+    setProfileData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -160,10 +174,10 @@ export default function PersonalInformation() {
 
   const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       // Update username if it has changed
-      if (profileData.name !== (user?.username || user?.name || '')) {
+      if (profileData.name !== (user?.username || user?.name || "")) {
         await handleUsernameUpdate();
       }
 
@@ -173,8 +187,8 @@ export default function PersonalInformation() {
       }
 
       // Add your additional profile update API calls here for other fields
-      console.log('Profile data to save:', profileData);
-      
+      console.log("Profile data to save:", profileData);
+
       toast({
         title: "Success",
         description: "All changes saved successfully",
@@ -200,15 +214,15 @@ export default function PersonalInformation() {
     // Reset to original user data
     if (user) {
       setProfileData({
-        name: user?.username || user?.name || '',
-        location: '',
-        email: user?.email || '',
-        socialMedia: '',
-        website: '',
-        bio: ''
+        name: user?.username || user?.name || "",
+        location: "",
+        email: user?.email || "",
+        socialMedia: "",
+        website: "",
+        bio: "",
       });
     }
-    
+
     // Reset password fields
     setIsEditingPassword(false);
     setCurrentPassword("");
@@ -218,7 +232,7 @@ export default function PersonalInformation() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
+      <div className="min-h-[600px] bg-black text-white p-8 flex items-center justify-center">
         <div className="text-neutral-400">Loading...</div>
       </div>
     );
@@ -226,45 +240,57 @@ export default function PersonalInformation() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
+      <div className="min-h-[600px] bg-black text-white p-8 flex items-center justify-center">
         <div className="text-neutral-400">Please sign in to view this page</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <div className="min-h-[600px] bg-black text-white">
+      <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold">Personal Information</h1>
-          <p className="text-neutral-400 mt-2">This information will be displayed publicly on your profile.</p>
+          <p className="text-neutral-400 mt-2">
+            This information will be displayed publicly on your profile.
+          </p>
         </div>
 
         {/* Profile Information Section */}
         <Card className="bg-[#1a1a1a] border-neutral-800">
           <CardHeader>
             <CardTitle className="text-white">Profile Information</CardTitle>
-            <CardDescription className="text-neutral-400">Update your public profile information</CardDescription>
+            <CardDescription className="text-neutral-400">
+              Update your public profile information
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSaveChanges} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-neutral-300">Name</Label>
+                  <Label htmlFor="name" className="text-neutral-300">
+                    Name
+                  </Label>
                   <Input
                     id="name"
                     value={profileData.name}
-                    onChange={(e) => handleProfileInputChange('name', e.target.value)}
+                    onChange={(e) =>
+                      handleProfileInputChange("name", e.target.value)
+                    }
                     className="bg-neutral-900 border-neutral-700 text-white"
                     placeholder="Your display name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="location" className="text-neutral-300">Location</Label>
+                  <Label htmlFor="location" className="text-neutral-300">
+                    Location
+                  </Label>
                   <Input
                     id="location"
                     value={profileData.location}
-                    onChange={(e) => handleProfileInputChange('location', e.target.value)}
+                    onChange={(e) =>
+                      handleProfileInputChange("location", e.target.value)
+                    }
                     placeholder="Your location"
                     className="bg-neutral-900 border-neutral-700 text-white"
                   />
@@ -273,23 +299,33 @@ export default function PersonalInformation() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-neutral-300">Email Address</Label>
+                  <Label htmlFor="email" className="text-neutral-300">
+                    Email Address
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     value={profileData.email}
-                    onChange={(e) => handleProfileInputChange('email', e.target.value)}
+                    onChange={(e) =>
+                      handleProfileInputChange("email", e.target.value)
+                    }
                     className="bg-neutral-900 border-neutral-700 text-white"
                     disabled
                   />
-                  <p className="text-xs text-neutral-500">Email cannot be changed</p>
+                  <p className="text-xs text-neutral-500">
+                    Email cannot be changed
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="socialMedia" className="text-neutral-300">Social Media</Label>
+                  <Label htmlFor="socialMedia" className="text-neutral-300">
+                    Social Media
+                  </Label>
                   <Input
                     id="socialMedia"
                     value={profileData.socialMedia}
-                    onChange={(e) => handleProfileInputChange('socialMedia', e.target.value)}
+                    onChange={(e) =>
+                      handleProfileInputChange("socialMedia", e.target.value)
+                    }
                     placeholder="Your Twitter handle (without @)"
                     className="bg-neutral-900 border-neutral-700 text-white"
                   />
@@ -297,23 +333,31 @@ export default function PersonalInformation() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="website" className="text-neutral-300">Website</Label>
+                <Label htmlFor="website" className="text-neutral-300">
+                  Website
+                </Label>
                 <Input
                   id="website"
                   type="url"
                   value={profileData.website}
-                  onChange={(e) => handleProfileInputChange('website', e.target.value)}
+                  onChange={(e) =>
+                    handleProfileInputChange("website", e.target.value)
+                  }
                   placeholder="Your website URL"
                   className="bg-neutral-900 border-neutral-700 text-white"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio" className="text-neutral-300">Bio</Label>
+                <Label htmlFor="bio" className="text-neutral-300">
+                  Bio
+                </Label>
                 <textarea
                   id="bio"
                   value={profileData.bio}
-                  onChange={(e) => handleProfileInputChange('bio', e.target.value)}
+                  onChange={(e) =>
+                    handleProfileInputChange("bio", e.target.value)
+                  }
                   placeholder="Write a few sentences about yourself"
                   rows={4}
                   className="w-full bg-neutral-900 border border-neutral-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
@@ -323,11 +367,15 @@ export default function PersonalInformation() {
               {/* Password Management Section */}
               <div className="space-y-4 pt-4">
                 <Separator className="bg-neutral-800" />
-                
+
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label className="text-neutral-300">Password Management</Label>
-                    <p className="text-sm text-neutral-400">Change your account password</p>
+                    <Label className="text-neutral-300">
+                      Password Management
+                    </Label>
+                    <p className="text-sm text-neutral-400">
+                      Change your account password
+                    </p>
                   </div>
                   {!isEditingPassword && (
                     <Button
@@ -343,7 +391,12 @@ export default function PersonalInformation() {
                 {isEditingPassword && (
                   <>
                     <div className="space-y-2">
-                      <Label htmlFor="currentPassword" className="text-neutral-300">Current Password</Label>
+                      <Label
+                        htmlFor="currentPassword"
+                        className="text-neutral-300"
+                      >
+                        Current Password
+                      </Label>
                       <div className="relative">
                         <Input
                           id="currentPassword"
@@ -354,15 +407,23 @@ export default function PersonalInformation() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-300"
                         >
-                          {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showCurrentPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="newPassword" className="text-neutral-300">New Password</Label>
+                      <Label htmlFor="newPassword" className="text-neutral-300">
+                        New Password
+                      </Label>
                       <div className="relative">
                         <Input
                           id="newPassword"
@@ -376,12 +437,21 @@ export default function PersonalInformation() {
                           onClick={() => setShowNewPassword(!showNewPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-300"
                         >
-                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showNewPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword" className="text-neutral-300">Confirm New Password</Label>
+                      <Label
+                        htmlFor="confirmPassword"
+                        className="text-neutral-300"
+                      >
+                        Confirm New Password
+                      </Label>
                       <div className="relative">
                         <Input
                           id="confirmPassword"
@@ -392,10 +462,16 @@ export default function PersonalInformation() {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-300"
                         >
-                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -423,7 +499,6 @@ export default function PersonalInformation() {
             </form>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

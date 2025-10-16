@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import ProjectDetail from "./pages/ProjectDetail";
 // import ComponentDetail from "./pages/ComponentDetail";
 import PersonalInformation from "./pages/PersonalInformation";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import AdminComponentUpload from "./pages/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
@@ -50,7 +51,7 @@ const App: React.FC = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/settings/personal" element={
               <ProtectedRoute>
-                <PersonalInformation />
+                <SettingsPage />
               </ProtectedRoute>
             } />
             <Route path="/favourite" element={

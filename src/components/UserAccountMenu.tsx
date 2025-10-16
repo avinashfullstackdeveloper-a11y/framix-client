@@ -65,14 +65,21 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
+          <span>Your Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => navigate("/favourite")}
+          onClick={() => navigate("/feedback")}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <Heart className="mr-2 h-4 w-4" />
-          <span>Favourite</span>
+          <span>Give Feedback</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => navigate("/report-bug")}
+          className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
+        >
+          <Shield className="mr-2 h-4 w-4" />
+          <span>Report Bug</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-800" />
         <DropdownMenuItem
@@ -80,7 +87,7 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
           className="text-red-400 focus:text-red-300 focus:bg-neutral-800 cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign out</span>
+          <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
