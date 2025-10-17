@@ -68,6 +68,13 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
           <span>Your Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem
+          onClick={() => navigate("/settings/favourite")}
+          className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
+        >
+          <Heart className="mr-2 h-4 w-4" />
+          <span>Favourite</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
           onClick={() => navigate("/feedback")}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >

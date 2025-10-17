@@ -56,8 +56,13 @@ const App: React.FC = () => {
                 <Favourite />
               </ProtectedRoute>
             } />
+            <Route path="/settings/favourite" element={
+              <ProtectedRoute>
+                <Favourite />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFoundPage />} />
-          <Route path="/report-bug" element={<ReportBug />} />
+            <Route path="/report-bug" element={<ReportBug />} />
           </Routes>
         </Layout>
       </TooltipProvider>
