@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import Editor from '@monaco-editor/react';
+import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { ComponentType, TechnologyType } from "@/components/ComponentSelectorPopup";
+import {
+  ComponentType,
+  TechnologyType,
+} from "@/components/ComponentSelectorPopup";
+import { CreatorVerificationModal } from "./CreatorVerificationModal";
 
 // Template code for each component type
-const getTemplateCode = (componentType: ComponentType, technology: TechnologyType): string => {
+const getTemplateCode = (
+  componentType: ComponentType,
+  technology: TechnologyType
+): string => {
   const templates: Record<ComponentType, Record<TechnologyType, string>> = {
     button: {
       css: `<!DOCTYPE html>
@@ -43,7 +50,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
 </html>`,
       tailwind: `<button class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0">
   Click me!
-</button>`
+</button>`,
     },
     toggle: {
       css: `<!DOCTYPE html>
@@ -105,7 +112,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
       tailwind: `<label class="relative inline-block w-14 h-8 cursor-pointer">
   <input type="checkbox" class="sr-only peer" />
   <div class="w-14 h-8 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
-</label>`
+</label>`,
     },
     checkbox: {
       css: `<!DOCTYPE html>
@@ -179,7 +186,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
       tailwind: `<label class="flex items-center cursor-pointer">
   <input type="checkbox" class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2" />
   <span class="ml-2 text-gray-700">Check me</span>
-</label>`
+</label>`,
     },
     card: {
       css: `<!DOCTYPE html>
@@ -224,7 +231,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
       tailwind: `<div class="bg-white rounded-xl shadow-lg p-6 max-w-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
   <h3 class="text-xl font-bold mb-2 text-gray-800">Card Title</h3>
   <p class="text-gray-600 text-sm leading-relaxed">This is a beautiful card component with a clean design and smooth hover effects.</p>
-</div>`
+</div>`,
     },
     loader: {
       css: `<!DOCTYPE html>
@@ -250,7 +257,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
   <div class="loader"></div>
 </body>
 </html>`,
-      tailwind: `<div class="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600"></div>`
+      tailwind: `<div class="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600"></div>`,
     },
     input: {
       css: `<!DOCTYPE html>
@@ -292,7 +299,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
   type="text"
   placeholder="Enter text..."
   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all duration-200 placeholder-gray-400"
-/>`
+/>`,
     },
     form: {
       css: `<!DOCTYPE html>
@@ -375,7 +382,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
   <button type="submit" class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-pink-600 transform hover:-translate-y-0.5 transition-all">
     Submit
   </button>
-</form>`
+</form>`,
     },
     pattern: {
       css: `<!DOCTYPE html>
@@ -401,7 +408,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
   <div class="pattern-container"></div>
 </body>
 </html>`,
-      tailwind: `<div class="w-48 h-48 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 rounded-xl" style="background-image: repeating-linear-gradient(45deg, #667eea 0, #667eea 10px, #764ba2 10px, #764ba2 20px);"></div>`
+      tailwind: `<div class="w-48 h-48 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 rounded-xl" style="background-image: repeating-linear-gradient(45deg, #667eea 0, #667eea 10px, #764ba2 10px, #764ba2 20px);"></div>`,
     },
     radio: {
       css: `<!DOCTYPE html>
@@ -490,7 +497,7 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
     <input type="radio" name="option" class="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500 focus:ring-2" />
     <span class="ml-2 text-gray-700">Option 3</span>
   </label>
-</div>`
+</div>`,
     },
     tooltip: {
       css: `<!DOCTYPE html>
@@ -560,8 +567,8 @@ const getTemplateCode = (componentType: ComponentType, technology: TechnologyTyp
   <span class="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-sm py-2 px-3 rounded-lg absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap before:content-[''] before:absolute before:top-full before:left-1/2 before:-translate-x-1/2 before:border-4 before:border-transparent before:border-t-gray-800">
     This is a tooltip!
   </span>
-</div>`
-    }
+</div>`,
+    },
   };
 
   return templates[componentType]?.[technology] || "";
@@ -572,8 +579,10 @@ const ComponentEditor: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const componentType = (searchParams.get("component") as ComponentType) || "button";
-  const technology = (searchParams.get("technology") as TechnologyType) || "css";
+  const componentType =
+    (searchParams.get("component") as ComponentType) || "button";
+  const technology =
+    (searchParams.get("technology") as TechnologyType) || "css";
 
   // --- Refactor: Multi-tab for CSS, single editor for Tailwind ---
   const [htmlCode, setHtmlCode] = useState<string>("");
@@ -581,6 +590,10 @@ const ComponentEditor: React.FC = () => {
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(true);
+
+  // Modal open state
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [modalLocked, setModalLocked] = useState(false);
 
   useEffect(() => {
     const template = getTemplateCode(componentType, technology);
@@ -653,7 +666,7 @@ const ComponentEditor: React.FC = () => {
         <iframe
           srcDoc={srcDoc}
           className="w-full h-full border-0"
-          style={{ background: 'transparent' }}
+          style={{ background: "transparent" }}
           sandbox="allow-scripts allow-same-origin"
         />
       );
@@ -700,7 +713,7 @@ const ComponentEditor: React.FC = () => {
         <iframe
           srcDoc={srcDoc}
           className="w-full h-full border-0"
-          style={{ background: 'transparent' }}
+          style={{ background: "transparent" }}
           sandbox="allow-scripts allow-same-origin"
         />
       );
@@ -746,18 +759,44 @@ const ComponentEditor: React.FC = () => {
     });
   };
 
+  // Show modal on submit, prevent multiple opens
   const handleSubmit = () => {
-    const codeToSubmit = getCurrentCode();
-    console.log("Submit action, code:", codeToSubmit);
-    toast({
-      title: "Component Ready!",
-      description: "Your component has been customized successfully.",
-      variant: "default",
-    });
+    if (!showVerificationModal && !modalLocked) {
+      setShowVerificationModal(true);
+      setModalLocked(true);
+    }
+  };
+
+  // Modal close handler
+  const handleModalClose = () => {
+    setShowVerificationModal(false);
+    setModalLocked(false);
+  };
+
+  // Modal submit handler
+  const handleModalSubmit = (creatorStatus) => {
+    setShowVerificationModal(false);
+    setModalLocked(false);
+    if (toast) {
+      toast({
+        title: "Creator Status Selected",
+        description: `You selected: ${creatorStatus}`,
+        variant: "default",
+      });
+    } else {
+      // eslint-disable-next-line no-console
+      console.log("Creator Status Selected:", creatorStatus);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background p-4">
+      {showVerificationModal && (
+        <CreatorVerificationModal
+          onClose={handleModalClose}
+          onSubmit={handleModalSubmit}
+        />
+      )}
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -784,7 +823,8 @@ const ComponentEditor: React.FC = () => {
             Customize Your {componentType}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Edit the code on the right to customize your component. See the changes in real-time on the left.
+            Edit the code on the right to customize your component. See the
+            changes in real-time on the left.
           </p>
         </div>
 
@@ -811,11 +851,7 @@ const ComponentEditor: React.FC = () => {
                   : `${componentType}.jsx`}
               </h3>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopy}
-                >
+                <Button variant="outline" size="sm" onClick={handleCopy}>
                   Copy
                 </Button>
                 <Button
@@ -831,7 +867,11 @@ const ComponentEditor: React.FC = () => {
               {technology === "css" && (
                 <div className="flex border-b bg-muted/50">
                   <button
-                    className={`px-4 py-2 font-medium ${activeTab === "html" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                    className={`px-4 py-2 font-medium ${
+                      activeTab === "html"
+                        ? "bg-background text-purple-700 border-b-2 border-purple-700"
+                        : "text-gray-500"
+                    }`}
                     onClick={() => {
                       console.log("Switching to HTML tab");
                       setActiveTab("html");
@@ -840,7 +880,11 @@ const ComponentEditor: React.FC = () => {
                     HTML
                   </button>
                   <button
-                    className={`px-4 py-2 font-medium ${activeTab === "css" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                    className={`px-4 py-2 font-medium ${
+                      activeTab === "css"
+                        ? "bg-background text-purple-700 border-b-2 border-purple-700"
+                        : "text-gray-500"
+                    }`}
                     onClick={() => {
                       console.log("Switching to CSS tab");
                       setActiveTab("css");
@@ -867,8 +911,8 @@ const ComponentEditor: React.FC = () => {
                       fontSize: 14,
                       scrollBeyondLastLine: false,
                       readOnly: !isEditing,
-                      wordWrap: 'on',
-                      lineNumbers: 'on',
+                      wordWrap: "on",
+                      lineNumbers: "on",
                       folding: true,
                       lineDecorationsWidth: 1,
                       padding: { top: 16, bottom: 16 },
@@ -889,8 +933,8 @@ const ComponentEditor: React.FC = () => {
                       fontSize: 14,
                       scrollBeyondLastLine: false,
                       readOnly: !isEditing,
-                      wordWrap: 'on',
-                      lineNumbers: 'on',
+                      wordWrap: "on",
+                      lineNumbers: "on",
                       folding: true,
                       lineDecorationsWidth: 1,
                       padding: { top: 16, bottom: 16 },
@@ -904,14 +948,11 @@ const ComponentEditor: React.FC = () => {
 
         {/* Action Bar */}
         <div className="flex justify-end gap-4 mt-6 pt-6 border-t">
-          <Button
-            variant="outline"
-            onClick={handleReset}
-          >
+          <Button variant="outline" onClick={handleReset}>
             Reset
           </Button>
           <Button variant="default" onClick={handleSubmit}>
-            Submit Component
+            Submit for Review
           </Button>
         </div>
       </div>
