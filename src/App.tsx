@@ -21,6 +21,7 @@ import Templates from "./pages/Template";
 import TemplateDetail from "./pages/TemplateDetail";
 import ReportBug from "./pages/ReportBug";
 import { CommunityUserProfile } from "./components/CommunityUserProfile";
+import ComponentEditor from "./pages/ComponentEditor";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/components" element={<Components />} />
             <Route path="/components/:type/:id" element={<ComponentDetail />} />
+            <Route path="/component-editor" element={<ComponentEditor />} />
             <Route path="/admin-component-upload" element={
               <ProtectedRoute>
                 <AdminComponentUpload />

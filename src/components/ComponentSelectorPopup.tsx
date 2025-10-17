@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 // Types
 export type ComponentType =
   | "button"
@@ -233,6 +235,7 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
   initialComponent = "button",
   initialTechnology = "css",
 }) => {
+  const navigate = useNavigate();
   const [selectedComponent, setSelectedComponent] =
     React.useState<ComponentType>(initialComponent);
   const [selectedTechnology, setSelectedTechnology] =
@@ -285,7 +288,17 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onContinue?.(selectedComponent, selectedTechnology);
+
+    // Call the onContinue callback if provided
+    if (onContinue) {
+      onContinue(selectedComponent, selectedTechnology);
+    }
+
+    // Navigate to the component editor with selected options
+    navigate(`/component-editor?component=${selectedComponent}&technology=${selectedTechnology}`);
+
+    // Close the popup
+    onClose?.();
   };
 
   if (!isOpen) return null;
