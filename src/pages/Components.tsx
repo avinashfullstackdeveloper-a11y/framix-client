@@ -157,11 +157,11 @@ const Components = () => {
                           srcDoc={item.code}
                           className="border-0"
                           style={{
-                            width: '200%',
-                            height: '200%',
+                            width: '160%',
+                            height: '160%',
                             margin: 0,
                             padding: 0,
-                            transform: 'scale(0.4)',
+                            transform: 'scale(0.6)',
                             transformOrigin: 'center',
                             overflow: 'hidden'
                           }}
