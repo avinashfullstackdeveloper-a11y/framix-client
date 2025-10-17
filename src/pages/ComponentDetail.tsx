@@ -155,8 +155,8 @@ const ComponentDetail: React.FC = () => {
   const renderPreview = () => {
     if (!component?.code || !component?.language) {
       return (
-        <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-          <div className="text-center text-gray-500">
+        <div className="w-full h-full flex items-center justify-center rounded-lg">
+          <div className="text-center text-gray-400">
             <div className="text-2xl mb-2">👁️</div>
             <p>No preview available</p>
           </div>
@@ -165,7 +165,7 @@ const ComponentDetail: React.FC = () => {
     }
 
     const lang = component.language.toLowerCase();
-    
+
     if (lang === "react") {
       const reactPreviewHTML = `
         <!DOCTYPE html>
@@ -178,22 +178,20 @@ const ComponentDetail: React.FC = () => {
             <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
             <style>
               * { margin: 0; padding: 0; box-sizing: border-box; }
-              body, html { 
-                width: 100%; 
-                height: 100%; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center;
-                background: transparent;
-                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-              }
-              #root { 
-                width: 100%; 
+              body, html {
+                width: 100%;
                 height: 100%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 20px;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                overflow: hidden;
+              }
+              #root {
+                display: flex;
+                align-items: center;
+                justify-content: center;
               }
             </style>
           </head>
@@ -206,11 +204,12 @@ const ComponentDetail: React.FC = () => {
           </body>
         </html>
       `;
-      
+
       return (
         <iframe
           srcDoc={reactPreviewHTML}
-          className="w-full h-full rounded-lg border-0"
+          className="w-full h-full border-0"
+          style={{ background: 'transparent' }}
           sandbox="allow-scripts allow-same-origin"
         />
       );
@@ -220,7 +219,8 @@ const ComponentDetail: React.FC = () => {
       return (
         <iframe
           srcDoc={component.code}
-          className="w-full h-full rounded-lg border-0"
+          className="w-full h-full border-0"
+          style={{ background: 'transparent' }}
           sandbox="allow-scripts allow-same-origin"
         />
       );
@@ -234,15 +234,15 @@ const ComponentDetail: React.FC = () => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body, html { 
-              width: 100%; 
-              height: 100%; 
-              display: flex; 
-              align-items: center; 
+            body, html {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
               justify-content: center;
               background: transparent;
               font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-              padding: 20px;
+              overflow: hidden;
             }
             ${lang === "css" ? code : ""}
           </style>
@@ -257,7 +257,8 @@ const ComponentDetail: React.FC = () => {
     return (
       <iframe
         srcDoc={srcDoc}
-        className="w-full h-full rounded-lg border-0"
+        className="w-full h-full border-0"
+        style={{ background: 'transparent' }}
         sandbox="allow-scripts allow-same-origin"
       />
     );
@@ -330,19 +331,21 @@ const ComponentDetail: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[70vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Preview Panel */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-            <div className="p-4 border-b bg-muted/50">
+          <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
+            <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
               <h3 className="font-semibold">Preview</h3>
             </div>
-            <div className="h-full p-4 bg-white">
-              {renderPreview()}
+            <div className="flex-1 flex items-center justify-center p-8 bg-neutral-950 overflow-hidden">
+              <div className="w-full h-full flex items-center justify-center">
+                {renderPreview()}
+              </div>
             </div>
           </div>
 
           {/* Code Panel */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
             <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
               <h3 className="font-semibold">
                 {component.name}.{getLanguageForEditor()}
@@ -351,7 +354,14 @@ const ComponentDetail: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigator.clipboard.writeText(code)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(code);
+                    toast({
+                      title: "Copied!",
+                      description: "Code copied to clipboard.",
+                      variant: "default",
+                    });
+                  }}
                 >
                   Copy
                 </Button>
@@ -364,7 +374,7 @@ const ComponentDetail: React.FC = () => {
                 </Button>
               </div>
             </div>
-            <div className="h-full">
+            <div className="flex-1">
               <Editor
                 height="100%"
                 language={getLanguageForEditor()}
@@ -380,6 +390,7 @@ const ComponentDetail: React.FC = () => {
                   lineNumbers: 'on',
                   folding: true,
                   lineDecorationsWidth: 1,
+                  padding: { top: 16, bottom: 16 },
                 }}
               />
             </div>
