@@ -143,7 +143,7 @@ const Components = () => {
                   {item.language &&
                     item.code &&
                     (item.language.toLowerCase() === "react" ? (
-                      <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-full h-full flex items-center justify-center" style={{ transform: 'scale(0.6)', transformOrigin: 'center' }}>
                         <LiveProvider code={item.code}>
                           <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
                           <LivePreview />
@@ -155,7 +155,7 @@ const Components = () => {
                         title="Preview"
                         srcDoc={item.code}
                         className="w-full h-full rounded-lg border-0"
-                        style={{ margin: 0, padding: 0 }}
+                        style={{ margin: 0, padding: 0, transform: 'scale(0.7)', transformOrigin: 'center' }}
                       />
                     ) : (
                       <iframe
@@ -164,14 +164,23 @@ const Components = () => {
                             <html>
                               <head>
                                 <style>
-                                  body {
+                                  * {
                                     margin: 0;
                                     padding: 0;
+                                    box-sizing: border-box;
+                                  }
+                                  body, html {
+                                    width: 100%;
+                                    height: 100%;
+                                    overflow: hidden;
                                     background: transparent;
                                     display: flex;
                                     align-items: center;
                                     justify-content: center;
-                                    min-height: 100vh;
+                                  }
+                                  body > * {
+                                    transform: scale(0.6);
+                                    transform-origin: center;
                                   }
                                   ${
                                     item.language.toLowerCase() === "css"
