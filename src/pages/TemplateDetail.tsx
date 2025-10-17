@@ -160,7 +160,7 @@ const TemplateDetail = () => {
               </p>
             </div>
 
-            <h3 className="text-2xl font-bold mt-12 mb-6">Projects</h3>
+            <h3 className="text-2xl font-bold mt-12 mb-6">Templates</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {media.relatedProjectVideos.map((src, index) => (
                 <Card key={index} className="bg-gradient-card border-border overflow-hidden">
