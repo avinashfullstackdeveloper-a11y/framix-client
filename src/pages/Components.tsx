@@ -137,7 +137,7 @@ const Components = () => {
               onClick={() => navigate(`/components/${item.type}/${item._id}`)}
               className="cursor-pointer w-full"
             >
-              <div className="flex w-full h-48 sm:h-56 lg:h-64 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
+              <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
                 <div className="flex h-[calc(100%-5rem)] flex-col justify-center items-center shrink-0 absolute w-[calc(100%-4rem)] bg-black rounded-2xl sm:rounded-3xl left-8 top-4 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
                   {/* Preview based on code and language */}
                   {item.language &&
@@ -151,12 +151,23 @@ const Components = () => {
                         </LiveProvider>
                       </div>
                     ) : item.language.toLowerCase() === "multi" ? (
-                      <iframe
-                        title="Preview"
-                        srcDoc={item.code}
-                        className="w-full h-full rounded-lg border-0"
-                        style={{ margin: 0, padding: 0, transform: 'scale(0.7)', transformOrigin: 'center' }}
-                      />
+                      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                        <iframe
+                          title="Preview"
+                          srcDoc={item.code}
+                          className="border-0"
+                          style={{
+                            width: '200%',
+                            height: '200%',
+                            margin: 0,
+                            padding: 0,
+                            transform: 'scale(0.4)',
+                            transformOrigin: 'center',
+                            overflow: 'hidden'
+                          }}
+                          sandbox="allow-scripts"
+                        />
+                      </div>
                     ) : (
                       <iframe
                         title="Preview"
@@ -178,8 +189,11 @@ const Components = () => {
                                     align-items: center;
                                     justify-content: center;
                                   }
-                                  body > * {
-                                    transform: scale(0.6);
+                                  #preview-wrapper {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    transform: scale(0.5);
                                     transform-origin: center;
                                   }
                                   ${
@@ -190,11 +204,13 @@ const Components = () => {
                                 </style>
                               </head>
                               <body>
-                                ${
-                                  item.language.toLowerCase() === "html"
-                                    ? item.code
-                                    : ""
-                                }
+                                <div id="preview-wrapper">
+                                  ${
+                                    item.language.toLowerCase() === "html"
+                                      ? item.code
+                                      : ""
+                                  }
+                                </div>
                                 <script>${
                                   item.language.toLowerCase() === "javascript"
                                     ? item.code
