@@ -575,72 +575,180 @@ const ComponentEditor: React.FC = () => {
   const componentType = (searchParams.get("component") as ComponentType) || "button";
   const technology = (searchParams.get("technology") as TechnologyType) || "css";
 
-  const [code, setCode] = useState<string>("");
+  // --- Refactor: Multi-tab for CSS, single editor for Tailwind ---
+  const [htmlCode, setHtmlCode] = useState<string>("");
+  const [cssCode, setCssCode] = useState<string>("");
+  const [tailwindCode, setTailwindCode] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(true);
 
   useEffect(() => {
     const template = getTemplateCode(componentType, technology);
-    setCode(template);
+    if (technology === "css") {
+      // Extract HTML and CSS from template
+      const htmlMatch = template.match(/<body>([\s\S]*?)<\/body>/);
+      const styleMatch = template.match(/<style>([\s\S]*?)<\/style>/);
+      setHtmlCode(htmlMatch ? htmlMatch[1].trim() : "");
+      setCssCode(styleMatch ? styleMatch[1].trim() : "");
+    } else if (technology === "tailwind") {
+      setTailwindCode(template);
+    }
   }, [componentType, technology]);
 
+  // For copy/reset actions
+  const getCurrentCode = () => {
+    if (technology === "css") {
+      return activeTab === "html" ? htmlCode : cssCode;
+    }
+    return tailwindCode;
+  };
+
+  // Editor language
   const getLanguageForEditor = () => {
-    if (technology === "css") return "html";
-    if (technology === "tailwind") return "html";
+    if (technology === "css") return activeTab;
+    if (technology === "tailwind") return "javascript";
     return "html";
   };
 
+  // Preview logic
   const renderPreview = () => {
-    if (!code) {
-      return (
-        <div className="w-full h-full flex items-center justify-center rounded-lg">
-          <div className="text-center text-gray-400">
-            <div className="text-2xl mb-2">👁️</div>
-            <p>No preview available</p>
+    if (technology === "css") {
+      if (!htmlCode && !cssCode) {
+        return (
+          <div className="w-full h-full flex items-center justify-center rounded-lg">
+            <div className="text-center text-gray-400">
+              <div className="text-2xl mb-2">👁️</div>
+              <p>No preview available</p>
+            </div>
           </div>
-        </div>
+        );
+      }
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                overflow: hidden;
+              }
+              ${cssCode}
+            </style>
+          </head>
+          <body>
+            ${htmlCode}
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="w-full h-full border-0"
+          style={{ background: 'transparent' }}
+          sandbox="allow-scripts allow-same-origin"
+        />
       );
     }
-
-    const srcDoc = technology === "css" && code.includes("<!DOCTYPE html>")
-      ? code
-      : `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body, html {
-              width: 100%;
-              height: 100%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: transparent;
-              font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-              overflow: hidden;
-            }
-          </style>
-        </head>
-        <body>
-          ${code}
-        </body>
-      </html>
-    `;
-
+    // Tailwind: Render React code with Tailwind CDN
+    if (technology === "tailwind") {
+      if (!tailwindCode) {
+        return (
+          <div className="w-full h-full flex items-center justify-center rounded-lg">
+            <div className="text-center text-gray-400">
+              <div className="text-2xl mb-2">👁️</div>
+              <p>No preview available</p>
+            </div>
+          </div>
+        );
+      }
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                overflow: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            ${tailwindCode}
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="w-full h-full border-0"
+          style={{ background: 'transparent' }}
+          sandbox="allow-scripts allow-same-origin"
+        />
+      );
+    }
+    // Fallback
     return (
-      <iframe
-        srcDoc={srcDoc}
-        className="w-full h-full border-0"
-        style={{ background: 'transparent' }}
-        sandbox="allow-scripts allow-same-origin"
-      />
+      <div className="w-full h-full flex items-center justify-center rounded-lg">
+        <div className="text-center text-gray-400">
+          <div className="text-2xl mb-2">👁️</div>
+          <p>No preview available</p>
+        </div>
+      </div>
     );
   };
 
+  // Actions
+  const handleCopy = () => {
+    const codeToCopy = getCurrentCode();
+    console.log("Copy action, code:", codeToCopy);
+    navigator.clipboard.writeText(codeToCopy);
+    toast({
+      title: "Copied!",
+      description: "Code copied to clipboard.",
+      variant: "default",
+    });
+  };
+
+  const handleReset = () => {
+    const template = getTemplateCode(componentType, technology);
+    console.log("Reset action, template:", template);
+    if (technology === "css") {
+      const htmlMatch = template.match(/<body>([\s\S]*?)<\/body>/);
+      const styleMatch = template.match(/<style>([\s\S]*?)<\/style>/);
+      setHtmlCode(htmlMatch ? htmlMatch[1].trim() : "");
+      setCssCode(styleMatch ? styleMatch[1].trim() : "");
+    } else if (technology === "tailwind") {
+      setTailwindCode(template);
+    }
+    toast({
+      title: "Reset!",
+      description: "Code has been reset to template.",
+      variant: "default",
+    });
+  };
+
   const handleSubmit = () => {
+    const codeToSubmit = getCurrentCode();
+    console.log("Submit action, code:", codeToSubmit);
     toast({
       title: "Component Ready!",
       description: "Your component has been customized successfully.",
@@ -698,20 +806,15 @@ const ComponentEditor: React.FC = () => {
           <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
             <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
               <h3 className="font-semibold">
-                {componentType}.{getLanguageForEditor()}
+                {technology === "css"
+                  ? `${componentType}.${activeTab}`
+                  : `${componentType}.jsx`}
               </h3>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    navigator.clipboard.writeText(code);
-                    toast({
-                      title: "Copied!",
-                      description: "Code copied to clipboard.",
-                      variant: "default",
-                    });
-                  }}
+                  onClick={handleCopy}
                 >
                   Copy
                 </Button>
@@ -724,25 +827,77 @@ const ComponentEditor: React.FC = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex-1">
-              <Editor
-                height="100%"
-                language={getLanguageForEditor()}
-                value={code}
-                onChange={(value) => setCode(value || '')}
-                theme="vs-dark"
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  readOnly: !isEditing,
-                  wordWrap: 'on',
-                  lineNumbers: 'on',
-                  folding: true,
-                  lineDecorationsWidth: 1,
-                  padding: { top: 16, bottom: 16 },
-                }}
-              />
+            <div className="flex-1 flex flex-col">
+              {technology === "css" && (
+                <div className="flex border-b bg-muted/50">
+                  <button
+                    className={`px-4 py-2 font-medium ${activeTab === "html" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                    onClick={() => {
+                      console.log("Switching to HTML tab");
+                      setActiveTab("html");
+                    }}
+                  >
+                    HTML
+                  </button>
+                  <button
+                    className={`px-4 py-2 font-medium ${activeTab === "css" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                    onClick={() => {
+                      console.log("Switching to CSS tab");
+                      setActiveTab("css");
+                    }}
+                  >
+                    CSS
+                  </button>
+                </div>
+              )}
+              <div className="flex-1">
+                {technology === "css" ? (
+                  <Editor
+                    height="100%"
+                    language={getLanguageForEditor()}
+                    value={activeTab === "html" ? htmlCode : cssCode}
+                    onChange={(value) => {
+                      console.log("Editor change:", activeTab, value);
+                      if (activeTab === "html") setHtmlCode(value || "");
+                      else setCssCode(value || "");
+                    }}
+                    theme="vs-dark"
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      readOnly: !isEditing,
+                      wordWrap: 'on',
+                      lineNumbers: 'on',
+                      folding: true,
+                      lineDecorationsWidth: 1,
+                      padding: { top: 16, bottom: 16 },
+                    }}
+                  />
+                ) : (
+                  <Editor
+                    height="100%"
+                    language={getLanguageForEditor()}
+                    value={tailwindCode}
+                    onChange={(value) => {
+                      console.log("Tailwind editor change:", value);
+                      setTailwindCode(value || "");
+                    }}
+                    theme="vs-dark"
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      readOnly: !isEditing,
+                      wordWrap: 'on',
+                      lineNumbers: 'on',
+                      folding: true,
+                      lineDecorationsWidth: 1,
+                      padding: { top: 16, bottom: 16 },
+                    }}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -751,15 +906,7 @@ const ComponentEditor: React.FC = () => {
         <div className="flex justify-end gap-4 mt-6 pt-6 border-t">
           <Button
             variant="outline"
-            onClick={() => {
-              const template = getTemplateCode(componentType, technology);
-              setCode(template);
-              toast({
-                title: "Reset!",
-                description: "Code has been reset to template.",
-                variant: "default",
-              });
-            }}
+            onClick={handleReset}
           >
             Reset
           </Button>
