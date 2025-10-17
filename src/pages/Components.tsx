@@ -69,20 +69,21 @@ const Components = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-6">
+      <div className="text-center mb-8 sm:mb-12">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
           <span className="text-primary">Components</span> Showcase
         </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+        <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
           Explore polished, scalable components — from simple buttons to full
           dashboards — in both design and code.
         </p>
       </div>
+
       {/* Admin Upload Button */}
       {user?.role === "admin" && (
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 sm:mb-8">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button className="px-4 py-2 bg-primary text-white rounded shadow hover:bg-primary/80 transition">
@@ -102,20 +103,20 @@ const Components = () => {
       )}
 
       {/* Filter Tabs */}
-      <div className="flex justify-center items-center mb-12">
-        <div className="flex gap-4 flex-wrap justify-center items-center w-full max-w-xl mx-auto">
+      <div className="flex justify-center items-center mb-8 sm:mb-12">
+        <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4 justify-center items-center w-full max-w-4xl mx-auto px-2">
           {filterTabs.map((filter) => (
             <button
               key={filter}
               type="button"
               onClick={() => setActiveFilter(filter)}
-              className={`flex w-28 h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-[10px] border-solid ${
+              className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
                 activeFilter === filter
                   ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828]"
                   : "bg-[rgba(0,0,0,0.80)] border-[#767676] text-white hover:border-[#FF9AC9]"
               }`}
             >
-              <span className="text-sm font-medium truncate px-2">
+              <span className="text-xs sm:text-sm font-medium truncate px-2 sm:px-3">
                 {filter}
               </span>
             </button>
@@ -124,18 +125,20 @@ const Components = () => {
       </div>
 
       {/* Components Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-24 w-full mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto">
         {loading ? (
-          <div className="text-center text-lg w-full">Loading...</div>
+          <div className="text-center text-lg w-full col-span-3">
+            Loading...
+          </div>
         ) : (
           components.map((item: ComponentItem) => (
             <div
               key={item._id}
               onClick={() => navigate(`/components/${item.type}/${item._id}`)}
-              className="cursor-pointer"
+              className="cursor-pointer w-full"
             >
-              <div className="flex w-full sm:w-[411px] h-[269px] flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-[30px] border-solid border-[#3A3A3A] max-md:w-[calc(50%_-_10px)] max-sm:w-full max-sm:h-60 cursor-pointer group">
-                <div className="flex h-[251px] flex-col justify-center items-center shrink-0 self-stretch absolute w-[379px] bg-black px-14 py-[121px] rounded-[30px] left-4 top-2.5 max-sm:h-[220px] max-sm:px-10 max-sm:py-[100px] group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease]">
+              <div className="flex w-full h-48 sm:h-56 lg:h-64 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
+                <div className="flex h-[calc(100%-3rem)] flex-col justify-center items-center shrink-0 self-stretch absolute w-[calc(100%-2rem)] bg-black px-4 sm:px-8 lg:px-14 py-8 sm:py-16 lg:py-[121px] rounded-2xl sm:rounded-3xl left-4 top-2.5 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease]">
                   {/* Preview based on code and language */}
                   {item.language &&
                     item.code &&
@@ -185,14 +188,14 @@ const Components = () => {
                       />
                     ))}
                 </div>
-                <div className="flex w-[359px] flex-col justify-center items-start absolute h-11 z-10 left-[26px] bottom-0 max-sm:w-[calc(100%_-_32px)] max-sm:left-4">
-                  <div className="flex justify-between items-center self-stretch mb-2.5">
-                    <h3 className="flex-[1_0_0] text-white text-base font-semibold max-sm:text-sm transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+                  <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
+                    <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                       {item.title}
                     </h3>
-                    <div className="flex justify-center items-center rounded pl-3 pr-[11px] pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                    <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                       <span
-                        className={`text-sm font-normal max-sm:text-xs ${
+                        className={`text-xs sm:text-sm font-normal ${
                           item.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
                         }`}
                       >
@@ -200,8 +203,8 @@ const Components = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="flex w-[45px] items-center gap-1.5">
-                    <span className="text-white text-[13px] font-light max-sm:text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white text-xs sm:text-[13px] font-light">
                       {item.stats || ""}
                     </span>
                   </div>
@@ -209,7 +212,7 @@ const Components = () => {
                 {/* Admin delete button */}
                 {user?.role === "admin" && (
                   <button
-                    className="absolute top-2 right-2 px-3 py-1 bg-red-600 text-white rounded text-xs z-20"
+                    className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white rounded text-xs z-20"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(item._id);

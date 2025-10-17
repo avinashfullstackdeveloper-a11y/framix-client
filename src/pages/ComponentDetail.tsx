@@ -1,10 +1,6 @@
-// ComponentDetail.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { LiveProvider, LivePreview, LiveError } from "react-live";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import "../index.css";
+import Editor from '@monaco-editor/react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
@@ -28,21 +24,18 @@ const ComponentDetail: React.FC = () => {
   const [component, setComponent] = useState<ComponentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
   const [isEditing, setIsEditing] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Favourites state
   const [isFavourited, setIsFavourited] = useState(false);
   const [savingFavourite, setSavingFavourite] = useState(false);
 
   const { toast } = useToast();
-  // Use only user from AuthContext, get token from user if available
   const { user } = useAuth();
-  // Get token from user context or localStorage if available
   const token =
-    // Try user.token, fallback to localStorage, avoid 'any' type
-    ("token" in (user ?? {}) ? (user as { token?: string }).token : undefined) ||
+    ("token" in (user ?? {})
+      ? (user as { token?: string }).token
+      : undefined) ||
     localStorage.getItem("token") ||
     "";
 
@@ -64,7 +57,6 @@ const ComponentDetail: React.FC = () => {
   // Check if already favourited
   useEffect(() => {
     if (!id || !user) return;
-    // Instead of GET /api/favourites/:id, fetch all and check if current id is favourited
     fetch(`/api/favourites`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -75,8 +67,13 @@ const ComponentDetail: React.FC = () => {
         return res.json();
       })
       .then((data) => {
-        // data is array of favourites, check if any matches current id
-        const found = Array.isArray(data) && data.some(fav => fav.component && (fav.component._id === id || fav.component === id));
+        const found =
+          Array.isArray(data) &&
+          data.some(
+            (fav) =>
+              fav.component &&
+              (fav.component._id === id || fav.component === id)
+          );
         setIsFavourited(found);
       })
       .catch(() => setIsFavourited(false));
@@ -95,7 +92,6 @@ const ComponentDetail: React.FC = () => {
     setSavingFavourite(true);
     try {
       if (!isFavourited) {
-        // Add to favourites
         const res = await fetch("/api/favourites", {
           method: "POST",
           headers: {
@@ -115,7 +111,6 @@ const ComponentDetail: React.FC = () => {
           variant: "default",
         });
       } else {
-        // Remove from favourites
         const res = await fetch(`/api/favourites/${id}`, {
           method: "DELETE",
           headers: {
@@ -147,376 +142,265 @@ const ComponentDetail: React.FC = () => {
     }
   };
 
+  const getLanguageForEditor = () => {
+    const lang = component?.language?.toLowerCase();
+    if (lang === "react") return "javascript";
+    if (lang === "multi") return "html";
+    if (lang === "javascript") return "javascript";
+    if (lang === "html") return "html";
+    if (lang === "css") return "css";
+    return "text";
+  };
+
+  const renderPreview = () => {
+    if (!component?.code || !component?.language) {
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+          <div className="text-center text-gray-500">
+            <div className="text-2xl mb-2">👁️</div>
+            <p>No preview available</p>
+          </div>
+        </div>
+      );
+    }
+
+    const lang = component.language.toLowerCase();
+    
+    if (lang === "react") {
+      const reactPreviewHTML = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+            <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+            <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html { 
+                width: 100%; 
+                height: 100%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+              }
+              #root { 
+                width: 100%; 
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div id="root"></div>
+            <script type="text/babel">
+              ${code}
+              ReactDOM.render(React.createElement(${component.name.replace(/\s+/g, '') || 'Component'}), document.getElementById('root'));
+            </script>
+          </body>
+        </html>
+      `;
+      
+      return (
+        <iframe
+          srcDoc={reactPreviewHTML}
+          className="w-full h-full rounded-lg border-0"
+          sandbox="allow-scripts allow-same-origin"
+        />
+      );
+    }
+
+    if (lang === "multi") {
+      return (
+        <iframe
+          srcDoc={component.code}
+          className="w-full h-full rounded-lg border-0"
+          sandbox="allow-scripts allow-same-origin"
+        />
+      );
+    }
+
+    const srcDoc = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body, html { 
+              width: 100%; 
+              height: 100%; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              background: transparent;
+              font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+              padding: 20px;
+            }
+            ${lang === "css" ? code : ""}
+          </style>
+        </head>
+        <body>
+          ${lang === "html" ? code : `<div>${code}</div>`}
+          <script>${lang === "javascript" ? code : ""}</script>
+        </body>
+      </html>
+    `;
+
+    return (
+      <iframe
+        srcDoc={srcDoc}
+        className="w-full h-full rounded-lg border-0"
+        sandbox="allow-scripts allow-same-origin"
+      />
+    );
+  };
+
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading component...</p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg">Loading component...</p>
+        </div>
       </div>
     );
   }
 
   if (!component) {
     return (
-      <div className="error-container">
-        <div className="error-icon">⚠️</div>
-        <h2>Component not found</h2>
-        <p>
-          The component you're looking for doesn't exist or has been removed.
-        </p>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold mb-2">Component not found</h2>
+          <p className="text-gray-600">
+            The component you're looking for doesn't exist or has been removed.
+          </p>
+        </div>
       </div>
     );
   }
 
-  const renderPreview = () => {
-    if (component?.language?.toLowerCase() === "react") {
-      return (
-        <div
-          className="preview-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            width: "100%",
-          }}
-        >
-          <LiveProvider code={code}>
-            <div
-              className="live-preview-wrapper"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <LivePreview
-                style={{
-                  margin: 0,
-                  width: "auto",
-                  height: "auto",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+  return (
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2"
+          >
+            ← Back
+          </Button>
+          
+          <div className="flex items-center gap-4">
+            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              {component.language}
+            </span>
+          </div>
+        </div>
+
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-4">{component.name}</h1>
+          {component.description && (
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {component.description}
+            </p>
+          )}
+          {component.tags && component.tags.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
+              {component.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[70vh]">
+          {/* Preview Panel */}
+          <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
+            <div className="p-4 border-b bg-muted/50">
+              <h3 className="font-semibold">Preview</h3>
+            </div>
+            <div className="h-full p-4 bg-white">
+              {renderPreview()}
+            </div>
+          </div>
+
+          {/* Code Panel */}
+          <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
+            <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
+              <h3 className="font-semibold">
+                {component.name}.{getLanguageForEditor()}
+              </h3>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigator.clipboard.writeText(code)}
+                >
+                  Copy
+                </Button>
+                <Button
+                  variant={isEditing ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  {isEditing ? "Save" : "Edit"}
+                </Button>
+              </div>
+            </div>
+            <div className="h-full">
+              <Editor
+                height="100%"
+                language={getLanguageForEditor()}
+                value={code}
+                onChange={(value) => setCode(value || '')}
+                theme="vs-dark"
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  scrollBeyondLastLine: false,
+                  readOnly: !isEditing,
+                  wordWrap: 'on',
+                  lineNumbers: 'on',
+                  folding: true,
+                  lineDecorationsWidth: 1,
                 }}
               />
             </div>
-            <LiveError className="live-error" />
-          </LiveProvider>
-        </div>
-      );
-    }
-
-    if (component?.language?.toLowerCase() === "multi") {
-      return (
-        <div
-          className="preview-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            width: "100%",
-          }}
-        >
-          <iframe
-            title="Live Preview"
-            srcDoc={component.code}
-            className="preview-iframe"
-            style={{
-              display: "block",
-              margin: 0,
-              maxWidth: "100%",
-              maxHeight: "100%",
-            }}
-          />
-        </div>
-      );
-    }
-
-    if (
-      ["html", "css", "javascript"].includes(component?.language?.toLowerCase())
-    ) {
-      const srcDoc = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              body {
-                margin: 0;
-                padding: 20px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: transparent;
-              }
-              ${component.language?.toLowerCase() === "css" ? code : ""}
-            </style>
-          </head>
-          <body>
-            ${component.language?.toLowerCase() === "html" ? code : ""}
-            <script>${
-              component.language?.toLowerCase() === "javascript" ? code : ""
-            }</script>
-          </body>
-        </html>
-      `;
-      return (
-        <div
-          className="preview-container"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            width: "100%",
-          }}
-        >
-          <iframe
-            title="Live Preview"
-            srcDoc={srcDoc}
-            className="preview-iframe"
-            style={{
-              display: "block",
-              margin: 0,
-              maxWidth: "100%",
-              maxHeight: "100%",
-            }}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <div className="no-preview">
-        <div className="no-preview-icon">👁️</div>
-        <p>No preview available for this component type</p>
-      </div>
-    );
-  };
-
-  const getLanguageForHighlighting = () => {
-    const lang = component?.language?.toLowerCase();
-    if (lang === "multi") return "html";
-    if (lang === "javascript") return "javascript";
-    if (lang === "html") return "html";
-    if (lang === "css") return "css";
-    if (lang === "react") return "jsx";
-    return "text";
-  };
-
-  return (
-    <div
-      className={`component-detail ${isFullscreen ? "fullscreen" : ""}`}
-      style={{ position: "relative" }}
-    >
-      {/* Go Back Button */}
-      <div
-        style={{
-          position: "absolute",
-          top: "2rem",
-          left: "2rem",
-          zIndex: 10,
-        }}
-      >
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          aria-label="Go Back"
-          style={{
-            background: "transparent",
-            color: "#fff",
-            border: "none",
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-            borderRadius: "0",
-            padding: "0.5rem 1.25rem",
-            boxShadow: "none",
-            cursor: "pointer",
-            transition: "transform 0.15s",
-          }}
-        >
-          ← Go Back
-        </Button>
-      </div>
-      {/* Header */}
-      <header className="component-header">
-        <div className="header-content">
-          <h1 className="component-title">{component.name}</h1>
-          <div className="component-meta">
-            {component.tags && component.tags.length > 0 && (
-              <div className="tags">
-                {component.tags.map((tag, index) => (
-                  <span key={index} className="tag">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-        <div
-          className="header-actions"
-          style={{ display: "flex", alignItems: "center", gap: "1rem" }}
-        >
-          <span
-            className="language-badge"
-            style={{
-              fontWeight: "bold",
-              fontSize: "1rem",
-              color: "#6366f1",
-              background: "#eef2ff",
-              borderRadius: "8px",
-              padding: "0.25rem 0.75rem",
-              marginRight: "0.5rem",
-            }}
-          >
-            {component.language}
-          </span>
-          <button
-            className="copy-button"
-            onClick={() => navigator.clipboard.writeText(code)}
-          >
-            Copy Code
-          </button>
-        </div>
-      </header>
-
-      {component.description && (
-        <div className="component-description">
-          <p>{component.description}</p>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <div
-        className="component-content"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "2rem",
-          minHeight: "32rem",
-          maxHeight: "40rem",
-        }}
-      >
-        {/* Preview Panel Side */}
-        <div
-          className="preview-panel active"
-          style={{ height: "100%", maxHeight: "40rem", overflow: "auto" }}
-        >
-          <div className="panel-header"></div>
-          <div
-            className="panel-content"
-            style={{ maxHeight: "36rem", overflow: "auto" }}
-          >
-            {renderPreview()}
           </div>
         </div>
 
-        {/* Code Panel Side */}
-        <div
-          className="code-panel active"
-          style={{ height: "100%", maxHeight: "40rem", overflow: "auto" }}
-        >
-          {/* Removed code panel heading */}
-          <div
-            className="panel-content"
-            style={{ maxHeight: "36rem", overflow: "auto" }}
+        {/* Action Bar */}
+        <div className="flex justify-end gap-4 mt-6 pt-6 border-t">
+          <Button
+            variant="default"
+            disabled={savingFavourite}
+            onClick={handleToggleFavourite}
           >
-            <div className="code-editor">
-              <div
-                className="editor-header"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span className="file-name">
-                  {component.name}.{getLanguageForHighlighting()}
-                </span>
-                <div>
-                  <button
-                    className="copy-icon"
-                    onClick={() => navigator.clipboard.writeText(code)}
-                    title="Copy code"
-                  >
-                    📄
-                  </button>
-                  <button
-                    className="edit-toggle"
-                    style={{ marginLeft: "0.5rem" }}
-                    onClick={() => setIsEditing((prev) => !prev)}
-                  >
-                    {isEditing ? "Save" : "Edit Code"}
-                  </button>
-                </div>
-              </div>
-              <div style={{ maxHeight: "32rem", overflow: "auto" }}>
-                {isEditing ? (
-                  <textarea
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className="code-textarea"
-                    spellCheck="false"
-                    style={{
-                      width: "100%",
-                      height: "28rem",
-                      fontFamily: "monospace",
-                      fontSize: "14px",
-                      borderRadius: "0 0 12px 12px",
-                      padding: "1rem",
-                      boxSizing: "border-box",
-                      resize: "vertical",
-                      background: "#1e1e1e",
-                      color: "#fff",
-                      border: "1px solid #333",
-                    }}
-                  />
-                ) : (
-                  <SyntaxHighlighter
-                    language={getLanguageForHighlighting()}
-                    style={vscDarkPlus}
-                    customStyle={{
-                      margin: 0,
-                      borderRadius: "0 0 12px 12px",
-                      fontSize: "14px",
-                      lineHeight: "1.5",
-                    }}
-                    showLineNumbers
-                  >
-                    {code}
-                  </SyntaxHighlighter>
-                )}
-              </div>
-            </div>
-          </div>
+            {savingFavourite
+              ? "Saving..."
+              : isFavourited
+              ? "Unfavourite"
+              : "Save to Favourite"}
+          </Button>
+          <Button variant="outline">Export</Button>
         </div>
-      </div>
-      {/* Horizontal Action Bar */}
-      <div
-        className="component-action-bar"
-        style={{
-          gridColumn: "1 / span 2",
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: "1rem",
-          padding: "1.25rem 0 0 0",
-        }}
-      >
-        <Button
-          variant="default"
-          disabled={savingFavourite}
-          onClick={handleToggleFavourite}
-        >
-          {savingFavourite
-            ? "Saving..."
-            : isFavourited
-            ? "Unfavourite"
-            : "Save to Favourite"}
-        </Button>
-        <Button variant="outline">Export</Button>
       </div>
     </div>
   );
