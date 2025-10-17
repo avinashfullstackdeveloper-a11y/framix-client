@@ -138,12 +138,12 @@ const Components = () => {
               className="cursor-pointer w-full"
             >
               <div className="flex w-full h-48 sm:h-56 lg:h-64 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
-                <div className="flex h-[calc(100%-3rem)] flex-col justify-center items-center shrink-0 self-stretch absolute w-[calc(100%-2rem)] bg-black px-4 sm:px-8 lg:px-14 py-8 sm:py-16 lg:py-[121px] rounded-2xl sm:rounded-3xl left-4 top-2.5 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease]">
+                <div className="flex h-[calc(100%-5rem)] flex-col justify-center items-center shrink-0 absolute w-[calc(100%-4rem)] bg-black rounded-2xl sm:rounded-3xl left-8 top-4 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
                   {/* Preview based on code and language */}
                   {item.language &&
                     item.code &&
                     (item.language.toLowerCase() === "react" ? (
-                      <div className="w-full h-full flex items-center justify-center bg-neutral-900 rounded-lg overflow-hidden">
+                      <div className="w-full h-full flex items-center justify-center">
                         <LiveProvider code={item.code}>
                           <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
                           <LivePreview />
@@ -154,7 +154,8 @@ const Components = () => {
                       <iframe
                         title="Preview"
                         srcDoc={item.code}
-                        className="w-full h-full min-h-[6rem] rounded-lg border overflow-auto"
+                        className="w-full h-full rounded-lg border-0"
+                        style={{ margin: 0, padding: 0 }}
                       />
                     ) : (
                       <iframe
@@ -163,7 +164,15 @@ const Components = () => {
                             <html>
                               <head>
                                 <style>
-                                  body { margin: 0; padding: 10px; background: #f8f9fa; }
+                                  body {
+                                    margin: 0;
+                                    padding: 0;
+                                    background: transparent;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    min-height: 100vh;
+                                  }
                                   ${
                                     item.language.toLowerCase() === "css"
                                       ? item.code
@@ -184,7 +193,8 @@ const Components = () => {
                                 }</script>
                               </body>
                             </html>`}
-                        className="w-full h-full min-h-[6rem] rounded-lg border overflow-auto"
+                        className="w-full h-full rounded-lg border-0"
+                        style={{ margin: 0, padding: 0 }}
                       />
                     ))}
                 </div>
