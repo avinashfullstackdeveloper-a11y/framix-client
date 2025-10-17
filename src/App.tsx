@@ -20,6 +20,7 @@ import Community from "./pages/Community";
 import Templates from "./pages/Template";
 import TemplateDetail from "./pages/TemplateDetail";
 import ReportBug from "./pages/ReportBug";
+import { CommunityUserProfile } from "./components/CommunityUserProfile";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,9 @@ const App: React.FC = () => {
             <Route path="/templates" element={<Templates />} />
             <Route path="/templates/:id" element={<TemplateDetail />} />
             <Route path="/community" element={<Community />} />
+// Community user profile route
+
+<Route path="/community/:username" element={<CommunityUserProfile />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/signin" element={<SignIn />} />

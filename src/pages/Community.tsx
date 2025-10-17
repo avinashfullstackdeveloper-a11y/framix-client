@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import {
@@ -8,8 +8,9 @@ import {
   DialogTrigger,
   DialogContent,
 } from "@/components/ui/dialog";
+import { CommunityUserProfile } from "@/components/CommunityUserProfile";
 
-const Community = () => {
+const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [popupOpen, setPopupOpen] = useState(false);
 
@@ -169,13 +170,13 @@ const Community = () => {
       <div className="flex items-center gap-3">
         <button className="flex items-center gap-1 hover:opacity-80 transition-opacity">
           <svg width="16" height="16" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path 
-              d="M13.1165 9.67708C14.1099 8.70375 15.1165 7.53708 15.1165 6.01042C15.1165 5.03796 14.7302 4.10533 14.0426 3.41769C13.355 2.73006 12.4223 2.34375 11.4499 2.34375C10.2765 2.34375 9.44987 2.67708 8.44987 3.67708C7.44987 2.67708 6.6232 2.34375 5.44987 2.34375C4.47741 2.34375 3.54478 2.73006 2.85714 3.41769C2.16951 4.10533 1.7832 5.03796 1.7832 6.01042C1.7832 7.54375 2.7832 8.71042 3.7832 9.67708L8.44987 14.3438L13.1165 9.67708Z" 
-              fill="#F14336" 
-              stroke="white" 
-              strokeOpacity="0.6" 
-              strokeWidth="1.33333" 
-              strokeLinecap="round" 
+            <path
+              d="M13.1165 9.67708C14.1099 8.70375 15.1165 7.53708 15.1165 6.01042C15.1165 5.03796 14.7302 4.10533 14.0426 3.41769C13.355 2.73006 12.4223 2.34375 11.4499 2.34375C10.2765 2.34375 9.44987 2.67708 8.44987 3.67708C7.44987 2.67708 6.6232 2.34375 5.44987 2.34375C4.47741 2.34375 3.54478 2.73006 2.85714 3.41769C2.16951 4.10533 1.7832 5.03796 1.7832 6.01042C1.7832 7.54375 2.7832 8.71042 3.7832 9.67708L8.44987 14.3438L13.1165 9.67708Z"
+              fill="#F14336"
+              stroke="white"
+              strokeOpacity="0.6"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
@@ -185,12 +186,12 @@ const Community = () => {
         </button>
         <button className="flex items-center gap-1 hover:opacity-80 transition-opacity">
           <svg width="16" height="16" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path 
-              d="M6.12865 13.677C7.40103 14.3297 8.8647 14.5064 10.2559 14.1755C11.6471 13.8445 12.8743 13.0275 13.7165 11.8717C14.5586 10.716 14.9603 9.29742 14.849 7.87173C14.7378 6.44603 14.121 5.10693 13.1099 4.09575C12.0987 3.08456 10.7596 2.46779 9.33387 2.35656C7.90817 2.24534 6.48963 2.64698 5.33386 3.48912C4.17809 4.33125 3.36111 5.55849 3.03013 6.94969C2.69915 8.34089 2.87594 9.80457 3.52865 11.077L2.19531 15.0103L6.12865 13.677Z" 
-              stroke="white" 
-              strokeOpacity="0.6" 
-              strokeWidth="1.33333" 
-              strokeLinecap="round" 
+            <path
+              d="M6.12865 13.677C7.40103 14.3297 8.8647 14.5064 10.2559 14.1755C11.6471 13.8445 12.8743 13.0275 13.7165 11.8717C14.5586 10.716 14.9603 9.29742 14.849 7.87173C14.7378 6.44603 14.121 5.10693 13.1099 4.09575C12.0987 3.08456 10.7596 2.46779 9.33387 2.35656C7.90817 2.24534 6.48963 2.64698 5.33386 3.48912C4.17809 4.33125 3.36111 5.55849 3.03013 6.94969C2.69915 8.34089 2.87594 9.80457 3.52865 11.077L2.19531 15.0103L6.12865 13.677Z"
+              stroke="white"
+              strokeOpacity="0.6"
+              strokeWidth="1.33333"
+              strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
@@ -289,15 +290,15 @@ const Community = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredComponents.map((component, index) => (
-            <Link to={`/components/${component.title}`} key={index}>
+            <Link to={`/community/${component.author.username.replace('@', '')}`} key={index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-0">
                   <div className="aspect-video rounded-t-lg relative overflow-hidden">
-                    <video 
-                      src={component.preview} 
-                      autoPlay 
-                      loop 
-                      muted 
+                    <video
+                      src={component.preview}
+                      autoPlay
+                      loop
+                      muted
                       playsInline
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -313,8 +314,8 @@ const Community = () => {
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Avatar 
-                          initials={component.author.initials} 
+                        <Avatar
+                          initials={component.author.initials}
                           size="sm"
                         />
                         <div>
@@ -341,7 +342,7 @@ const Community = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {allComponents.map((component, index) => (
-            <Link to={`/components/${component.title}`} key={index}>
+            <Link to={`/community/${component.author.username.replace('@', '')}`} key={index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
@@ -359,8 +360,8 @@ const Community = () => {
                   <p className="text-muted-foreground text-sm mb-4">{component.description}</p>
                   
                   <div className="flex items-center gap-2">
-                    <Avatar 
-                      initials={component.author.initials} 
+                    <Avatar
+                      initials={component.author.initials}
                       size="sm"
                     />
                     <div>
@@ -404,6 +405,92 @@ const Community = () => {
     {/* Popup now handled by Dialog above */}
     </div>
   );
-}
+};
+
+const CommunityUserProfileRoute = () => {
+  const navigate = useNavigate();
+  const { username } = useParams();
+
+  // Example: You would fetch user data by username here.
+  // For demo, use default props.
+  return (
+    <CommunityUserProfile
+      user={{
+        initials: username ? username.substring(0, 2).toUpperCase() : "EM",
+        name: username ? username : "Eliana Moretti",
+        username: username ? `@${username}` : "@elianam",
+        social: {
+          github: "#",
+          twitter: "#",
+          website: "#",
+        },
+        profilePicture:
+          "https://api.builder.io/api/v1/image/assets/TEMP/0c1d6bd65b1ea1ffa811a1c7e3602bd5c3fea2ba?width=400",
+        stats: {
+          posts: 89,
+          views: 1200000,
+          bookmarks: 1300,
+          likes: 5400,
+          comments: 320,
+        },
+        sharedComponents: [
+          {
+            title: "Start Code HTML Button",
+            views: "10k",
+            bookmarks: "1.3K",
+            children: (
+              <button className="flex w-[121px] h-[50px] justify-center items-center shadow-[4px_8px_19px_-3px_rgba(0,0,0,0.27)] bg-[#E8E8E8] px-[25px] py-[15px] rounded-[15px] hover:bg-[#D8D8D8] transition-colors">
+                <span className="text-[#212121] text-[17px] font-[1000]">
+                  Click me!
+                </span>
+              </button>
+            ),
+          },
+          {
+            title: "Blue Button",
+            views: "80k",
+            bookmarks: "1.3K",
+            isFree: true,
+            subtitle: "Blue Button",
+            subtitleViews: "80k",
+            children: (
+              <button className="flex w-[184px] h-[49px] justify-center items-center shadow-[0_8px_0_0_#4836BB] bg-[#644DFF] pl-[50.67px] pr-[50.69px] pt-[13.5px] pb-[14.24px] rounded-xl border-2 border-solid border-[#4836BB] hover:bg-[#5A43E6] transition-colors">
+                <span className="text-white text-lg font-black tracking-[2px]">
+                  BUTTON
+                </span>
+              </button>
+            ),
+          },
+          {
+            title: "3d box",
+            views: "70k",
+            bookmarks: "1.3K",
+            isPro: true,
+            children: (
+              <div className="w-[94px] h-[136px] relative">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      '<svg width="85" height="52" viewBox="0 0 85 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-element" style="width: 94px; height: 136px; position: absolute; left: 0; top: 0"> <path d="M82.86 24.9299L44.6068 1.8746C43.3459 1.11466 41.3011 1.11466 40.0402 1.8746L1.78699 24.9299C0.526087 25.6909 0.526087 26.9228 1.78699 27.6837L40.0392 50.738C41.3011 51.499 43.3459 51.499 44.6068 50.738L82.86 27.6837C84.1209 26.9228 84.1209 25.6909 82.86 24.9299" stroke="#4B22B5" stroke-width="0.999926"></path> </svg>',
+                  }}
+                />
+              </div>
+            ),
+          },
+        ],
+      }}
+      goBackHandler={() => navigate("/community")}
+    />
+  );
+};
+
+const Community = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<CommunityList />} />
+      <Route path=":username" element={<CommunityUserProfileRoute />} />
+    </Routes>
+  );
+};
 
 export default Community;
