@@ -234,7 +234,107 @@ const CommunityList = () => {
   // LivePreview Component
   const LivePreview = ({ component }: { component: any }) => {
     const renderPreview = () => {
-      // If component has technology field (new format)
+      // Handle components with language and code fields (standard format)
+      if (component.language && component.code) {
+        if (component.language.toLowerCase() === 'react') {
+          // React components need special handling - we'll use iframe for now
+          const srcDoc = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body, html {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: transparent;
+                    overflow: hidden;
+                  }
+                </style>
+              </head>
+              <body>
+                <div style="display: flex; align-items: center; justify-content: center; color: white;">
+                  React Component
+                </div>
+              </body>
+            </html>
+          `;
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: 'transparent' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        } else if (component.language.toLowerCase() === 'multi') {
+          return (
+            <iframe
+              srcDoc={component.code}
+              className="absolute inset-0 w-full h-full"
+              style={{ background: 'transparent', transform: 'scale(0.6)', transformOrigin: 'center' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        } else {
+          // Handle HTML, CSS, JavaScript
+          const srcDoc = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body, html {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: transparent;
+                    overflow: hidden;
+                  }
+                  #preview-wrapper {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transform: scale(0.5);
+                    transform-origin: center;
+                    max-width: 100%;
+                    max-height: 100%;
+                  }
+                  ${component.language.toLowerCase() === 'css' ? component.code : ''}
+                </style>
+              </head>
+              <body>
+                <div id="preview-wrapper">
+                  ${component.language.toLowerCase() === 'html' ? component.code : ''}
+                </div>
+                <script>${component.language.toLowerCase() === 'javascript' ? component.code : ''}</script>
+              </body>
+            </html>
+          `;
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full"
+              style={{ background: 'transparent' }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
+      }
+
+      // Handle components with technology field (submission format)
       if (component.technology === 'css' && component.htmlCode && component.cssCode) {
         const srcDoc = `
           <!DOCTYPE html>
@@ -268,6 +368,7 @@ const CommunityList = () => {
             className="absolute inset-0 w-full h-full object-cover"
             style={{ background: 'transparent' }}
             sandbox="allow-scripts allow-same-origin"
+            title="Preview"
           />
         );
       } else if (component.technology === 'tailwind' && component.tailwindCode) {
@@ -303,9 +404,11 @@ const CommunityList = () => {
             className="absolute inset-0 w-full h-full object-cover"
             style={{ background: 'transparent' }}
             sandbox="allow-scripts allow-same-origin"
+            title="Preview"
           />
         );
       }
+
       // Fallback to preview video if available
       if (component.preview) {
         return (
@@ -319,7 +422,13 @@ const CommunityList = () => {
           />
         );
       }
-      return null;
+
+      // No preview available
+      return (
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500">
+          No preview
+        </div>
+      );
     };
 
     return renderPreview();
@@ -415,9 +524,9 @@ const CommunityList = () => {
             <Link to={`/components/${component.type || 'component'}/${component._id || index}`} key={component._id || index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-0">
-                  <div className="aspect-video rounded-t-lg relative overflow-hidden">
+                  <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
                     <LivePreview component={component} />
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-3 right-3 z-10">
                       <Badge variant="secondary" className="bg-black/50 text-white backdrop-blur-sm">
                         {component.type || component.category}
                       </Badge>
@@ -467,7 +576,7 @@ const CommunityList = () => {
                     <InteractionButtons likes={component.likes || 0} comments={component.comments || 0} />
                   </div>
 
-                  <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                  <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
                     <LivePreview component={component} />
                   </div>
 
