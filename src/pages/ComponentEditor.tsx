@@ -774,18 +774,67 @@ const ComponentEditor: React.FC = () => {
   };
 
   // Modal submit handler
-  const handleModalSubmit = (creatorStatus) => {
-    setShowVerificationModal(false);
-    setModalLocked(false);
-    if (toast) {
-      toast({
-        title: "Creator Status Selected",
-        description: `You selected: ${creatorStatus}`,
-        variant: "default",
+  const handleModalSubmit = async (creatorStatus: "original" | "found" | "modified") => {
+    try {
+      // Get user token
+      const token = localStorage.getItem("token") || "";
+
+      // Prepare submission data
+      const submissionData = {
+        title: `${componentType} component`,
+        componentType: componentType,
+        technology: technology,
+        htmlCode: technology === "css" ? htmlCode : "",
+        cssCode: technology === "css" ? cssCode : "",
+        tailwindCode: technology === "tailwind" ? tailwindCode : "",
+        creatorStatus: creatorStatus,
+      };
+
+      // Submit to backend
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify(submissionData),
       });
-    } else {
-      // eslint-disable-next-line no-console
-      console.log("Creator Status Selected:", creatorStatus);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit component");
+      }
+
+      setShowVerificationModal(false);
+      setModalLocked(false);
+
+      if (toast) {
+        toast({
+          title: "Submission Successful!",
+          description: "Your component has been submitted for review.",
+          variant: "default",
+        });
+      }
+
+      // Optionally navigate back after a delay
+      setTimeout(() => {
+        navigate(-1);
+      }, 2000);
+    } catch (error) {
+      setShowVerificationModal(false);
+      setModalLocked(false);
+
+      if (toast) {
+        toast({
+          title: "Submission Failed",
+          description: error instanceof Error ? error.message : "An error occurred",
+          variant: "destructive",
+        });
+      } else {
+        console.error("Submission error:", error);
+      }
     }
   };
 

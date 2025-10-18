@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import {
   Dialog,
@@ -13,12 +13,40 @@ import { CommunityUserProfile } from "@/components/CommunityUserProfile";
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [popupOpen, setPopupOpen] = useState(false);
+  const [components, setComponents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleOpenPopup = () => setPopupOpen(true);
   const handleClosePopup = () => setPopupOpen(false);
   const handleContinuePopup = () => setPopupOpen(false);
 
-  // Sample data for components
+  // Fetch approved components from API
+  useEffect(() => {
+    const fetchComponents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/components', {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch components');
+        }
+
+        const data = await response.json();
+        setComponents(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching components:', error);
+        setComponents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComponents();
+  }, []);
+
+  // Sample data for components (fallback)
   const featuredComponents = [
     {
       title: "Animated Navigation",
@@ -203,6 +231,100 @@ const CommunityList = () => {
     );
   };
 
+  // LivePreview Component
+  const LivePreview = ({ component }: { component: any }) => {
+    const renderPreview = () => {
+      // If component has technology field (new format)
+      if (component.technology === 'css' && component.htmlCode && component.cssCode) {
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                  overflow: hidden;
+                }
+                ${component.cssCode || ''}
+              </style>
+            </head>
+            <body>
+              ${component.htmlCode || ''}
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            srcDoc={srcDoc}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ background: 'transparent' }}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        );
+      } else if (component.technology === 'tailwind' && component.tailwindCode) {
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <script src="https://cdn.tailwindcss.com"></script>
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                  overflow: hidden;
+                }
+              </style>
+            </head>
+            <body>
+              ${component.tailwindCode || ''}
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            srcDoc={srcDoc}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ background: 'transparent' }}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        );
+      }
+      // Fallback to preview video if available
+      if (component.preview) {
+        return (
+          <video
+            src={component.preview}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        );
+      }
+      return null;
+    };
+
+    return renderPreview();
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
@@ -289,41 +411,34 @@ const CommunityList = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredComponents.map((component, index) => (
-            <Link to={`/community/${component.author.username.replace('@', '')}`} key={index}>
+          {(components.length > 0 ? components.slice(0, 4) : featuredComponents).map((component, index) => (
+            <Link to={`/components/${component.type || 'component'}/${component._id || index}`} key={component._id || index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-0">
                   <div className="aspect-video rounded-t-lg relative overflow-hidden">
-                    <video
-                      src={component.preview}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
+                    <LivePreview component={component} />
                     <div className="absolute top-3 right-3">
                       <Badge variant="secondary" className="bg-black/50 text-white backdrop-blur-sm">
-                        {component.category}
+                        {component.type || component.category}
                       </Badge>
                     </div>
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold text-lg mb-1">{component.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-3">{component.description}</p>
-                    
+                    <p className="text-muted-foreground text-sm mb-3">{component.description || 'Community component'}</p>
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar
-                          initials={component.author.initials}
+                          initials={component.createdBy?.name?.charAt(0).toUpperCase() || component.author?.initials || 'U'}
                           size="sm"
                         />
                         <div>
-                          <div className="text-sm font-medium">{component.author.name}</div>
-                          <div className="text-xs text-muted-foreground">{component.author.username}</div>
+                          <div className="text-sm font-medium">{component.createdBy?.name || component.author?.name || 'Anonymous'}</div>
+                          <div className="text-xs text-muted-foreground">{component.createdBy?.email || component.author?.username || ''}</div>
                         </div>
                       </div>
-                      <InteractionButtons likes={component.likes} comments={component.comments} />
+                      <InteractionButtons likes={component.likes || 0} comments={component.comments || 0} />
                     </div>
                   </div>
                 </CardContent>
@@ -341,32 +456,32 @@ const CommunityList = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allComponents.map((component, index) => (
-            <Link to={`/community/${component.author.username.replace('@', '')}`} key={index}>
+          {(components.length > 0 ? components.slice(4) : allComponents).map((component, index) => (
+            <Link to={`/components/${component.type || 'component'}/${component._id || index}`} key={component._id || index}>
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <Badge variant="secondary" className="bg-secondary/50">
-                      {component.category}
+                      {component.type || component.category}
                     </Badge>
-                    <InteractionButtons likes={component.likes} comments={component.comments} />
+                    <InteractionButtons likes={component.likes || 0} comments={component.comments || 0} />
                   </div>
-                  
-                  <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center">
-                    <div className="text-4xl font-bold text-primary/30">{component.author.initials}</div>
+
+                  <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                    <LivePreview component={component} />
                   </div>
-                  
+
                   <h3 className="font-semibold text-lg mb-2">{component.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4">{component.description}</p>
-                  
+                  <p className="text-muted-foreground text-sm mb-4">{component.description || 'Community component'}</p>
+
                   <div className="flex items-center gap-2">
                     <Avatar
-                      initials={component.author.initials}
+                      initials={component.createdBy?.name?.charAt(0).toUpperCase() || component.author?.initials || 'U'}
                       size="sm"
                     />
                     <div>
-                      <div className="text-sm font-medium">{component.author.name}</div>
-                      <div className="text-xs text-muted-foreground">{component.author.username}</div>
+                      <div className="text-sm font-medium">{component.createdBy?.name || component.author?.name || 'Anonymous'}</div>
+                      <div className="text-xs text-muted-foreground">{component.createdBy?.email || component.author?.username || ''}</div>
                     </div>
                   </div>
                 </CardContent>

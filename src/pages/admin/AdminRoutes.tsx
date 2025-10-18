@@ -12,6 +12,7 @@ import PaymentHistoryPage from "./PaymentHistory/PaymentHistoryPage";
 import BugReportPage from "./BugReport/BugReportPage";
 import FeedbackHistoryPage from "./FeedbackHistory/FeedbackHistoryPage";
 import AdminSidebar from "./components/AdminSidebar";
+import AdminQueue from "@/pages/AdminQueue";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -34,6 +35,14 @@ const AdminRoutes: React.FC = () => {
             element={
               <ProtectedRoute>
                 <UserQueuePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="submission-queue"
+            element={
+              <ProtectedRoute>
+                <AdminQueue />
               </ProtectedRoute>
             }
           />

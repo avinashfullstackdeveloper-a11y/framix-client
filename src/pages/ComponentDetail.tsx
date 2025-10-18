@@ -454,6 +454,27 @@ const ComponentDetail: React.FC = () => {
               {component.description}
             </p>
           )}
+
+          {/* Creator Information */}
+          {component.createdBy && (
+            <div className="flex items-center justify-center gap-3 mt-6 p-4 bg-muted rounded-lg max-w-md mx-auto">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-lg font-semibold">
+                {component.createdBy.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div className="text-left">
+                <div className="font-semibold text-base">{component.createdBy.name || 'Anonymous'}</div>
+                <div className="text-sm text-muted-foreground">{component.createdBy.email || ''}</div>
+                {component.creatorStatus && (
+                  <div className="text-xs text-primary mt-1">
+                    {component.creatorStatus === 'original' && '✓ Original Creator'}
+                    {component.creatorStatus === 'found' && 'Found & Shared'}
+                    {component.creatorStatus === 'modified' && 'Found & Modified'}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {component.tags && component.tags.length > 0 && (
             <div className="flex flex-wrap justify-center gap-2 mt-4">
               {component.tags.map((tag, index) => (
