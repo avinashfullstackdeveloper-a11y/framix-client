@@ -30,7 +30,7 @@ const UserProfileManagementPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiRequest<{ users: User[] }>(`${API_URL}/api/users`);
+      const data = await apiRequest<{ users: User[] }>(`${API_URL}/api/user`);
       setUsers(data.users || []);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to fetch users";
@@ -54,7 +54,7 @@ const UserProfileManagementPage: React.FC = () => {
     setDeletingId(id);
     setError(null);
     try {
-      await apiRequest(`${API_URL}/api/users/${id}`, {
+      await apiRequest(`${API_URL}/api/user/${id}`, {
         method: "DELETE",
       });
       setUsers((prev) => prev.filter((u) => u._id !== id));
