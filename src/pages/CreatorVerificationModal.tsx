@@ -115,18 +115,7 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
             aria-label="Post preview"
           >
             <div className="flex w-full items-center gap-4">
-              <button
-                type="button"
-                className="rounded bg-white border-neutral-700 border flex items-center justify-center px-6 py-2.5 text-sm font-medium text-gray-800 shadow-sm cursor-not-allowed"
-                disabled
-                aria-label="Preview button example"
-                tabIndex={-1}
-              >
-                Button
-              </button>
-              <span className="text-[rgba(26,26,29,1)] text-base font-normal whitespace-normal break-words">
-                This is how your post will look in the preview card.
-              </span>
+              {/* this is the preview area */}
             </div>
           </section>
 
