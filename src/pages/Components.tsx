@@ -221,18 +221,7 @@ const Components = () => {
                     </span>
                   </div>
                 </div>
-                {/* Admin delete button */}
-                {user?.role === "admin" && (
-                  <button
-                    className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white rounded text-xs z-20"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(item._id);
-                    }}
-                  >
-                    Delete
-                  </button>
-                )}
+                {/* Admin delete button removed */}
               </div>
             </div>
           ))
