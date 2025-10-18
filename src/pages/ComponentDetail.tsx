@@ -52,6 +52,7 @@ const ComponentDetail: React.FC = () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
@@ -110,6 +111,7 @@ const ComponentDetail: React.FC = () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      credentials: "include",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch favourites");
@@ -147,6 +149,7 @@ const ComponentDetail: React.FC = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({ component: id }),
         });
         if (!res.ok) {
@@ -165,6 +168,7 @@ const ComponentDetail: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
         });
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));

@@ -22,6 +22,7 @@ import TemplateDetail from "./pages/TemplateDetail";
 import ReportBug from "./pages/ReportBug";
 import { CommunityUserProfile } from "./components/CommunityUserProfile";
 import ComponentEditor from "./pages/ComponentEditor";
+import AdminRoutes from "./pages/admin/AdminRoutes";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,15 @@ const App: React.FC = () => {
             } />
             <Route path="*" element={<NotFoundPage />} />
             <Route path="/report-bug" element={<ReportBug />} />
+            {/* Admin Panel Route */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute>
+                  <AdminRoutes />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Layout>
       </TooltipProvider>

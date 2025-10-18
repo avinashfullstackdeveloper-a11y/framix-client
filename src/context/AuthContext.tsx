@@ -67,7 +67,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
+          role: result.user.role, // Ensure role is set on login
         });
+        // Store user in localStorage for immediate access after login
+        localStorage.setItem("user", JSON.stringify({
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          username: result.user.name,
+          role: result.user.role,
+        }));
       }
     } catch (error: any) {
       console.error("Login error:", error);
@@ -163,7 +172,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
+          role: result.user.role, // Ensure role is set on refetch
         });
+        // Store user in localStorage for immediate access after refetch
+        localStorage.setItem("user", JSON.stringify({
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          username: result.user.name,
+          role: result.user.role,
+        }));
       }
     } catch (error) {
       console.error("Failed to refetch user:", error);

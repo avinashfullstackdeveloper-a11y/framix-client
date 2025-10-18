@@ -37,7 +37,7 @@ const Components = () => {
 
   const fetchComponents = () => {
     setLoading(true);
-    fetch("/api/components")
+    fetch("/api/components", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
@@ -51,7 +51,7 @@ const Components = () => {
     if (!window.confirm("Are you sure you want to delete this component?"))
       return;
     try {
-      const res = await fetch(`/api/components/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/components/${id}`, { method: "DELETE", credentials: "include" });
       if (!res.ok) throw new Error("Failed to delete component");
       setComponents((prev: ComponentItem[]) =>
         prev.filter((c) => c._id !== id)

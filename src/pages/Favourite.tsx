@@ -69,6 +69,7 @@ const Favourite: React.FC = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to remove favourite");
       setFavourites((prev) => prev.filter((f) => f.id !== componentId));

@@ -12,7 +12,7 @@ import { FaGithub } from "react-icons/fa";
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, refetchUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,12 +27,22 @@ const SignIn: React.FC = () => {
 
     try {
       await login(email, password);
+      // Refetch user and wait for update
+      await refetchUser();
 
-      // Navigate immediately after successful login
-      navigate("/components", { replace: true });
-    } catch (err: any) {
+      // Get the latest user from context after refetch
+      // Instead of using stale 'user', fetch fresh user from session
+      const result = await refetchUser();
+      // Use the updated user from AuthContext after refetch
+      const updatedUser = JSON.parse(localStorage.getItem("user") || "null") || user;
+      if (updatedUser && updatedUser.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/components", { replace: true });
+      }
+    } catch (err) {
       console.error("SignIn error:", err);
-      setError((err as Error).message || "An error occurred");
+      setError((err instanceof Error ? err.message : "An error occurred"));
       setIsLoading(false);
     }
   };
