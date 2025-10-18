@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState, useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-export type CreatorStatus = 'original' | 'found' | 'modified';
+export type CreatorStatus = "original" | "found" | "modified";
 
 export interface CreatorVerificationModalProps {
   onClose: () => void;
@@ -12,18 +12,17 @@ interface CreatorFormData {
   creatorStatus: CreatorStatus;
 }
 
-export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> = ({
-  onClose,
-  onSubmit,
-}) => {
+export const CreatorVerificationModal: React.FC<
+  CreatorVerificationModalProps
+> = ({ onClose, onSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, watch } = useForm<CreatorFormData>({
     defaultValues: {
-      creatorStatus: 'original',
+      creatorStatus: "original",
     },
   });
 
-  const selectedValue = watch('creatorStatus');
+  const selectedValue = watch("creatorStatus");
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Trap focus inside modal for accessibility
@@ -33,14 +32,15 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
     const modal = modalRef.current;
     if (!modal) return;
 
-    const focusableEls = modal.querySelectorAll<HTMLElement>(focusableSelectors);
+    const focusableEls =
+      modal.querySelectorAll<HTMLElement>(focusableSelectors);
     if (focusableEls.length) focusableEls[0].focus();
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
-      if (e.key === 'Tab') {
+      if (e.key === "Tab") {
         const first = focusableEls[0];
         const last = focusableEls[focusableEls.length - 1];
         if (e.shiftKey) {
@@ -56,8 +56,8 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
         }
       }
     }
-    modal.addEventListener('keydown', handleKeyDown);
-    return () => modal.removeEventListener('keydown', handleKeyDown);
+    modal.addEventListener("keydown", handleKeyDown);
+    return () => modal.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
   const handleFormSubmit = async (data: { creatorStatus: CreatorStatus }) => {
@@ -72,7 +72,7 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
   // Prevent background scroll when modal is open
   useEffect(() => {
     const original = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = original;
     };
@@ -87,11 +87,11 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
       aria-describedby="modal-description"
       tabIndex={-1}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      style={{ overscrollBehavior: 'contain' }}
+      style={{ overscrollBehavior: "contain" }}
     >
       <div
         className="relative bg-[rgba(26,26,29,1)] shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)] flex flex-col max-w-[920px] w-full rounded-2xl border-0 max-h-[90vh] overflow-y-auto focus:outline-none"
-        style={{ boxSizing: 'border-box' }}
+        style={{ boxSizing: "border-box" }}
       >
         <header className="flex justify-end mb-6 sticky top-0 bg-[rgba(26,26,29,1)] z-20 px-6 pt-6 rounded-t-2xl">
           <button
@@ -134,89 +134,92 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
                   <span className="leading-[35px]">
                     Are you the original creator of
                   </span>
-                  <span className="leading-none">
-                    this element?
-                  </span>
+                  <span className="leading-none">this element?</span>
                 </legend>
 
-                <div className="mt-6 space-y-4" id="modal-description">
-                  <label className="flex items-center gap-3 cursor-pointer">
+                <div className="mt-8 space-y-6" id="modal-description">
+                  {/* Option 1 */}
+                  <label className="flex items-start gap-4 cursor-pointer group">
                     <input
-                      {...register('creatorStatus')}
+                      {...register("creatorStatus")}
                       type="radio"
                       value="original"
                       id="original"
                       className="sr-only"
                     />
                     <span
-                      className={`flex items-center justify-center w-5 h-5 rounded-full border-2 ${
-                        selectedValue === 'original'
-                          ? 'bg-[rgba(255,71,156,1)] border-[rgba(255,71,156,1)]'
-                          : 'border-[rgba(74,74,82,1)]'
+                      className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 transition-colors ${
+                        selectedValue === "original"
+                          ? "bg-[rgba(255,71,156,1)] border-[rgba(255,71,156,1)]"
+                          : "border-[rgba(74,74,82,1)] group-hover:border-[rgba(255,71,156,0.5)]"
                       }`}
-                      aria-checked={selectedValue === 'original'}
+                      aria-checked={selectedValue === "original"}
                       aria-label="Yes, I am the original creator"
                     >
-                      {selectedValue === 'original' && (
+                      {selectedValue === "original" && (
                         <span className="bg-white w-2 h-2 rounded-full block" />
                       )}
                     </span>
-                    <span className="text-[rgba(229,229,231,1)] text-[15px] font-medium leading-loose">
-                      Yes, I am the original creator
+                    <span className="flex flex-col">
+                      <span className="text-[rgba(229,229,231,1)] text-[15px] font-medium leading-relaxed">
+                        Yes, I am the original creator
+                      </span>
                     </span>
                   </label>
 
-                  <label className="flex items-start gap-3 cursor-pointer">
+                  {/* Option 2 */}
+                  <label className="flex items-start gap-4 cursor-pointer group">
                     <input
-                      {...register('creatorStatus')}
+                      {...register("creatorStatus")}
                       type="radio"
                       value="found"
                       id="found"
                       className="sr-only"
                     />
                     <span
-                      className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-1 ${
-                        selectedValue === 'found'
-                          ? 'bg-[rgba(255,71,156,1)] border-[rgba(255,71,156,1)]'
-                          : 'border-[rgba(74,74,82,1)]'
+                      className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 transition-colors ${
+                        selectedValue === "found"
+                          ? "bg-[rgba(255,71,156,1)] border-[rgba(255,71,156,1)]"
+                          : "border-[rgba(74,74,82,1)] group-hover:border-[rgba(255,71,156,0.5)]"
                       }`}
-                      aria-checked={selectedValue === 'found'}
+                      aria-checked={selectedValue === "found"}
                       aria-label="No, I found this post somewhere else"
                     >
-                      {selectedValue === 'found' && (
+                      {selectedValue === "found" && (
                         <span className="bg-white w-2 h-2 rounded-full block" />
                       )}
                     </span>
-                    <span className="flex flex-col text-[15px] text-gray-400 font-medium leading-6">
-                      <span>
+                    <span className="flex flex-col">
+                      <span className="text-[rgba(229,229,231,1)] text-[15px] font-medium leading-relaxed">
                         No, I found this post somewhere else and I want to share it with the community here
                       </span>
                     </span>
                   </label>
 
-                  <label className="flex items-start gap-3 cursor-pointer">
+                  {/* Option 3 */}
+                  <label className="flex items-start gap-4 cursor-pointer group">
                     <input
-                      {...register('creatorStatus')}
+                      {...register("creatorStatus")}
                       type="radio"
                       value="modified"
                       id="modified"
                       className="sr-only"
                     />
                     <span
-                      className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-1 ${
-                        selectedValue === 'modified'
-                          ? 'bg-[rgba(255,71,156,1)] border-[rgba(255,71,156,1)]'
-                          : 'border-[rgba(74,74,82,1)]'
+                      className={`flex items-center justify-center w-5 h-5 rounded-full border-2 mt-0.5 flex-shrink-0 transition-colors ${
+                        selectedValue === "modified"
+                          ? "bg-[rgba(255,71,156,1)] border-[rgba(255,71,156,1)]"
+                          : "border-[rgba(74,74,82,1)] group-hover:border-[rgba(255,71,156,0.5)]"
                       }`}
-                      aria-checked={selectedValue === 'modified'}
+                      aria-checked={selectedValue === "modified"}
                       aria-label="No, I found this post and made changes"
                     >
-                      {selectedValue === 'modified' && (
+                      {selectedValue === "modified" && (
                         <span className="bg-white w-2 h-2 rounded-full block" />
                       )}
                     </span>
-                    <span className="flex flex-col text-[15px] text-gray-400 font-medium leading-6">
-                      <span>
+                    <span className="flex flex-col">
+                      <span className="text-[rgba(229,229,231,1)] text-[15px] font-medium leading-relaxed">
                         No, I found this post somewhere else and I made significant changes to it
                       </span>
                     </span>
@@ -226,17 +229,18 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
 
               {/* Warning Message */}
               <aside
-                className="flex items-center text-sm text-yellow-400 font-medium mt-6 gap-2"
+                className="flex items-start text-sm text-yellow-400 font-medium mt-8 gap-3"
                 role="alert"
                 aria-label="Important warning"
               >
                 <img
                   src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/9e5cf6b5d093bde6d1cc529106add6e556e0e795?placeholderIfAbsent=true"
-                  className="aspect-[1] object-contain w-4 shrink-0"
+                  className="aspect-[1] object-contain w-4 shrink-0 mt-0.5"
                   alt="Warning icon"
                 />
-                <span>
-                  If you repost without crediting the source, your account may be suspended.
+                <span className="leading-5">
+                  If you repost without crediting the source, your account may
+                  be suspended.
                 </span>
               </aside>
 
@@ -244,7 +248,7 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-[rgba(255,71,156,1)] flex min-h-[51px] w-full items-center gap-2 text-[15px] text-white font-medium justify-center mt-8 rounded-[10px] hover:bg-[rgba(255,71,156,0.9)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="bg-[rgba(255,71,156,1)] flex min-h-[51px] w-full items-center gap-2 text-[15px] text-white font-medium justify-center mt-8 rounded-[10px] hover:bg-[rgba(255,71,156,0.9)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-[rgba(255,71,156,0.5)] focus:ring-offset-2 focus:ring-offset-[rgba(26,26,29,1)]"
                 aria-label="Submit form for review"
               >
                 <img
@@ -252,9 +256,7 @@ export const CreatorVerificationModal: React.FC<CreatorVerificationModalProps> =
                   className="aspect-[1] object-contain w-4 shrink-0"
                   alt=""
                 />
-                <span>
-                  Submit for review
-                </span>
+                <span>Submit for review</span>
               </button>
             </form>
           </section>
