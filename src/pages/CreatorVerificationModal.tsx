@@ -6,6 +6,10 @@ export type CreatorStatus = "original" | "found" | "modified";
 export interface CreatorVerificationModalProps {
   onClose: () => void;
   onSubmit: (creatorStatus: CreatorStatus) => void;
+  htmlCode?: string;
+  cssCode?: string;
+  tailwindCode?: string;
+  technology?: "css" | "tailwind";
 }
 
 interface CreatorFormData {
@@ -14,7 +18,14 @@ interface CreatorFormData {
 
 export const CreatorVerificationModal: React.FC<
   CreatorVerificationModalProps
-> = ({ onClose, onSubmit }) => {
+> = ({
+  onClose,
+  onSubmit,
+  htmlCode = "",
+  cssCode = "",
+  tailwindCode = "",
+  technology = "css",
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, watch } = useForm<CreatorFormData>({
     defaultValues: {
@@ -109,13 +120,75 @@ export const CreatorVerificationModal: React.FC<
         </header>
 
         <main className="flex flex-col md:flex-row w-full max-w-[824px] mx-auto gap-8 px-6 pb-12 max-md:px-3 max-md:pb-6">
-          {/* Left: Preview Card */}
+          {/* Left: Live Preview */}
           <section
             className="flex-1 flex items-center justify-center min-h-[315px] max-w-[380px] w-full bg-neutral-200 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1)] rounded-[14px] p-6 overflow-auto"
             aria-label="Post preview"
           >
-            <div className="flex w-full items-center gap-4">
-              {/* this is the preview area */}
+            <div className="w-full h-full flex items-center justify-center">
+              {technology === "css" ? (
+                <iframe
+                  srcDoc={`<!DOCTYPE html>
+                    <html>
+                      <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>
+                          * { margin: 0; padding: 0; box-sizing: border-box; }
+                          body, html {
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: transparent;
+                            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                            overflow: hidden;
+                          }
+                          ${cssCode || ""}
+                        </style>
+                      </head>
+                      <body>
+                        ${htmlCode || ""}
+                      </body>
+                    </html>`}
+                  className="w-full h-full border-0"
+                  style={{ background: "transparent", minHeight: 200 }}
+                  sandbox="allow-scripts allow-same-origin"
+                  title="Live Preview"
+                />
+              ) : (
+                <iframe
+                  srcDoc={`<!DOCTYPE html>
+                    <html>
+                      <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <script src="https://cdn.tailwindcss.com"></script>
+                        <style>
+                          * { margin: 0; padding: 0; box-sizing: border-box; }
+                          body, html {
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: transparent;
+                            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                            overflow: hidden;
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        ${tailwindCode || ""}
+                      </body>
+                    </html>`}
+                  className="w-full h-full border-0"
+                  style={{ background: "transparent", minHeight: 200 }}
+                  sandbox="allow-scripts allow-same-origin"
+                  title="Live Preview"
+                />
+              )}
             </div>
           </section>
 
@@ -191,7 +264,8 @@ export const CreatorVerificationModal: React.FC<
                     </span>
                     <span className="flex flex-col">
                       <span className="text-[rgba(229,229,231,1)] text-[15px] font-medium leading-relaxed">
-                        No, I found this post somewhere else and I want to share it with the community here
+                        No, I found this post somewhere else and I want to share
+                        it with the community here
                       </span>
                     </span>
                   </label>
@@ -220,7 +294,8 @@ export const CreatorVerificationModal: React.FC<
                     </span>
                     <span className="flex flex-col">
                       <span className="text-[rgba(229,229,231,1)] text-[15px] font-medium leading-relaxed">
-                        No, I found this post somewhere else and I made significant changes to it
+                        No, I found this post somewhere else and I made
+                        significant changes to it
                       </span>
                     </span>
                   </label>

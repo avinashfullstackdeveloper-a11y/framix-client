@@ -795,6 +795,10 @@ const ComponentEditor: React.FC = () => {
         <CreatorVerificationModal
           onClose={handleModalClose}
           onSubmit={handleModalSubmit}
+          htmlCode={technology === "css" ? htmlCode : undefined}
+          cssCode={technology === "css" ? cssCode : undefined}
+          tailwindCode={technology === "tailwind" ? tailwindCode : undefined}
+          technology={technology}
         />
       )}
       <div className="max-w-7xl mx-auto">
