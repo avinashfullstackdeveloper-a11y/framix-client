@@ -7,6 +7,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { apiRequest } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { LiveProvider, LivePreview, LiveError } from "react-live";
+import { Trash2, Component } from "lucide-react";
 
 type ComponentItem = {
   _id: string;
@@ -48,7 +50,7 @@ const ComponentsPage: React.FC = () => {
       await apiRequest(`/api/components/${id}`, { method: "DELETE" });
       setComponents((prev) => prev.filter((c) => c._id !== id));
       toast({
-        title: "Component deleted",
+        title: "Component deleted successfully",
         variant: "default",
       });
     } catch (err) {
@@ -66,47 +68,178 @@ const ComponentsPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          <span className="text-primary">Admin</span> Components
+          <span className="text-[#FF9AC9]">Admin</span> Components
         </h1>
-        <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
-          Manage all uploaded components. Only admins can delete components.
+        <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
+          Manage all uploaded components with full administrative control and preview capabilities.
         </p>
       </div>
+
+      {/* Stats Bar */}
+      <div className="flex justify-center mb-8">
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl px-6 py-3">
+          <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <Component className="w-4 h-4 text-[#FF9AC9]" />
+              <span className="text-white">{components.length}</span>
+              <span className="text-[#767676]">Total Components</span>
+            </div>
+            <div className="w-px h-6 bg-[#3A3A3A]"></div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#FF9AC9] font-medium">Admin Access</span>
+              <span className="text-[#767676]">Full Control</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Components Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto">
         {loading ? (
-          <div className="text-center text-lg w-full col-span-3">Loading...</div>
+          <div className="text-center text-lg text-white w-full col-span-3 py-12">
+            Loading components...
+          </div>
         ) : components.length === 0 ? (
-          <div className="text-center text-lg w-full col-span-3">No components found.</div>
+          <div className="text-center w-full col-span-3 py-16">
+            <Component className="w-16 h-16 text-[#767676] mx-auto mb-4" />
+            <p className="text-[#767676] text-lg">No components found</p>
+            <p className="text-[#767676] text-sm mt-1">Upload some components to get started</p>
+          </div>
         ) : (
           components.map((item) => (
             <div
               key={item._id}
-              className="relative group border rounded-2xl bg-black hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] transition-all duration-300 p-4 cursor-pointer"
               onClick={() => navigate(`/components/${item.type}/${item._id}`)}
+              className="cursor-pointer w-full"
             >
-              <div className="mb-2">
-                <h3 className="text-white text-lg font-semibold">{item.title}</h3>
-                <span className={`ml-2 text-xs ${item.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"}`}>
-                  {item.badge || "Free"}
-                </span>
+              <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
+                
+                {/* Component Preview */}
+                <div className="flex h-[calc(100%-5rem)] flex-col justify-center items-center shrink-0 absolute w-[calc(100%-4rem)] bg-black rounded-2xl sm:rounded-3xl left-8 top-4 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
+                  {item.language && item.code && (
+                    item.language.toLowerCase() === "react" ? (
+                      <div className="w-full h-full flex items-center justify-center" style={{ transform: 'scale(0.6)', transformOrigin: 'center' }}>
+                        <LiveProvider code={item.code}>
+                          <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
+                          <LivePreview />
+                          <LiveError className="live-error" />
+                        </LiveProvider>
+                      </div>
+                    ) : item.language.toLowerCase() === "multi" ? (
+                      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                        <iframe
+                          title="Preview"
+                          srcDoc={item.code}
+                          className="border-0"
+                          style={{
+                            width: '160%',
+                            height: '160%',
+                            margin: 0,
+                            padding: 0,
+                            transform: 'scale(0.6)',
+                            transformOrigin: 'center',
+                            overflow: 'hidden'
+                          }}
+                          sandbox="allow-scripts"
+                        />
+                      </div>
+                    ) : (
+                      <iframe
+                        title="Preview"
+                        srcDoc={`<!DOCTYPE html>
+                            <html>
+                              <head>
+                                <style>
+                                  * {
+                                    margin: 0;
+                                    padding: 0;
+                                    box-sizing: border-box;
+                                  }
+                                  body, html {
+                                    width: 100%;
+                                    height: 100%;
+                                    overflow: hidden;
+                                    background: transparent;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                  }
+                                  #preview-wrapper {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    transform: scale(0.5);
+                                    transform-origin: center;
+                                  }
+                                  ${
+                                    item.language.toLowerCase() === "css"
+                                      ? item.code
+                                      : ""
+                                  }
+                                </style>
+                              </head>
+                              <body>
+                                <div id="preview-wrapper">
+                                  ${
+                                    item.language.toLowerCase() === "html"
+                                      ? item.code
+                                      : ""
+                                  }
+                                </div>
+                                <script>${
+                                  item.language.toLowerCase() === "javascript"
+                                    ? item.code
+                                    : ""
+                                }</script>
+                              </body>
+                            </html>`}
+                        className="w-full h-full rounded-lg border-0"
+                        style={{ margin: 0, padding: 0 }}
+                      />
+                    )
+                  )}
+                </div>
+
+                {/* Component Info */}
+                <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+                  <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
+                    <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                      {item.title}
+                    </h3>
+                    <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                      <span
+                        className={`text-xs sm:text-sm font-normal ${
+                          item.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
+                        }`}
+                      >
+                        {item.badge || "Free"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-white text-xs sm:text-[13px] font-light">
+                      {item.type} • {item.stats || ""}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Admin Delete Button */}
+                {user?.role === "admin" && (
+                  <button
+                    className="absolute top-3 right-3 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 hover:border-red-500/50 rounded-lg text-xs font-medium transition-all duration-300 z-20 flex items-center gap-1 group/delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(item._id);
+                    }}
+                  >
+                    <Trash2 className="w-3 h-3 group-hover/delete:scale-110 transition-transform" />
+                    Delete
+                  </button>
+                )}
               </div>
-              <div className="text-sm text-muted-foreground mb-2">{item.type}</div>
-              <div className="text-xs text-gray-400 mb-4">{item.stats || ""}</div>
-              {user?.role === "admin" && (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-3 right-3 z-10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(item._id);
-                  }}
-                >
-                  Delete
-                </Button>
-              )}
             </div>
           ))
         )}

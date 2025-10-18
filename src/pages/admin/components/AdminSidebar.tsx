@@ -17,35 +17,27 @@ export const adminTabs = [
 
 const AdminSidebar: React.FC = () => {
   return (
-    <aside
-      style={{
-        width: 220,
-        minHeight: "100vh",
-        background: "#f8f9fa",
-        borderRight: "1px solid #e5e7eb",
-        padding: "2rem 1rem",
-        boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem"
-      }}
-    >
+    <aside className="w-64 min-h-screen bg-[rgba(0,0,0,0.80)] border-r border-[#3A3A3A] p-8 flex flex-col gap-6">
+      {/* Header */}
+      <div className="pb-4 border-b border-[#3A3A3A]">
+        <h2 className="text-xl font-bold text-white">Admin Panel</h2>
+        <p className="text-xs text-[#767676] mt-1">Management Dashboard</p>
+      </div>
+
+      {/* Navigation */}
       <nav>
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        <ul className="space-y-2">
           {adminTabs.map((tab) => (
-            <li key={tab.path} style={{ marginBottom: "0.5rem" }}>
+            <li key={tab.path}>
               <NavLink
                 to={tab.path}
-                style={({ isActive }) => ({
-                  display: "block",
-                  padding: "0.75rem 1rem",
-                  borderRadius: 6,
-                  color: isActive ? "#fff" : "#222",
-                  background: isActive ? "#2563eb" : "transparent",
-                  textDecoration: "none",
-                  fontWeight: isActive ? 600 : 400,
-                  transition: "background 0.15s"
-                })}
+                className={({ isActive }) => 
+                  `block w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border ${
+                    isActive 
+                      ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828] shadow-[0_0_20px_rgba(255,154,201,0.3)]" 
+                      : "border-transparent text-[#767676] hover:text-white hover:bg-[#3A3A3A] hover:border-[#3A3A3A]"
+                  }`
+                }
                 end
               >
                 {tab.label}
@@ -54,6 +46,13 @@ const AdminSidebar: React.FC = () => {
           ))}
         </ul>
       </nav>
+
+      {/* Footer */}
+      <div className="mt-auto pt-4 border-t border-[#3A3A3A]">
+        <p className="text-xs text-[#767676] text-center">
+          Admin Portal v1.0
+        </p>
+      </div>
     </aside>
   );
 };

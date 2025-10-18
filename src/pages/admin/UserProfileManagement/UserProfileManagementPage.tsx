@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { Trash2, User, Mail, Shield, Activity } from "lucide-react";
 
 type User = {
   _id: string;
@@ -59,7 +60,7 @@ const UserProfileManagementPage: React.FC = () => {
       });
       setUsers((prev) => prev.filter((u) => u._id !== id));
       toast({
-        title: "User deleted",
+        title: "User deleted successfully",
         variant: "default",
       });
     } catch (err) {
@@ -75,54 +76,176 @@ const UserProfileManagementPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="p-4">Loading users...</div>;
-  if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center text-white">Loading users...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">User Profile Management</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            {currentUser?.role === "admin" && <TableHead>Actions</TableHead>}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((u) => (
-            <TableRow key={u._id}>
-              <TableCell>{u.name}</TableCell>
-              <TableCell>{u.email}</TableCell>
-              <TableCell>{u.role}</TableCell>
-              <TableCell>
-                {u.isActive ? (
-                  <span className="text-green-600">Active</span>
-                ) : (
-                  <span className="text-gray-400">Inactive</span>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+          <span className="text-[#FF9AC9]">User Profile</span> Management
+        </h1>
+        <p className="text-base sm:text-lg text-[#767676] max-w-2xl mx-auto">
+          Manage user accounts, roles, and permissions across the platform.
+        </p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300">
+          <div className="flex justify-center mb-3">
+            <User className="w-8 h-8 text-[#FF9AC9]" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">{users.length}</h3>
+          <p className="text-sm text-[#767676]">Total Users</p>
+        </div>
+        
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300">
+          <div className="flex justify-center mb-3">
+            <Shield className="w-8 h-8 text-[#FF9AC9]" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">
+            {users.filter(u => u.role === 'admin').length}
+          </h3>
+          <p className="text-sm text-[#767676]">Admin Users</p>
+        </div>
+        
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300">
+          <div className="flex justify-center mb-3">
+            <Activity className="w-8 h-8 text-[#FF9AC9]" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">
+            {users.filter(u => u.isActive).length}
+          </h3>
+          <p className="text-sm text-[#767676]">Active Users</p>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl overflow-hidden">
+        <div className="p-6 border-b border-[#3A3A3A]">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <User className="w-5 h-5 text-[#FF9AC9]" />
+            User Accounts
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-[#3A3A3A] hover:bg-transparent">
+                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Name
+                  </div>
+                </TableHead>
+                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </div>
+                </TableHead>
+                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
+                    Role
+                  </div>
+                </TableHead>
+                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4" />
+                    Status
+                  </div>
+                </TableHead>
+                {currentUser?.role === "admin" && (
+                  <TableHead className="text-[#FF9AC9] font-medium py-4 text-center">
+                    Actions
+                  </TableHead>
                 )}
-              </TableCell>
-              {currentUser?.role === "admin" && (
-                <TableCell>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={deletingId === u._id}
-                    onClick={() => handleDelete(u._id)}
-                  >
-                    {deletingId === u._id ? "Deleting..." : "Delete"}
-                  </Button>
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {users.length === 0 && (
-        <div className="mt-4 text-muted-foreground">No users found.</div>
-      )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((u) => (
+                <TableRow 
+                  key={u._id} 
+                  className="border-b border-[#3A3A3A] hover:bg-[#1A1A1A] transition-all duration-300 group"
+                >
+                  <TableCell className="py-4 text-white font-medium">
+                    {u.name}
+                  </TableCell>
+                  <TableCell className="py-4 text-[#767676]">
+                    {u.email}
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      u.role === 'admin' 
+                        ? 'bg-[#FF9AC9] text-[#282828]' 
+                        : 'bg-[#3A3A3A] text-white'
+                    }`}>
+                      {u.role}
+                    </span>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      u.isActive 
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                        : 'bg-[#3A3A3A] text-[#767676]'
+                    }`}>
+                      {u.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </TableCell>
+                  {currentUser?.role === "admin" && (
+                    <TableCell className="py-4 text-center">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        disabled={deletingId === u._id}
+                        onClick={() => handleDelete(u._id)}
+                        className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 hover:border-red-500/50 transition-all duration-300"
+                      >
+                        {deletingId === u._id ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                            Deleting...
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Trash2 className="w-3 h-3" />
+                            Delete
+                          </div>
+                        )}
+                      </Button>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {users.length === 0 && (
+          <div className="text-center py-12">
+            <User className="w-12 h-12 text-[#767676] mx-auto mb-4" />
+            <p className="text-[#767676] text-lg">No users found</p>
+            <p className="text-[#767676] text-sm mt-1">There are no users to display</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
