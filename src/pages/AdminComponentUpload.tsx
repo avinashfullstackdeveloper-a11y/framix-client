@@ -7,6 +7,9 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Upload, Code, FileText, Palette, Settings2, X } from "lucide-react";
 
+import { apiRequest } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+
 interface AdminComponentUploadProps {
   onUploadSuccess?: () => void;
 }
@@ -107,6 +110,8 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     return form.html || form.css || form.js;
   };
 
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -146,17 +151,16 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
         js: form.js,
       };
 
-      const res = await fetch("/api/components", {
+      await apiRequest("/api/components", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(jsonBody),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to upload component");
-      }
-
       setSuccess(true);
+      toast({
+        title: "Component uploaded successfully!",
+        variant: "default",
+      });
       setForm({
         title: "",
         type: "",
@@ -169,11 +173,13 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
         onUploadSuccess();
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Error occurred");
-      }
+      const msg = err instanceof Error ? err.message : "Error occurred";
+      setError(msg);
+      toast({
+        title: "Upload failed",
+        description: msg,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

@@ -2,8 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
-import AdminComponentUpload from "./AdminComponentUpload";
 
 import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
@@ -33,7 +31,6 @@ const Components = () => {
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState(filterTabs[0]);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -81,26 +78,6 @@ const Components = () => {
         </p>
       </div>
 
-      {/* Admin Upload Button */}
-      {user?.role === "admin" && (
-        <div className="flex justify-center mb-6 sm:mb-8">
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="px-4 py-2 bg-primary text-white rounded shadow hover:bg-primary/80 transition">
-                Upload New Component
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <AdminComponentUpload
-                onUploadSuccess={() => {
-                  setDialogOpen(false);
-                  fetchComponents();
-                }}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-      )}
 
       {/* Filter Tabs */}
       <div className="flex justify-center items-center mb-8 sm:mb-12">

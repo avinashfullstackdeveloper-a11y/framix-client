@@ -4,6 +4,7 @@ import { Skeleton } from "../components/ui/skeleton";
 import { useAuth } from "@/context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
 import { Heart, ExternalLink, Eye, Trash2 } from "lucide-react";
+import { apiRequest } from "@/lib/api";
 
 type FavouriteComponent = {
   id: string;
@@ -33,18 +34,14 @@ const Favourite: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/favourites", {
+        const data = await apiRequest<any[]>("/api/favourites", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!response.ok) {
-          throw new Error("Failed to fetch favourites");
-        }
-        const data = await response.json();
         // Map backend favourites to FavouriteComponent[]
         const mapped = Array.isArray(data)
-          ? data.map((fav: any) => ({
+          ? data.map((fav) => ({
               id: fav.component?._id || fav.component?.id || fav.component,
               title: fav.component?.title || "Untitled",
               type: fav.component?.type || "",
@@ -55,8 +52,8 @@ const Favourite: React.FC = () => {
             }))
           : [];
         setFavourites(mapped);
-      } catch (err: any) {
-        setError(err.message || "Unknown error");
+      } catch (err) {
+        setError((err as Error).message || "Unknown error");
       } finally {
         setLoading(false);
       }

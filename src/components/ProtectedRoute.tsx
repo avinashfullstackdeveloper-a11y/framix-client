@@ -30,6 +30,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
+  // Only allow admins for admin routes
+  if (location.pathname.startsWith("/admin") && user?.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
   // User is authenticated, render the protected content
   return <>{children}</>;
 }
