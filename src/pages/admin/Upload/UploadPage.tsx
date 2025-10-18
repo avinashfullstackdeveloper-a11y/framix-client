@@ -1,5 +1,5 @@
 import React from "react";
-import AdminComponentUpload from "../../AdminComponentUpload";
+import AdminComponentUpload from "../AdminComponentUpload";
 
 const UploadPage: React.FC = () => {
   return (

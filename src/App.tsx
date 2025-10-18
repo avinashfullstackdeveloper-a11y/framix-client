@@ -13,7 +13,7 @@ import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import SettingsPage from "./pages/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import AdminComponentUpload from "./pages/AdminComponentUpload";
+import AdminComponentUpload from "./pages/admin/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
 import Favourite from "./pages/Favourite";
 import Community from "./pages/Community";
