@@ -4,7 +4,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ComponentsPage from "./components/ComponentsPage";
-import UserQueuePage from "./UserQueue/UserQueuePage";
 import UploadPage from "./Upload/UploadPage";
 import BlogsPage from "./Blogs/BlogsPage";
 import UserProfileManagementPage from "./UserProfileManagement/UserProfileManagementPage";
@@ -12,7 +11,7 @@ import PaymentHistoryPage from "./PaymentHistory/PaymentHistoryPage";
 import BugReportPage from "./BugReport/BugReportPage";
 import FeedbackHistoryPage from "./FeedbackHistory/FeedbackHistoryPage";
 import AdminSidebar from "./components/AdminSidebar";
-import AdminQueue from "@/pages/AdminQueue";
+import AdminQueue from "@/pages/admin/AdminQueue/AdminQueue";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -31,15 +30,7 @@ const AdminRoutes: React.FC = () => {
             }
           />
           <Route
-            path="user-queue"
-            element={
-              <ProtectedRoute>
-                <UserQueuePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="submission-queue"
+            path="admin-queue"
             element={
               <ProtectedRoute>
                 <AdminQueue />

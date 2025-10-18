@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 
 export const adminTabs = [
   { label: "Components", path: "/admin/components" },
-  { label: "User Queue", path: "/admin/user-queue" },
+  { label: "Admin Queue", path: "/admin/admin-queue" },
   { label: "Upload", path: "/admin/upload" },
   { label: "Blogs", path: "/admin/blogs" },
   { label: "User Profile Management", path: "/admin/user-profile-management" },
