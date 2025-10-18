@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, Shield, Heart } from "lucide-react";
+import { User, LogOut, Settings, Shield, Heart, Bell } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,6 +73,13 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
         >
           <Heart className="mr-2 h-4 w-4" />
           <span>Favourite</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => navigate("/notifications")}
+          className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
+        >
+          <Bell className="mr-2 h-4 w-4" />
+          <span>Notifications</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => navigate("/feedback")}

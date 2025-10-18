@@ -23,6 +23,7 @@ import ReportBug from "./pages/ReportBug";
 import { CommunityUserProfile } from "./components/CommunityUserProfile";
 import ComponentEditor from "./pages/ComponentEditor";
 import AdminRoutes from "./pages/admin/AdminRoutes";
+import NotificationsPage from "./pages/NotificationsPage";
 
 const queryClient = new QueryClient();
 
@@ -46,9 +47,9 @@ const App: React.FC = () => {
             <Route path="/templates" element={<Templates />} />
             <Route path="/templates/:id" element={<TemplateDetail />} />
             <Route path="/community" element={<Community />} />
-// Community user profile route
-
-<Route path="/community/:username" element={<CommunityUserProfile />} />
+            {/* Community user profile route */}
+            <Route path="/community/:username" element={<CommunityUserProfile />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/signin" element={<SignIn />} />
