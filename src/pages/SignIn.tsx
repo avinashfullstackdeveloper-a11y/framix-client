@@ -19,6 +19,17 @@ const SignIn: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
+  // Redirect based on user role after login/refetch
+  React.useEffect(() => {
+    if (user && user.role) {
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/components", { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
   // Handle Email/Password Login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,19 +38,8 @@ const SignIn: React.FC = () => {
 
     try {
       await login(email, password);
-      // Refetch user and wait for update
       await refetchUser();
-
-      // Get the latest user from context after refetch
-      // Instead of using stale 'user', fetch fresh user from session
-      const result = await refetchUser();
-      // Use the updated user from AuthContext after refetch
-      const updatedUser = JSON.parse(localStorage.getItem("user") || "null") || user;
-      if (updatedUser && updatedUser.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/components", { replace: true });
-      }
+      // Navigation is now handled by useEffect when user updates
     } catch (err) {
       console.error("SignIn error:", err);
       setError((err instanceof Error ? err.message : "An error occurred"));
