@@ -1,30 +1,53 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 const ReportBug: React.FC = () => {
+  const [title, setTitle] = useState("");
   const [bugDescription, setBugDescription] = useState("");
-  const maxCharacters = 500;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (bugDescription.trim()) {
-      // Handle form submission here
-      console.log("Bug report submitted:", bugDescription);
-      // You could add actual submission logic here
-      alert("Bug report submitted successfully!");
-      setBugDescription("");
-    }
-  };
-
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (value.length <= maxCharacters) {
-      setBugDescription(value);
-    }
-  };
-
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<null | { type: "success" | "error"; message: string }>(null);
+  const maxTitleCharacters = 100;
+  const maxDescriptionCharacters = 500;
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFeedback(null);
+    if (!title.trim() || !bugDescription.trim()) return;
+    setLoading(true);
+    try {
+      console.log("Submitting bug report:", {
+        title: title.trim(),
+        description: bugDescription.trim(),
+        username: user?.username || user?.name || undefined,
+      });
+      const response = await apiRequest("/api/bug-reports", {
+        method: "POST",
+        body: JSON.stringify({
+          title: title.trim(),
+          description: bugDescription.trim(),
+          username: user?.username || user?.name || undefined,
+        }),
+      });
+      console.log("Bug report submission response:", response);
+      setFeedback({ type: "success", message: "Bug report submitted successfully!" });
+      setTitle("");
+      setBugDescription("");
+    } catch (err) {
+      console.error("Bug report submission error:", err);
+      const errorMsg =
+        err && typeof err === "object" && "message" in err
+          ? (err as { message?: string }).message
+          : "Failed to submit bug report.";
+      setFeedback({ type: "error", message: errorMsg || "Failed to submit bug report." });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section className="flex items-center justify-center min-h-screen w-full">
@@ -53,30 +76,60 @@ const ReportBug: React.FC = () => {
           onSubmit={handleSubmit}
           className="w-full text-sm leading-none mt-8 max-md:max-w-full"
         >
+          <div className="mb-4">
+            <input
+              type="text"
+              value={title}
+              onChange={e => {
+                if (e.target.value.length <= maxTitleCharacters) setTitle(e.target.value);
+              }}
+              placeholder="Bug Title"
+              className="w-full bg-black border border-[rgba(255,154,201,0.6)] rounded-[14px] px-5 py-3 text-white placeholder-gray-400 outline-none mb-2"
+              aria-label="Bug Title"
+              maxLength={maxTitleCharacters}
+              disabled={loading}
+              required
+            />
+            <div className="text-white text-xs text-right">{title.length}/{maxTitleCharacters} characters</div>
+          </div>
           <div className="bg-black border min-h-[200px] w-full text-white font-normal pt-5 px-5 rounded-[14px] border-[rgba(255,154,201,0.6)] border-solid max-md:max-w-full">
             <div className="bg-black flex min-h-[120px] w-full overflow-hidden pt-2 pb-[92px] px-3 rounded-[14px] max-md:max-w-full">
               <textarea
                 value={bugDescription}
-                onChange={handleTextareaChange}
+                onChange={e => {
+                  if (e.target.value.length <= maxDescriptionCharacters) setBugDescription(e.target.value);
+                }}
                 placeholder="Bug Description"
                 className="w-full h-full bg-transparent border-none outline-none resize-none text-white placeholder-gray-400"
                 aria-label="Bug Description"
-                maxLength={maxCharacters}
+                maxLength={maxDescriptionCharacters}
+                disabled={loading}
+                required
               />
             </div>
           </div>
 
           <div className="text-white font-semibold text-right mt-[18px] max-md:max-w-full">
-            {bugDescription.length}/{maxCharacters} characters
+            {bugDescription.length}/{maxDescriptionCharacters} characters
           </div>
 
           <button
             type="submit"
             className="bg-[rgba(235,142,185,1)] flex min-h-12 w-full items-center gap-2 text-sm text-black font-semibold leading-none justify-center mt-8 px-[13px] py-3.5 rounded-[30px] max-md:max-w-full hover:bg-[rgba(235,142,185,0.9)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!bugDescription.trim()}
+            disabled={!title.trim() || !bugDescription.trim() || loading}
           >
-            <span className="self-stretch my-auto">Submit Bug Report</span>
+            <span className="self-stretch my-auto">{loading ? "Submitting..." : "Submit Bug Report"}</span>
           </button>
+          {feedback && (
+            <div
+              className={`mt-4 text-center font-semibold ${
+                feedback.type === "success" ? "text-green-400" : "text-red-400"
+              }`}
+              role="alert"
+            >
+              {feedback.message}
+            </div>
+          )}
         </form>
       </div>
     </section>
