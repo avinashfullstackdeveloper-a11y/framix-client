@@ -25,6 +25,8 @@ import ComponentEditor from "./pages/ComponentEditor";
 import AdminRoutes from "./pages/admin/AdminRoutes";
 import NotificationsPage from "./pages/NotificationsPage";
 
+import FeedbackForm from "./pages/Feedback";
+
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -69,6 +71,7 @@ const App: React.FC = () => {
                 <Favourite />
               </ProtectedRoute>
             } />
+            <Route path="/feedback" element={<FeedbackForm />} />
             <Route path="*" element={<NotFoundPage />} />
             <Route path="/report-bug" element={<ReportBug />} />
             {/* Admin Panel Route */}
