@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
-
 import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, { useEffect, useState } from "react";
@@ -28,6 +27,8 @@ const Components = () => {
     language?: string;
     badge?: "Free" | "Pro";
     stats?: string;
+    htmlCode?: string;
+    cssCode?: string;
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +52,10 @@ const Components = () => {
     if (!window.confirm("Are you sure you want to delete this component?"))
       return;
     try {
-      const res = await fetch(`/api/components/${id}`, { method: "DELETE", credentials: "include" });
+      const res = await fetch(`/api/components/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Failed to delete component");
       setComponents((prev: ComponentItem[]) =>
         prev.filter((c) => c._id !== id)
@@ -77,7 +81,6 @@ const Components = () => {
           dashboards — in both design and code.
         </p>
       </div>
-
 
       {/* Filter Tabs */}
       <div className="flex justify-center items-center mb-8 sm:mb-12">
@@ -119,36 +122,109 @@ const Components = () => {
                   {/* Preview based on code and language */}
                   {item.language &&
                     item.code &&
-                    (item.language.toLowerCase() === "react" ? (
-                      <div className="w-full h-full flex items-center justify-center" style={{ transform: 'scale(0.6)', transformOrigin: 'center' }}>
-                        <LiveProvider code={item.code}>
-                          <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
-                          <LivePreview />
-                          <LiveError className="live-error" />
-                        </LiveProvider>
-                      </div>
-                    ) : item.language.toLowerCase() === "multi" ? (
-                      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                    (() => {
+                      // Direct full HTML document preview
+                      if (
+                        typeof item.code === "string" &&
+                        item.code.trim().startsWith("<!DOCTYPE html")
+                      ) {
+                        return (
+                          <iframe
+                            title="Preview"
+                            srcDoc={item.code}
+                            className="w-full h-full rounded-lg border-0"
+                            style={{ margin: 0, padding: 0, background: "transparent" }}
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        );
+                      }
+                      // React preview
+                      if (item.language.toLowerCase() === "react") {
+                        return (
+                          <div
+                            className="w-full h-full flex items-center justify-center"
+                            style={{
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <LiveProvider code={item.code}>
+                              <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
+                              <LivePreview />
+                              <LiveError className="live-error" />
+                            </LiveProvider>
+                          </div>
+                        );
+                      }
+                      // Multi preview
+                      if (item.language.toLowerCase() === "multi") {
+                        return (
+                          <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                            <iframe
+                              title="Preview"
+                              srcDoc={item.code}
+                              className="border-0"
+                              style={{
+                                width: "160%",
+                                height: "160%",
+                                margin: 0,
+                                padding: 0,
+                                transform: "scale(0.6)",
+                                transformOrigin: "center",
+                                overflow: "hidden",
+                                background: "transparent",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
+                        );
+                      }
+                      // CSS + HTML combined preview (if both present)
+                      if (
+                        item.language.toLowerCase() === "css" &&
+                        item.htmlCode &&
+                        item.cssCode
+                      ) {
+                        const srcDoc = `
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <meta charset="UTF-8">
+                              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                              <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body, html {
+                                  width: 100%;
+                                  height: 100%;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  background: transparent;
+                                  overflow: hidden;
+                                }
+                                ${item.cssCode}
+                              </style>
+                            </head>
+                            <body>
+                              ${item.htmlCode}
+                            </body>
+                          </html>
+                        `;
+                        return (
+                          <iframe
+                            title="Preview"
+                            srcDoc={srcDoc}
+                            className="w-full h-full rounded-lg border-0"
+                            style={{ margin: 0, padding: 0, background: "transparent" }}
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        );
+                      }
+                      // Fallback: HTML/CSS/JS preview
+                      return (
                         <iframe
                           title="Preview"
-                          srcDoc={item.code}
-                          className="border-0"
-                          style={{
-                            width: '160%',
-                            height: '160%',
-                            margin: 0,
-                            padding: 0,
-                            transform: 'scale(0.6)',
-                            transformOrigin: 'center',
-                            overflow: 'hidden'
-                          }}
-                          sandbox="allow-scripts"
-                        />
-                      </div>
-                    ) : (
-                      <iframe
-                        title="Preview"
-                        srcDoc={`<!DOCTYPE html>
+                          srcDoc={`<!DOCTYPE html>
                             <html>
                               <head>
                                 <style>
@@ -195,10 +271,12 @@ const Components = () => {
                                 }</script>
                               </body>
                             </html>`}
-                        className="w-full h-full rounded-lg border-0"
-                        style={{ margin: 0, padding: 0 }}
-                      />
-                    ))}
+                          className="w-full h-full rounded-lg border-0"
+                          style={{ margin: 0, padding: 0, background: "transparent" }}
+                          sandbox="allow-scripts allow-same-origin"
+                        />
+                      );
+                    })()}
                 </div>
                 <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
                   <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
