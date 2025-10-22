@@ -585,6 +585,106 @@ const CommunityList = () => {
       </div>
 
       {/* Search & Filters Section */}
+      {/* (Removed from here, moved below Featured Components and above All Components) */}
+
+      {/* Featured Components Section */}
+      <div className="mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold mb-2">Featured Components</h2>
+          <p className="text-muted-foreground">
+            Hand-picked components from top creators
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {(components.length > 0
+            ? components.slice(0, 4)
+            : featuredComponents
+          ).map((component, index) => {
+            return (
+              <Link
+                to={`/components/${component.type || "component"}/${
+                  component._id || index
+                }`}
+                key={component._id || index}
+              >
+                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-0">
+                    <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
+                      <LivePreview component={component} />
+                      <div className="absolute top-3 right-3 z-10">
+                        <Badge
+                          variant="secondary"
+                          className="bg-black/50 text-white backdrop-blur-sm"
+                        >
+                          {component.type || component.category}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-1">
+                        {component.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-3">
+                        {component.description || "Community component"}
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <div
+                          className="flex items-center gap-2 cursor-pointer group"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const userId =
+                              component.createdBy?._id ||
+                              component.author?._id ||
+                              "";
+                            if (userId) {
+                              window.location.href = `/community/${userId}`;
+                            }
+                          }}
+                          title="View user profile"
+                        >
+                          <Avatar
+                            initials={
+                              component.createdBy?.name
+                                ?.charAt(0)
+                                .toUpperCase() ||
+                              component.author?.initials ||
+                              "U"
+                            }
+                            size="sm"
+                          />
+                          <div>
+                            <div className="text-sm font-medium group-hover:underline">
+                              {component.createdBy?.name ||
+                                component.author?.name ||
+                                "Anonymous"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {component.createdBy?.username ||
+                                component.author?.username ||
+                                component.createdBy?.email ||
+                                ""}
+                            </div>
+                          </div>
+                        </div>
+                        <InteractionButtons
+                          likes={component.likes || 0}
+                          comments={component.comments || 0}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* All Components Section */}
+      {/* Search & Filters Section moved here */}
       <div className="mb-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
@@ -741,104 +841,6 @@ const CommunityList = () => {
           </div>
         </div>
       </div>
-
-      {/* Featured Components Section */}
-      <div className="mb-16">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Featured Components</h2>
-          <p className="text-muted-foreground">
-            Hand-picked components from top creators
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(components.length > 0
-            ? components.slice(0, 4)
-            : featuredComponents
-          ).map((component, index) => {
-            return (
-              <Link
-                to={`/components/${component.type || "component"}/${
-                  component._id || index
-                }`}
-                key={component._id || index}
-              >
-                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardContent className="p-0">
-                    <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
-                      <LivePreview component={component} />
-                      <div className="absolute top-3 right-3 z-10">
-                        <Badge
-                          variant="secondary"
-                          className="bg-black/50 text-white backdrop-blur-sm"
-                        >
-                          {component.type || component.category}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-1">
-                        {component.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-3">
-                        {component.description || "Community component"}
-                      </p>
-
-                      <div className="flex items-center justify-between">
-                        <div
-                          className="flex items-center gap-2 cursor-pointer group"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const userId =
-                              component.createdBy?._id ||
-                              component.author?._id ||
-                              "";
-                            if (userId) {
-                              window.location.href = `/community/${userId}`;
-                            }
-                          }}
-                          title="View user profile"
-                        >
-                          <Avatar
-                            initials={
-                              component.createdBy?.name
-                                ?.charAt(0)
-                                .toUpperCase() ||
-                              component.author?.initials ||
-                              "U"
-                            }
-                            size="sm"
-                          />
-                          <div>
-                            <div className="text-sm font-medium group-hover:underline">
-                              {component.createdBy?.name ||
-                                component.author?.name ||
-                                "Anonymous"}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {component.createdBy?.username ||
-                                component.author?.username ||
-                                component.createdBy?.email ||
-                                ""}
-                            </div>
-                          </div>
-                        </div>
-                        <InteractionButtons
-                          likes={component.likes || 0}
-                          comments={component.comments || 0}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* All Components Section */}
       <div className="mb-16">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">All Components</h2>
@@ -849,7 +851,10 @@ const CommunityList = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(
-            (components.length > 0 ? components.slice(4) : allComponents)
+            (components.length > 0
+              ? [...components]
+              : [...featuredComponents, ...allComponents]
+            )
               .filter((component) => {
                 // Type/category filter
                 if (selectedCategory !== "All") {
@@ -870,79 +875,79 @@ const CommunityList = () => {
                 }
                 return true;
               })
-          ).map(
-            (component, index) => {
-              return (
-                <Link
-                  to={`/components/${component.type || "component"}/${component._id || index}`}
-                  key={component._id || index}
-                >
-                  <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge variant="secondary" className="bg-secondary/50">
-                          {component.type || component.category}
-                        </Badge>
-                        <InteractionButtons
-                          likes={component.likes || 0}
-                          comments={component.comments || 0}
-                        />
-                      </div>
-
-                      <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                        <LivePreview component={component} />
-                      </div>
-
-                      <h3 className="font-semibold text-lg mb-2">
-                        {component.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-4">
-                        {component.description || "Community component"}
-                      </p>
-
-                      <div
-                        className="flex items-center gap-2 cursor-pointer group"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const userId =
-                            component.createdBy?._id ||
-                            component.author?._id ||
-                            "";
-                          if (userId) {
-                            window.location.href = `/community/${userId}`;
-                          }
-                        }}
-                        title="View user profile"
-                      >
-                        <Avatar
-                          initials={
-                            component.createdBy?.name?.charAt(0).toUpperCase() ||
-                            component.author?.initials ||
-                            "U"
-                          }
-                          size="sm"
-                        />
-                        <div>
-                          <div className="text-sm font-medium group-hover:underline">
-                            {component.createdBy?.name ||
-                              component.author?.name ||
-                              "Anonymous"}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {component.createdBy?.username ||
-                              component.author?.username ||
-                              component.createdBy?.email ||
-                              ""}
+            ).map(
+              (component, index) => {
+                return (
+                  <Link
+                    to={`/components/${component.type || "component"}/${component._id || index}`}
+                    key={component._id || index}
+                  >
+                    <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <Badge variant="secondary" className="bg-secondary/50">
+                            {component.type || component.category}
+                          </Badge>
+                          <InteractionButtons
+                            likes={component.likes || 0}
+                            comments={component.comments || 0}
+                          />
+                        </div>
+  
+                        <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                          <LivePreview component={component} />
+                        </div>
+  
+                        <h3 className="font-semibold text-lg mb-2">
+                          {component.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm mb-4">
+                          {component.description || "Community component"}
+                        </p>
+  
+                        <div
+                          className="flex items-center gap-2 cursor-pointer group"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const userId =
+                              component.createdBy?._id ||
+                              component.author?._id ||
+                              "";
+                            if (userId) {
+                              window.location.href = `/community/${userId}`;
+                            }
+                          }}
+                          title="View user profile"
+                        >
+                          <Avatar
+                            initials={
+                              component.createdBy?.name?.charAt(0).toUpperCase() ||
+                              component.author?.initials ||
+                              "U"
+                            }
+                            size="sm"
+                          />
+                          <div>
+                            <div className="text-sm font-medium group-hover:underline">
+                              {component.createdBy?.name ||
+                                component.author?.name ||
+                                "Anonymous"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {component.createdBy?.username ||
+                                component.author?.username ||
+                                component.createdBy?.email ||
+                                ""}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            }
-          )}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              }
+            )}
         </div>
       </div>
 
