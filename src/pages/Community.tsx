@@ -258,6 +258,26 @@ const CommunityList = () => {
   // LivePreview Component
   const LivePreview = ({ component }: { component: any }) => {
     const renderPreview = () => {
+      // If code is a full HTML document, use it directly
+      if (
+        typeof component.code === "string" &&
+        component.code.trim().startsWith("<!DOCTYPE html")
+      ) {
+        return (
+          <iframe
+            srcDoc={component.code}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              background: "transparent",
+              transform: "scale(0.7)",
+              transformOrigin: "center",
+            }}
+            sandbox="allow-scripts allow-same-origin"
+            title="Preview"
+          />
+        );
+      }
+
       // Handle components with language and code fields (standard format)
       if (component.language && component.code) {
         if (component.language.toLowerCase() === "react") {
@@ -307,6 +327,42 @@ const CommunityList = () => {
                 transform: "scale(0.6)",
                 transformOrigin: "center",
               }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        } else if (component.language.toLowerCase() === "css" && component.htmlCode && component.cssCode) {
+          // If both htmlCode and cssCode are present, combine them
+          const srcDoc = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body, html {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: transparent;
+                    overflow: hidden;
+                  }
+                  ${component.cssCode}
+                </style>
+              </head>
+              <body>
+                ${component.htmlCode}
+              </body>
+            </html>
+          `;
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full"
+              style={{ background: "transparent" }}
               sandbox="allow-scripts allow-same-origin"
               title="Preview"
             />
@@ -653,41 +709,122 @@ const CommunityList = () => {
           {(components.length > 0
             ? components.slice(0, 4)
             : featuredComponents
-          ).map((component, index) => (
-            <Link
-              to={`/components/${component.type || "component"}/${
-                component._id || index
-              }`}
-              key={component._id || index}
-            >
-              <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-0">
-                  <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
-                    <LivePreview component={component} />
-                    <div className="absolute top-3 right-3 z-10">
-                      <Badge
-                        variant="secondary"
-                        className="bg-black/50 text-white backdrop-blur-sm"
-                      >
-                        {component.type || component.category}
-                      </Badge>
+          ).map((component, index) => {
+            console.log("Featured Card Data:", component);
+            return (
+              <Link
+                to={`/components/${component.type || "component"}/${
+                  component._id || index
+                }`}
+                key={component._id || index}
+              >
+                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-0">
+                    <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
+                      <LivePreview component={component} />
+                      <div className="absolute top-3 right-3 z-10">
+                        <Badge
+                          variant="secondary"
+                          className="bg-black/50 text-white backdrop-blur-sm"
+                        >
+                          {component.type || component.category}
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">
-                      {component.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-3">
-                      {component.description || "Community component"}
-                    </p>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-1">
+                        {component.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-3">
+                        {component.description || "Community component"}
+                      </p>
 
-                    <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Avatar
+                            initials={
+                              component.createdBy?.name
+                                ?.charAt(0)
+                                .toUpperCase() ||
+                              component.author?.initials ||
+                              "U"
+                            }
+                            size="sm"
+                          />
+                          <div>
+                            <div className="text-sm font-medium">
+                              {component.createdBy?.name ||
+                                component.author?.name ||
+                                "Anonymous"}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {component.createdBy?.email ||
+                                component.author?.username ||
+                                ""}
+                            </div>
+                          </div>
+                        </div>
+                        <InteractionButtons
+                          likes={component.likes || 0}
+                          comments={component.comments || 0}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* All Components Section */}
+      <div className="mb-16">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold mb-2">All Components</h2>
+          <p className="text-muted-foreground">
+            Explore the complete collection of community components
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {(components.length > 0 ? components.slice(4) : allComponents).map(
+            (component, index) => {
+              console.log("All Card Data:", component);
+              return (
+                <Link
+                  to={`/components/${component.type || "component"}/${
+                    component._id || index
+                  }`}
+                  key={component._id || index}
+                >
+                  <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge variant="secondary" className="bg-secondary/50">
+                          {component.type || component.category}
+                        </Badge>
+                        <InteractionButtons
+                          likes={component.likes || 0}
+                          comments={component.comments || 0}
+                        />
+                      </div>
+
+                      <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                        <LivePreview component={component} />
+                      </div>
+
+                      <h3 className="font-semibold text-lg mb-2">
+                        {component.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-4">
+                        {component.description || "Community component"}
+                      </p>
+
                       <div className="flex items-center gap-2">
                         <Avatar
                           initials={
-                            component.createdBy?.name
-                              ?.charAt(0)
-                              .toUpperCase() ||
+                            component.createdBy?.name?.charAt(0).toUpperCase() ||
                             component.author?.initials ||
                             "U"
                           }
@@ -706,86 +843,11 @@ const CommunityList = () => {
                           </div>
                         </div>
                       </div>
-                      <InteractionButtons
-                        likes={component.likes || 0}
-                        comments={component.comments || 0}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* All Components Section */}
-      <div className="mb-16">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">All Components</h2>
-          <p className="text-muted-foreground">
-            Explore the complete collection of community components
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(components.length > 0 ? components.slice(4) : allComponents).map(
-            (component, index) => (
-              <Link
-                to={`/components/${component.type || "component"}/${
-                  component._id || index
-                }`}
-                key={component._id || index}
-              >
-                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant="secondary" className="bg-secondary/50">
-                        {component.type || component.category}
-                      </Badge>
-                      <InteractionButtons
-                        likes={component.likes || 0}
-                        comments={component.comments || 0}
-                      />
-                    </div>
-
-                    <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                      <LivePreview component={component} />
-                    </div>
-
-                    <h3 className="font-semibold text-lg mb-2">
-                      {component.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      {component.description || "Community component"}
-                    </p>
-
-                    <div className="flex items-center gap-2">
-                      <Avatar
-                        initials={
-                          component.createdBy?.name?.charAt(0).toUpperCase() ||
-                          component.author?.initials ||
-                          "U"
-                        }
-                        size="sm"
-                      />
-                      <div>
-                        <div className="text-sm font-medium">
-                          {component.createdBy?.name ||
-                            component.author?.name ||
-                            "Anonymous"}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {component.createdBy?.email ||
-                            component.author?.username ||
-                            ""}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            )
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            }
           )}
         </div>
       </div>
