@@ -8,13 +8,27 @@ import { CommunityUserProfile } from "@/components/CommunityUserProfile";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [showTypeFilter, setShowTypeFilter] = useState(false);
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [popupOpen, setPopupOpen] = useState(false);
 
-  const handleOpenPopup = () => setPopupOpen(true);
-  const handleClosePopup = () => setPopupOpen(false);
-  const handleContinuePopup = () => setPopupOpen(false);
+  // Types from ComponentSelectorPopup
+  const componentTypes = [
+    "button",
+    "toggle",
+    "checkbox",
+    "card",
+    "loader",
+    "input",
+    "form",
+    "pattern",
+    "radio",
+    "tooltip",
+  ];
+
+  // Remove unused popup handlers
 
   // Fetch approved components from API
   useEffect(() => {
@@ -41,6 +55,16 @@ const CommunityList = () => {
 
     fetchComponents();
   }, []);
+
+  // Get all unique categories from both API and fallback data
+  const getAllCategories = () => {
+    const apiCategories = components.map((c) => c.category || c.type).filter(Boolean);
+    const fallbackCategories = [
+      ...featuredComponents.map((c) => c.category || c.type),
+      ...allComponents.map((c) => c.category || c.type),
+    ].filter(Boolean);
+    return ["All", ...Array.from(new Set([...apiCategories, ...fallbackCategories]))];
+  };
 
   // Sample data for components (fallback)
   const featuredComponents = [
@@ -544,7 +568,7 @@ const CommunityList = () => {
             <DialogTrigger asChild>
               <button
                 className="border border-primary/50 hover:bg-secondary px-8 py-3 rounded-full font-medium transition-colors"
-                onClick={handleOpenPopup}
+                onClick={() => setPopupOpen(true)}
               >
                 Submit yours
               </button>
@@ -552,8 +576,8 @@ const CommunityList = () => {
             <DialogContent className="max-w-[897px] w-full mx-auto rounded-2xl bg-[rgba(15,15,15,1)] p-0 border-none shadow-none">
               <ComponentSelectorPopup
                 isOpen={popupOpen}
-                onClose={handleClosePopup}
-                onContinue={handleContinuePopup}
+                onClose={() => setPopupOpen(false)}
+                onContinue={() => setPopupOpen(false)}
               />
             </DialogContent>
           </Dialog>
@@ -564,7 +588,11 @@ const CommunityList = () => {
       <div className="mb-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-lg border border-border transition-colors">
+            <button
+              className="flex items-center gap-2 bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-lg border border-border transition-colors"
+              onClick={() => setShowTypeFilter((v) => !v)}
+              type="button"
+            >
               <svg
                 width="16"
                 height="16"
@@ -639,8 +667,41 @@ const CommunityList = () => {
               <span className="text-sm">Categories</span>
             </button>
             <Badge variant="secondary" className="bg-primary/20 text-primary">
-              All Components
+              {selectedCategory === "All" ? "All Components" : selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
             </Badge>
+            {showTypeFilter && (
+              <div className="absolute z-20 mt-2 bg-background border border-border rounded-lg shadow-lg p-3 flex flex-wrap gap-2">
+                <button
+                  className={`px-3 py-1 rounded-full border text-sm transition-colors ${
+                    selectedCategory === "All"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-secondary text-primary border-border hover:bg-primary/10"
+                  }`}
+                  onClick={() => {
+                    setSelectedCategory("All");
+                    setShowTypeFilter(false);
+                  }}
+                >
+                  All
+                </button>
+                {componentTypes.map((type) => (
+                  <button
+                    key={type}
+                    className={`px-3 py-1 rounded-full border text-sm transition-colors ${
+                      selectedCategory === type
+                        ? "bg-primary text-white border-primary"
+                        : "bg-secondary text-primary border-border hover:bg-primary/10"
+                    }`}
+                    onClick={() => {
+                      setSelectedCategory(type);
+                      setShowTypeFilter(false);
+                    }}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="relative w-full md:w-96">
@@ -787,13 +848,33 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(components.length > 0 ? components.slice(4) : allComponents).map(
+          {(
+            (components.length > 0 ? components.slice(4) : allComponents)
+              .filter((component) => {
+                // Type/category filter
+                if (selectedCategory !== "All") {
+                  const type = (component.type || component.category || "").toLowerCase();
+                  if (type !== selectedCategory.toLowerCase()) return false;
+                }
+                // Search filter
+                if (searchQuery.trim() !== "") {
+                  const q = searchQuery.toLowerCase();
+                  return (
+                    (component.title && component.title.toLowerCase().includes(q)) ||
+                    (component.description && component.description.toLowerCase().includes(q)) ||
+                    (component.category && component.category.toLowerCase().includes(q)) ||
+                    (component.type && component.type.toLowerCase().includes(q)) ||
+                    (component.author?.name && component.author.name.toLowerCase().includes(q)) ||
+                    (component.createdBy?.name && component.createdBy.name.toLowerCase().includes(q))
+                  );
+                }
+                return true;
+              })
+          ).map(
             (component, index) => {
               return (
                 <Link
-                  to={`/components/${component.type || "component"}/${
-                    component._id || index
-                  }`}
+                  to={`/components/${component.type || "component"}/${component._id || index}`}
                   key={component._id || index}
                 >
                   <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
@@ -875,7 +956,7 @@ const CommunityList = () => {
           <DialogTrigger asChild>
             <button
               className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity"
-              onClick={handleOpenPopup}
+              onClick={() => setPopupOpen(true)}
             >
               Submit Component
             </button>
@@ -883,8 +964,8 @@ const CommunityList = () => {
           <DialogContent className="max-w-[897px] w-full mx-auto rounded-2xl bg-[rgba(15,15,15,1)] p-0 border-none shadow-none">
             <ComponentSelectorPopup
               isOpen={popupOpen}
-              onClose={handleClosePopup}
-              onContinue={handleContinuePopup}
+              onClose={() => setPopupOpen(false)}
+              onContinue={() => setPopupOpen(false)}
             />
           </DialogContent>
         </Dialog>

@@ -650,7 +650,24 @@ export const CommunityUserProfile = ({
             posts: filteredComponents.length,
             views: userObj?.views || 0,
           },
-          sharedComponents: filteredComponents.map((comp: any) => ({
+          sharedComponents: filteredComponents.map((comp: {
+            _id?: string;
+            id?: string;
+            title: string;
+            type?: string;
+            language?: string;
+            code?: string;
+            badge?: "Free" | "Pro";
+            stats?: string;
+            htmlCode?: string;
+            cssCode?: string;
+            views?: number | string;
+            bookmarks?: number | string;
+            tags?: string[];
+            isPro?: boolean;
+            isFree?: boolean;
+            createdBy?: { _id?: string } | string;
+          }) => ({
             id: comp._id || comp.id || "",
             title: comp.title,
             type: comp.type || "other",
