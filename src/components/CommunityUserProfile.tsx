@@ -17,6 +17,13 @@ interface UserStats {
 interface SharedComponent {
   id: string;
   title: string;
+  type: string;
+  language?: string;
+  code?: string;
+  badge?: "Free" | "Pro";
+  stats?: string;
+  htmlCode?: string;
+  cssCode?: string;
   views: string;
   bookmarks: string;
   children: React.ReactNode;
@@ -96,6 +103,13 @@ const socialIcons = {
 
 // Stats icons
 const statsIcons = {
+  posts: (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="3" y="4" width="14" height="12" rx="2" fill="#F2F2F2"/>
+      <rect x="6" y="7" width="8" height="2" rx="1" fill="#282828"/>
+      <rect x="6" y="11" width="5" height="2" rx="1" fill="#282828"/>
+    </svg>
+  ),
   views: (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <path d="M19.3211 9.74688C19.2937 9.68516 18.632 8.21719 17.1609 6.74609C15.2008 4.78594 12.725 3.75 9.99999 3.75C7.27499 3.75 4.79921 4.78594 2.83905 6.74609C1.36796 8.21719 0.703118 9.6875 0.678899 9.74688C0.643362 9.82681 0.625 9.91331 0.625 10.0008C0.625 10.0883 0.643362 10.1748 0.678899 10.2547C0.706243 10.3164 1.36796 11.7836 2.83905 13.2547C4.79921 15.2141 7.27499 16.25 9.99999 16.25C12.725 16.25 15.2008 15.2141 17.1609 13.2547C18.632 11.7836 19.2937 10.3164 19.3211 10.2547C19.3566 10.1748 19.375 10.0883 19.375 10.0008C19.375 9.91331 19.3566 9.82681 19.3211 9.74688ZM9.99999 15C7.5953 15 5.49452 14.1258 3.75546 12.4023C3.0419 11.6927 2.43483 10.8836 1.95312 10C2.4347 9.11636 3.04179 8.30717 3.75546 7.59766C5.49452 5.87422 7.5953 5 9.99999 5C12.4047 5 14.5055 5.87422 16.2445 7.59766C16.9595 8.307 17.5679 9.11619 18.0508 10C17.4875 11.0516 15.0336 15 9.99999 15ZM9.99999 6.25C9.25831 6.25 8.53329 6.46993 7.9166 6.88199C7.29992 7.29404 6.81927 7.87971 6.53544 8.56494C6.25162 9.25016 6.17735 10.0042 6.32205 10.7316C6.46674 11.459 6.82389 12.1272 7.34834 12.6517C7.87279 13.1761 8.54097 13.5333 9.2684 13.6779C9.99583 13.8226 10.7498 13.7484 11.4351 13.4645C12.1203 13.1807 12.7059 12.7001 13.118 12.0834C13.5301 11.4667 13.75 10.7417 13.75 10C13.749 9.00576 13.3535 8.05253 12.6505 7.34949C11.9475 6.64645 10.9942 6.25103 9.99999 6.25ZM9.99999 12.5C9.50554 12.5 9.02219 12.3534 8.61107 12.0787C8.19994 11.804 7.87951 11.4135 7.69029 10.9567C7.50107 10.4999 7.45157 9.99723 7.54803 9.51227C7.64449 9.02732 7.88259 8.58186 8.23222 8.23223C8.58186 7.8826 9.02731 7.6445 9.51227 7.54804C9.99722 7.45157 10.4999 7.50108 10.9567 7.6903C11.4135 7.87952 11.804 8.19995 12.0787 8.61107C12.3534 9.0222 12.5 9.50555 12.5 10C12.5 10.663 12.2366 11.2989 11.7678 11.7678C11.2989 12.2366 10.663 12.5 9.99999 12.5Z" fill="white"/>
@@ -132,72 +146,378 @@ const UserStats = ({ stats }: { stats: UserStats }) => (
 );
 
 // Card grid for shared components
+import { useNavigate } from "react-router-dom";
+
 const SharedComponentsGrid = ({
   components,
 }: {
   components: SharedComponent[];
-}) => (
-  <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-    {components.map((comp) => (
-      <Card
-        key={comp.id}
-        className="bg-black border border-[#3A3A3A] rounded-2xl hover:border-[#555] transition-colors"
-      >
-        <CardContent className="p-0">
-          {/* Component Preview */}
-          <div className="flex h-48 flex-col justify-center items-center bg-black px-4 py-8 rounded-t-2xl">
-            {comp.children}
-          </div>
-          
-          {/* Component Info */}
-          <div className="p-4">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-white text-base font-semibold flex-1 pr-2">
-                {comp.title}
-              </h3>
-              {comp.isPro && (
-                <Badge className="bg-[rgba(255,71,156,0.60)] border-[#FF479C] text-white">
-                  Pro
-                </Badge>
-              )}
-              {comp.isFree && (
-                <Badge variant="secondary" className="opacity-70">
-                  Free
-                </Badge>
-              )}
-            </div>
-            
-            {/* Stats */}
-            <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <span>👁️</span>
-                <span>{comp.views}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>🔖</span>
-                <span>{comp.bookmarks}</span>
-              </div>
-            </div>
+}) => {
+  const navigate = useNavigate();
 
-            {/* Tags */}
-            {comp.tags && comp.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-3">
-                {comp.tags.map((tag, index) => (
+  return (
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      {components.map((comp) => (
+        <div
+          key={comp.id}
+          onClick={() => navigate(`/components/${comp.type}/${comp.id}`)}
+          className="cursor-pointer w-full"
+        >
+          <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
+            <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
+              {/* Preview based on code and language */}
+              {comp.language &&
+                comp.code &&
+                (() => {
+                  // Tailwind preview
+                  if (
+                    (comp.language && comp.language.toLowerCase() === "tailwind" && comp.code) ||
+                    (comp.language && comp.language.toLowerCase() === "tailwindcss" && comp.code)
+                  ) {
+                    const tailwindHtml = comp.code || "";
+                    const srcDoc = `
+                      <!DOCTYPE html>
+                      <html>
+                        <head>
+                          <meta charset="UTF-8">
+                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                          <script src="https://cdn.tailwindcss.com"></script>
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body, html {
+                              width: 100%;
+                              height: 100%;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              background: transparent;
+                              font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                              overflow: hidden;
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          ${tailwindHtml}
+                        </body>
+                      </html>
+                    `;
+                    return (
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                          transform: "scale(0.6)",
+                          transformOrigin: "center",
+                        }}
+                      >
+                        <iframe
+                          title="Preview"
+                          srcDoc={srcDoc}
+                          className="w-full h-full rounded-lg border-0"
+                          style={{
+                            margin: 0,
+                            padding: 0,
+                            background: "transparent",
+                            width: "100%",
+                            height: "100%",
+                          }}
+                          sandbox="allow-scripts allow-same-origin"
+                        />
+                      </div>
+                    );
+                  }
+                  // Direct full HTML document preview
+                  if (
+                    typeof comp.code === "string" &&
+                    comp.code.trim().startsWith("<!DOCTYPE html")
+                  ) {
+                    return (
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                          transform: "scale(0.6)",
+                          transformOrigin: "center",
+                        }}
+                      >
+                        <iframe
+                          title="Preview"
+                          srcDoc={comp.code}
+                          className="w-full h-full rounded-lg border-0"
+                          style={{
+                            margin: 0,
+                            padding: 0,
+                            background: "transparent",
+                            width: "100%",
+                            height: "100%",
+                          }}
+                          sandbox="allow-scripts allow-same-origin"
+                        />
+                      </div>
+                    );
+                  }
+                  // React preview (iframe Babel)
+                  if (comp.language.toLowerCase() === "react") {
+                    const srcDoc = `
+                      <!DOCTYPE html>
+                      <html>
+                        <head>
+                          <meta charset="UTF-8">
+                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                          <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+                          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+                          <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body, html {
+                              width: 100%;
+                              height: 100%;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              background: transparent;
+                              overflow: hidden;
+                            }
+                          </style>
+                        </head>
+                        <body>
+                          <div id="root"></div>
+                          <script type="text/babel">
+                            try {
+                              ${comp.code}
+                              if (typeof Component !== "undefined") {
+                                ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
+                              }
+                            } catch (e) {
+                              document.getElementById('root').innerHTML = '<pre style="color:red;">' + e.toString() + '</pre>';
+                            }
+                          </script>
+                        </body>
+                      </html>
+                    `;
+                    return (
+                      <div
+                        className="w-full h-full flex items-center justify-center"
+                        style={{
+                          transform: "scale(0.6)",
+                          transformOrigin: "center",
+                        }}
+                      >
+                        <iframe
+                          title="Preview"
+                          srcDoc={srcDoc}
+                          className="w-full h-full rounded-lg border-0"
+                          style={{
+                            margin: 0,
+                            padding: 0,
+                            background: "transparent",
+                            width: "100%",
+                            height: "100%",
+                          }}
+                          sandbox="allow-scripts allow-same-origin"
+                        />
+                      </div>
+                    );
+                  }
+                  // Multi preview
+                  if (comp.language.toLowerCase() === "multi") {
+                    return (
+                      <div
+                        className="w-full h-full flex items-center justify-center overflow-hidden"
+                        style={{
+                          transform: "scale(0.6)",
+                          transformOrigin: "center",
+                        }}
+                      >
+                        <iframe
+                          title="Preview"
+                          srcDoc={comp.code}
+                          className="border-0"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            margin: 0,
+                            padding: 0,
+                            overflow: "hidden",
+                            background: "transparent",
+                          }}
+                          sandbox="allow-scripts allow-same-origin"
+                        />
+                      </div>
+                    );
+                  }
+                  // CSS + HTML combined preview
+                  if (
+                    comp.language.toLowerCase() === "css" &&
+                    comp.htmlCode &&
+                    comp.cssCode
+                  ) {
+                    const srcDoc = `
+                      <!DOCTYPE html>
+                      <html>
+                        <head>
+                          <meta charset="UTF-8">
+                          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body, html {
+                              width: 100%;
+                              height: 100%;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              background: transparent;
+                              overflow: hidden;
+                            }
+                            ${comp.cssCode}
+                          </style>
+                        </head>
+                        <body>
+                          ${comp.htmlCode}
+                        </body>
+                      </html>
+                    `;
+                    return (
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                          transform: "scale(0.6)",
+                          transformOrigin: "center",
+                        }}
+                      >
+                        <iframe
+                          title="Preview"
+                          srcDoc={srcDoc}
+                          className="w-full h-full rounded-lg border-0"
+                          style={{
+                            margin: 0,
+                            padding: 0,
+                            background: "transparent",
+                            width: "100%",
+                            height: "100%",
+                          }}
+                          sandbox="allow-scripts allow-same-origin"
+                        />
+                      </div>
+                    );
+                  }
+                  // Fallback: HTML/CSS/JS preview
+                  return (
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        overflow: "hidden",
+                        transform: "scale(0.6)",
+                        transformOrigin: "center",
+                      }}
+                    >
+                      <iframe
+                        title="Preview"
+                        srcDoc={`<!DOCTYPE html>
+                          <html>
+                            <head>
+                              <style>
+                                * {
+                                  margin: 0;
+                                  padding: 0;
+                                  box-sizing: border-box;
+                                }
+                                body, html {
+                                  width: 100%;
+                                  height: 100%;
+                                  overflow: hidden;
+                                  background: transparent;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                }
+                                #preview-wrapper {
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  transform: scale(0.5);
+                                  transform-origin: center;
+                                }
+                                ${
+                                  comp.language.toLowerCase() === "css"
+                                    ? comp.code
+                                    : ""
+                                }
+                              </style>
+                            </head>
+                            <body>
+                              <div id="preview-wrapper">
+                                ${
+                                  comp.language.toLowerCase() === "html"
+                                    ? comp.code
+                                    : ""
+                                }
+                              </div>
+                              <script>${
+                                comp.language.toLowerCase() === "javascript"
+                                  ? comp.code
+                                  : ""
+                              }</script>
+                            </body>
+                          </html>`}
+                        className="w-full h-full rounded-lg border-0"
+                        style={{
+                          margin: 0,
+                          padding: 0,
+                          background: "transparent",
+                          width: "100%",
+                          height: "100%",
+                        }}
+                        sandbox="allow-scripts allow-same-origin"
+                      />
+                    </div>
+                  );
+                })()}
+            </div>
+            <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+              <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
+                <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                  {comp.title}
+                </h3>
+                <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                   <span
-                    key={index}
-                    className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-md"
+                    className={`text-xs sm:text-sm font-normal ${
+                      comp.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
+                    }`}
                   >
-                    {tag}
+                    {comp.badge || "Free"}
                   </span>
-                ))}
+                </div>
               </div>
-            )}
+              <div className="flex items-center gap-1.5">
+                <span className="text-white text-xs sm:text-[13px] font-light">
+                  {comp.stats || ""}
+                </span>
+              </div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    ))}
-  </section>
-);
+        </div>
+      ))}
+    </section>
+  );
+};
 
 // Filter component
 const ComponentFilter = ({ 
@@ -333,6 +653,13 @@ export const CommunityUserProfile = ({
           sharedComponents: filteredComponents.map((comp: any) => ({
             id: comp._id || comp.id || "",
             title: comp.title,
+            type: comp.type || "other",
+            language: comp.language,
+            code: comp.code,
+            badge: comp.badge,
+            stats: comp.stats,
+            htmlCode: comp.htmlCode,
+            cssCode: comp.cssCode,
             views: comp.views ? String(comp.views) : "0",
             bookmarks: comp.bookmarks ? String(comp.bookmarks) : "0",
             tags: comp.tags || [],
