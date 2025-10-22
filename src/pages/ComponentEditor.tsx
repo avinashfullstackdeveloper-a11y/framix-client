@@ -601,6 +601,7 @@ const ComponentEditor: React.FC = () => {
       // Extract HTML and CSS from template
       const htmlMatch = template.match(/<body>([\s\S]*?)<\/body>/);
       const styleMatch = template.match(/<style>([\s\S]*?)<\/style>/);
+      const htmlVal = htmlMatch ? htmlMatch[1].trim() : "";
       setHtmlCode(htmlMatch ? htmlMatch[1].trim() : "");
       setCssCode(styleMatch ? styleMatch[1].trim() : "");
     } else if (technology === "tailwind") {

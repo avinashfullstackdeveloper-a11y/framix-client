@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Editor from '@monaco-editor/react';
+import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
@@ -32,6 +32,8 @@ const ComponentDetail: React.FC = () => {
   /** --- Refactored: Use technology and tabs logic like ComponentEditor --- */
   const [technology, setTechnology] = useState<"css" | "tailwind">("css");
   const [htmlCode, setHtmlCode] = useState<string>("");
+  // Store the last non-empty HTML code for preview
+  const [previewHtmlCode, setPreviewHtmlCode] = useState<string>("");
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
@@ -40,7 +42,6 @@ const ComponentDetail: React.FC = () => {
   // Favourites state
   const [isFavourited, setIsFavourited] = useState(false);
   const [savingFavourite, setSavingFavourite] = useState(false);
-
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -52,46 +53,57 @@ const ComponentDetail: React.FC = () => {
     "";
 
   useEffect(() => {
-      fetch(`/api/components/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
+    fetch(`/api/components/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setComponent(data);
+
+        // Determine technology type
+        let tech: "css" | "tailwind" = "css";
+        if (data.language === "tailwind" || data.tailwind) tech = "tailwind";
+        setTechnology(tech);
+
+        if (tech === "css") {
+          // Prefer htmlCode/cssCode fields if present (like in DB)
+          let htmlValue = "";
+          let cssValue = "";
+          if (data.htmlCode !== undefined) htmlValue = data.htmlCode;
+          else if (data.html !== undefined) htmlValue = data.html;
+          if (data.cssCode !== undefined) cssValue = data.cssCode;
+          else if (data.css !== undefined) cssValue = data.css;
+          if (
+            !htmlValue &&
+            data.code &&
+            (data.language === "html" ||
+              data.language === "multi" ||
+              data.language === "css")
+          )
+            htmlValue = data.code;
+          if (!cssValue && data.code && data.language === "css")
+            cssValue = data.code;
+          setHtmlCode(htmlValue);
+          setCssCode(cssValue);
+          setPreviewHtmlCode(htmlValue);
+          setActiveTab("html");
+        } else if (tech === "tailwind") {
+          let tailwindValue = "";
+          if (data.tailwindCode !== undefined)
+            tailwindValue = data.tailwindCode;
+          else if (data.tailwind !== undefined) tailwindValue = data.tailwind;
+          if (!tailwindValue && data.code && data.language === "tailwind")
+            tailwindValue = data.code;
+          setTailwindCode(tailwindValue);
+        }
+
+        setLoading(false);
       })
-        .then((res) => res.json())
-        .then((data) => {
-          setComponent(data);
-  
-          // Determine technology type
-          let tech: "css" | "tailwind" = "css";
-          if (data.language === "tailwind" || data.tailwind) tech = "tailwind";
-          setTechnology(tech);
-  
-          if (tech === "css") {
-            // Prefer htmlCode/cssCode fields if present (like in DB)
-            let htmlValue = "";
-            let cssValue = "";
-            if (data.htmlCode !== undefined) htmlValue = data.htmlCode;
-            else if (data.html !== undefined) htmlValue = data.html;
-            if (data.cssCode !== undefined) cssValue = data.cssCode;
-            else if (data.css !== undefined) cssValue = data.css;
-            if (!htmlValue && data.code && (data.language === "html" || data.language === "multi" || data.language === "css")) htmlValue = data.code;
-            if (!cssValue && data.code && data.language === "css") cssValue = data.code;
-            setHtmlCode(htmlValue);
-            setCssCode(cssValue);
-            setActiveTab("html");
-          } else if (tech === "tailwind") {
-            let tailwindValue = "";
-            if (data.tailwindCode !== undefined) tailwindValue = data.tailwindCode;
-            else if (data.tailwind !== undefined) tailwindValue = data.tailwind;
-            if (!tailwindValue && data.code && data.language === "tailwind") tailwindValue = data.code;
-            setTailwindCode(tailwindValue);
-          }
-  
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }, [id, token]);
+      .catch(() => setLoading(false));
+  }, [id, token]);
 
   // Check if already favourited
   useEffect(() => {
@@ -186,71 +198,84 @@ const ComponentDetail: React.FC = () => {
 
   /** Editor language for Monaco (like ComponentEditor) */
   const getLanguageForEditor = () => {
-      if (technology === "css") return activeTab;
-      if (technology === "tailwind") return "javascript";
-      return "html";
+    if (technology === "css") return activeTab;
+    if (technology === "tailwind") return "javascript";
+    return "html";
   };
 
   // Preview logic (like ComponentEditor)
   const renderPreview = () => {
-      if (technology === "css") {
-        if (!htmlCode && !cssCode) {
-          return (
-            <div className="w-full h-full flex items-center justify-center rounded-lg">
-              <div className="text-center text-gray-400">
-                <div className="text-2xl mb-2">👁️</div>
-                <p>No preview available</p>
-              </div>
-            </div>
-          );
-        }
-        const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                  overflow: hidden;
-                }
-                ${cssCode}
-              </style>
-            </head>
-            <body>
-              ${htmlCode}
-            </body>
-          </html>
-        `;
+    if (technology === "css") {
+      if (!htmlCode && !cssCode) {
         return (
-          <iframe
-            srcDoc={srcDoc}
-            className="w-full h-full border-0"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-          />
+          <div className="w-full h-full flex items-center justify-center rounded-lg">
+            <div className="text-center text-gray-400">
+              <div className="text-2xl mb-2">👁️</div>
+              <p>No preview available</p>
+            </div>
+          </div>
         );
       }
-      if (technology === "tailwind") {
-        if (!tailwindCode) {
-          return (
-            <div className="w-full h-full flex items-center justify-center rounded-lg">
-              <div className="text-center text-gray-400">
-                <div className="text-2xl mb-2">👁️</div>
-                <p>No preview available</p>
-              </div>
+      // Always render the preview using htmlCode and cssCode, never show code as text
+      const hasHtml = htmlCode && htmlCode.trim() !== "";
+      const hasCss = cssCode && cssCode.trim() !== "";
+      if (!hasHtml) {
+        return (
+          <div className="w-full h-full flex items-center justify-center rounded-lg">
+            <div className="text-center text-gray-400">
+              <div className="text-2xl mb-2">👁️</div>
+              <p>No preview available</p>
             </div>
-          );
-        }
-        const srcDoc = `
+          </div>
+        );
+      }
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                overflow: hidden;
+              }
+              ${hasCss ? cssCode : ""}
+            </style>
+          </head>
+          <body>
+            ${previewHtmlCode}
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="w-full h-full border-0"
+          style={{ background: "transparent" }}
+          sandbox="allow-scripts allow-same-origin"
+        />
+      );
+    }
+    if (technology === "tailwind") {
+      if (!tailwindCode) {
+        return (
+          <div className="w-full h-full flex items-center justify-center rounded-lg">
+            <div className="text-center text-gray-400">
+              <div className="text-2xl mb-2">👁️</div>
+              <p>No preview available</p>
+            </div>
+          </div>
+        );
+      }
+      const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -276,23 +301,23 @@ const ComponentDetail: React.FC = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="w-full h-full border-0"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
       return (
-        <div className="w-full h-full flex items-center justify-center rounded-lg">
-          <div className="text-center text-gray-400">
-            <div className="text-2xl mb-2">👁️</div>
-            <p>No preview available</p>
-          </div>
-        </div>
+        <iframe
+          srcDoc={srcDoc}
+          className="w-full h-full border-0"
+          style={{ background: "transparent" }}
+          sandbox="allow-scripts allow-same-origin"
+        />
       );
+    }
+    return (
+      <div className="w-full h-full flex items-center justify-center rounded-lg">
+        <div className="text-center text-gray-400">
+          <div className="text-2xl mb-2">👁️</div>
+          <p>No preview available</p>
+        </div>
+      </div>
+    );
   };
 
   if (loading) {
@@ -332,7 +357,7 @@ const ComponentDetail: React.FC = () => {
           >
             ← Back
           </Button>
-          
+
           <div className="flex items-center gap-4">
             <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
               {component.language}
@@ -352,16 +377,22 @@ const ComponentDetail: React.FC = () => {
           {component.createdBy && (
             <div className="flex items-center justify-center gap-3 mt-6 p-4 bg-muted rounded-lg max-w-md mx-auto">
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-lg font-semibold">
-                {component.createdBy.name?.charAt(0).toUpperCase() || 'U'}
+                {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
               </div>
               <div className="text-left">
-                <div className="font-semibold text-base">{component.createdBy.name || 'Anonymous'}</div>
-                <div className="text-sm text-muted-foreground">{component.createdBy.email || ''}</div>
+                <div className="font-semibold text-base">
+                  {component.createdBy.name || "Anonymous"}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {component.createdBy.email || ""}
+                </div>
                 {component.creatorStatus && (
                   <div className="text-xs text-primary mt-1">
-                    {component.creatorStatus === 'original' && '✓ Original Creator'}
-                    {component.creatorStatus === 'found' && 'Found & Shared'}
-                    {component.creatorStatus === 'modified' && 'Found & Modified'}
+                    {component.creatorStatus === "original" &&
+                      "✓ Original Creator"}
+                    {component.creatorStatus === "found" && "Found & Shared"}
+                    {component.creatorStatus === "modified" &&
+                      "Found & Modified"}
                   </div>
                 )}
               </div>
@@ -410,7 +441,8 @@ const ComponentDetail: React.FC = () => {
                     let codeToCopy = "";
                     if (activeTab === "html") codeToCopy = htmlCode;
                     else if (activeTab === "css") codeToCopy = cssCode;
-                    else if (activeTab === "tailwind") codeToCopy = tailwindCode;
+                    else if (activeTab === "tailwind")
+                      codeToCopy = tailwindCode;
                     navigator.clipboard.writeText(codeToCopy);
                     toast({
                       title: "Copied!",
@@ -433,13 +465,21 @@ const ComponentDetail: React.FC = () => {
             {technology === "css" && (
               <div className="flex border-b bg-muted/50">
                 <button
-                  className={`px-4 py-2 font-medium ${activeTab === "html" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                  className={`px-4 py-2 font-medium ${
+                    activeTab === "html"
+                      ? "bg-background text-purple-700 border-b-2 border-purple-700"
+                      : "text-gray-500"
+                  }`}
                   onClick={() => setActiveTab("html")}
                 >
                   HTML
                 </button>
                 <button
-                  className={`px-4 py-2 font-medium ${activeTab === "css" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                  className={`px-4 py-2 font-medium ${
+                    activeTab === "css"
+                      ? "bg-background text-purple-700 border-b-2 border-purple-700"
+                      : "text-gray-500"
+                  }`}
                   onClick={() => setActiveTab("css")}
                 >
                   CSS
@@ -449,6 +489,7 @@ const ComponentDetail: React.FC = () => {
             <div className="flex-1">
               {technology === "css" ? (
                 <Editor
+                  key={activeTab}
                   height="100%"
                   language={getLanguageForEditor()}
                   value={activeTab === "html" ? htmlCode : cssCode}
