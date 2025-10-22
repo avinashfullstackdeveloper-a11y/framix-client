@@ -39,7 +39,7 @@ interface UserProfile {
 }
 
 interface CommunityUserProfileProps {
-  user?: UserProfile;
+  userId?: string; // userId prop for dynamic fetching
   goBackHandler?: () => void;
 }
 
@@ -235,70 +235,132 @@ const ComponentFilter = ({
 };
 
 // Main profile card layout
+import { useParams } from "react-router-dom";
+
 export const CommunityUserProfile = ({
-  user = {
-    avatar: "",
-    initials: "EM",
-    name: "Eliana Moretti",
-    username: "@elianam",
-    social: {
-      github: "#",
-      twitter: "#",
-      website: "#",
-    },
-    profilePicture: "https://api.builder.io/api/v1/image/assets/TEMP/0c1d6bd65b1ea1ffa811a1c7e3602bd5c3fea2ba?width=400",
-    stats: {
-      posts: 89,
-      views: 1200000,
-    },
-    sharedComponents: [
-      {
-        id: "1",
-        title: "Start Code HTML Button",
-        views: "10k",
-        bookmarks: "1.3K",
-        tags: ["Button", "HTML", "CSS"],
-        children: (
-          <button className="flex w-[121px] h-[50px] justify-center items-center shadow-[4px_8px_19px_-3px_rgba(0,0,0,0.27)] bg-[#E8E8E8] px-[25px] py-[15px] rounded-[15px] hover:bg-[#D8D8D8] transition-colors">
-            <span className="text-[#212121] text-[17px] font-[1000]">
-              Click me!
-            </span>
-          </button>
-        ),
-      },
-      {
-        id: "2",
-        title: "Blue Button",
-        views: "80k",
-        bookmarks: "1.3K",
-        isFree: true,
-        tags: ["Button", "React", "Tailwind"],
-        children: (
-          <button className="flex w-[184px] h-[49px] justify-center items-center shadow-[0_8px_0_0_#4836BB] bg-[#644DFF] px-[50px] py-[14px] rounded-xl border-2 border-solid border-[#4836BB] hover:bg-[#5A43E6] transition-colors">
-            <span className="text-white text-lg font-black tracking-[2px]">
-              BUTTON
-            </span>
-          </button>
-        ),
-      },
-      {
-        id: "3",
-        title: "3D Box Component",
-        views: "70k",
-        bookmarks: "1.3K",
-        isPro: true,
-        tags: ["3D", "CSS", "Animation"],
-        children: (
-          <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-blue-500 rounded-lg shadow-2xl transform rotate-45 hover:rotate-0 transition-transform duration-300 flex items-center justify-center">
-            <span className="text-white font-bold transform -rotate-45">3D</span>
-          </div>
-        ),
-      },
-    ],
-  },
+  userId: propUserId,
   goBackHandler,
 }: CommunityUserProfileProps) => {
+  const params = useParams();
+  console.log("[CommunityUserProfile] useParams() result:", params);
+  const userId =
+    propUserId ||
+    params.userId ||
+    params.userid ||
+    params.id ||
+    params.username ||
+    Object.values(params)[0]; // fallback to first param if only one exists
   const [activeFilter, setActiveFilter] = React.useState("all");
+  const [user, setUser] = React.useState<UserProfile | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    console.log("[CommunityUserProfile] useEffect triggered. userId:", userId);
+
+    if (!userId) {
+      setUser(null);
+      setLoading(false);
+      console.warn("[CommunityUserProfile] No userId provided.");
+      return;
+    }
+
+    setLoading(true);
+
+    // Log before fetch
+    console.log("[CommunityUserProfile] Fetching user and components for userId:", userId);
+
+    Promise.all([
+      fetch(`/api/users/${userId}`)
+        .then((res) => {
+          console.log("[CommunityUserProfile] /api/users response status:", res.status);
+          return res.json();
+        })
+        .catch((err) => {
+          console.error("[CommunityUserProfile] Error fetching user info:", err);
+          return null;
+        }),
+      fetch(`/api/components?createdBy=${userId}`)
+        .then((res) => {
+          console.log("[CommunityUserProfile] /api/components response status:", res.status);
+          return res.json();
+        })
+        .catch((err) => {
+          console.error("[CommunityUserProfile] Error fetching user components:", err);
+          return [];
+        }),
+    ])
+      .then(([userInfo, userComponents]) => {
+        // Log the raw API responses
+        console.log("[CommunityUserProfile] API userInfo:", userInfo);
+        console.log("[CommunityUserProfile] API userComponents:", userComponents);
+
+        if (!isMounted) return;
+
+        // Accept userInfo wrapped in { success: true, user: {...} }
+        const userObj = userInfo && userInfo.user ? userInfo.user : userInfo;
+        if (!userObj || userObj.error || !userObj._id) {
+          console.warn("[CommunityUserProfile] User not found or invalid userInfo:", userInfo);
+          setUser(null);
+          return;
+        }
+
+        // Only show components created by this user
+        const filteredComponents = Array.isArray(userComponents)
+          ? userComponents.filter(
+              (comp) =>
+                (comp.createdBy && (comp.createdBy._id === userObj._id || comp.createdBy === userObj._id))
+            )
+          : [];
+
+        const finalUser = {
+          initials:
+            userObj?.name?.substring(0, 2).toUpperCase() ||
+            userObj?.username?.substring(0, 2).toUpperCase() ||
+            "U",
+          name: userObj?.name || userObj?.username || "Anonymous",
+          username: userObj?.username ? `@${userObj.username}` : "",
+          social: {
+            github: userObj?.github || "",
+            twitter: userObj?.twitter || "",
+            website: userObj?.website || "",
+          },
+          profilePicture: userObj?.avatar || userObj?.profilePicture || "",
+          stats: {
+            posts: filteredComponents.length,
+            views: userObj?.views || 0,
+          },
+          sharedComponents: filteredComponents.map((comp: any) => ({
+            id: comp._id || comp.id || "",
+            title: comp.title,
+            views: comp.views ? String(comp.views) : "0",
+            bookmarks: comp.bookmarks ? String(comp.bookmarks) : "0",
+            tags: comp.tags || [],
+            isPro: comp.isPro,
+            isFree: comp.isFree,
+            children: (
+              <div className="w-full flex items-center justify-center">
+                <span className="text-white">{comp.title}</span>
+              </div>
+            ),
+          })),
+        };
+        // Log the final user state before rendering
+        console.log("[CommunityUserProfile] Final user state for rendering:", finalUser);
+        setUser(finalUser);
+      })
+      .catch((err) => {
+        console.error("[CommunityUserProfile] Error in Promise.all:", err);
+        if (isMounted) setUser(null);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userId]);
 
   const handleGoBack = () => {
     if (goBackHandler) {
@@ -308,6 +370,27 @@ export const CommunityUserProfile = ({
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
   };
+
+  if (loading) {
+    return (
+      <div className="text-center py-20 text-lg">Loading...</div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-20 text-lg text-red-500">
+        User not found.
+        <br />
+        <button
+          className="mt-4 px-4 py-2 rounded bg-primary text-white"
+          onClick={handleGoBack}
+        >
+          Back to Community
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full max-w-7xl mx-auto bg-gradient-card rounded-3xl border border-border shadow-lg p-8 pt-20 pb-12 mt-12 mb-8">
@@ -397,7 +480,7 @@ export const CommunityUserProfile = ({
       <div className="mt-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
          
-          <ComponentFilter 
+          <ComponentFilter
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
           />

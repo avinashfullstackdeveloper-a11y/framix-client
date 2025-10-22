@@ -724,7 +724,21 @@ const CommunityList = () => {
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                        <div
+                          className="flex items-center gap-2 cursor-pointer group"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const userId =
+                              component.createdBy?._id ||
+                              component.author?._id ||
+                              "";
+                            if (userId) {
+                              window.location.href = `/community/${userId}`;
+                            }
+                          }}
+                          title="View user profile"
+                        >
                           <Avatar
                             initials={
                               component.createdBy?.name
@@ -736,14 +750,15 @@ const CommunityList = () => {
                             size="sm"
                           />
                           <div>
-                            <div className="text-sm font-medium">
+                            <div className="text-sm font-medium group-hover:underline">
                               {component.createdBy?.name ||
                                 component.author?.name ||
                                 "Anonymous"}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {component.createdBy?.email ||
+                              {component.createdBy?.username ||
                                 component.author?.username ||
+                                component.createdBy?.email ||
                                 ""}
                             </div>
                           </div>
@@ -804,7 +819,21 @@ const CommunityList = () => {
                         {component.description || "Community component"}
                       </p>
 
-                      <div className="flex items-center gap-2">
+                      <div
+                        className="flex items-center gap-2 cursor-pointer group"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const userId =
+                            component.createdBy?._id ||
+                            component.author?._id ||
+                            "";
+                          if (userId) {
+                            window.location.href = `/community/${userId}`;
+                          }
+                        }}
+                        title="View user profile"
+                      >
                         <Avatar
                           initials={
                             component.createdBy?.name?.charAt(0).toUpperCase() ||
@@ -814,14 +843,15 @@ const CommunityList = () => {
                           size="sm"
                         />
                         <div>
-                          <div className="text-sm font-medium">
+                          <div className="text-sm font-medium group-hover:underline">
                             {component.createdBy?.name ||
                               component.author?.name ||
                               "Anonymous"}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {component.createdBy?.email ||
+                            {component.createdBy?.username ||
                               component.author?.username ||
+                              component.createdBy?.email ||
                               ""}
                           </div>
                         </div>
@@ -866,76 +896,82 @@ const CommunityList = () => {
 
 const CommunityUserProfileRoute = () => {
   const navigate = useNavigate();
-  const { username } = useParams();
+  const { userId } = useParams();
 
-  // Example: You would fetch user data by username here.
-  // For demo, use default props.
+  // Fetch user data and their components by userId param
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    // Fetch user info and their components
+    Promise.all([
+      fetch(`/api/users/${userId}`).then((res) => res.json()),
+      fetch(`/api/components?createdBy=${userId}`).then((res) => res.json()),
+    ])
+      .then(([userInfo, userComponents]) => {
+        setUser({
+          initials:
+            userInfo?.name?.substring(0, 2).toUpperCase() ||
+            userInfo?.username?.substring(0, 2).toUpperCase() ||
+            "U",
+          name: userInfo?.name || userInfo?.username || "Anonymous",
+          username: userInfo?.username ? `@${userInfo.username}` : "",
+          social: {
+            github: userInfo?.github || "",
+            twitter: userInfo?.twitter || "",
+            website: userInfo?.website || "",
+          },
+          profilePicture: userInfo?.profilePicture || "",
+          stats: {
+            posts: Array.isArray(userComponents) ? userComponents.length : 0,
+            views: userInfo?.views || 0,
+          },
+          sharedComponents: Array.isArray(userComponents)
+            ? userComponents.map((comp: any) => ({
+                id: comp._id || comp.id || "",
+                title: comp.title,
+                views: comp.views ? String(comp.views) : "0",
+                bookmarks: comp.bookmarks ? String(comp.bookmarks) : "0",
+                tags: comp.tags || [],
+                isPro: comp.isPro,
+                isFree: comp.isFree,
+                children: (
+                  <div className="w-full flex items-center justify-center">
+                    <span className="text-white">{comp.title}</span>
+                  </div>
+                ),
+              }))
+            : [],
+        });
+      })
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  if (loading) {
+    return <div className="text-center py-20 text-lg">Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-20 text-lg text-red-500">
+        User not found.
+        <br />
+        <button
+          className="mt-4 px-4 py-2 rounded bg-primary text-white"
+          onClick={() => navigate("/community")}
+        >
+          Back to Community
+        </button>
+      </div>
+    );
+  }
+
   return (
     <CommunityUserProfile
-      user={{
-        initials: username ? username.substring(0, 2).toUpperCase() : "EM",
-        name: username ? username : "Eliana Moretti",
-        username: username ? `@${username}` : "@elianam",
-        social: {
-          github: "#",
-          twitter: "#",
-          website: "#",
-        },
-        profilePicture:
-          "https://api.builder.io/api/v1/image/assets/TEMP/0c1d6bd65b1ea1ffa811a1c7e3602bd5c3fea2ba?width=400",
-        stats: {
-          posts: 89,
-          views: 1200000,
-          bookmarks: 1300,
-          likes: 5400,
-          comments: 320,
-        },
-        sharedComponents: [
-          {
-            title: "Start Code HTML Button",
-            views: "10k",
-            bookmarks: "1.3K",
-            children: (
-              <button className="flex w-[121px] h-[50px] justify-center items-center shadow-[4px_8px_19px_-3px_rgba(0,0,0,0.27)] bg-[#E8E8E8] px-[25px] py-[15px] rounded-[15px] hover:bg-[#D8D8D8] transition-colors">
-                <span className="text-[#212121] text-[17px] font-[1000]">
-                  Click me!
-                </span>
-              </button>
-            ),
-          },
-          {
-            title: "Blue Button",
-            views: "80k",
-            bookmarks: "1.3K",
-            isFree: true,
-            subtitle: "Blue Button",
-            subtitleViews: "80k",
-            children: (
-              <button className="flex w-[184px] h-[49px] justify-center items-center shadow-[0_8px_0_0_#4836BB] bg-[#644DFF] pl-[50.67px] pr-[50.69px] pt-[13.5px] pb-[14.24px] rounded-xl border-2 border-solid border-[#4836BB] hover:bg-[#5A43E6] transition-colors">
-                <span className="text-white text-lg font-black tracking-[2px]">
-                  BUTTON
-                </span>
-              </button>
-            ),
-          },
-          {
-            title: "3d box",
-            views: "70k",
-            bookmarks: "1.3K",
-            isPro: true,
-            children: (
-              <div className="w-[94px] h-[136px] relative">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      '<svg width="85" height="52" viewBox="0 0 85 52" fill="none" xmlns="http://www.w3.org/2000/svg" class="svg-element" style="width: 94px; height: 136px; position: absolute; left: 0; top: 0"> <path d="M82.86 24.9299L44.6068 1.8746C43.3459 1.11466 41.3011 1.11466 40.0402 1.8746L1.78699 24.9299C0.526087 25.6909 0.526087 26.9228 1.78699 27.6837L40.0392 50.738C41.3011 51.499 43.3459 51.499 44.6068 50.738L82.86 27.6837C84.1209 26.9228 84.1209 25.6909 82.86 24.9299" stroke="#4B22B5" stroke-width="0.999926"></path> </svg>',
-                  }}
-                />
-              </div>
-            ),
-          },
-        ],
-      }}
+      userId={userId}
       goBackHandler={() => navigate("/community")}
     />
   );
@@ -945,7 +981,7 @@ const Community = () => {
   return (
     <Routes>
       <Route path="/" element={<CommunityList />} />
-      <Route path=":username" element={<CommunityUserProfileRoute />} />
+      <Route path=":userId" element={<CommunityUserProfileRoute />} />
     </Routes>
   );
 };
