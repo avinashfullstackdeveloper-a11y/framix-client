@@ -8,15 +8,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Components = () => {
+  // Filter tabs should match the fields in ComponentSelectorPopup.tsx
   const filterTabs = [
     "All",
-    "Buttons",
-    "Cards",
+    "Button",
+    "Toggle switch",
     "Checkbox",
-    "Loaders",
-    "Inputs",
-    "Radio Buttons",
-    "Forms",
+    "Card",
+    "Loader",
+    "Input",
+    "Form",
+    "Pattern",
+    "Radio buttons",
     "Tooltips",
   ];
   type ComponentItem = {
@@ -111,12 +114,42 @@ const Components = () => {
             Loading...
           </div>
         ) : (
-          components.map((item: ComponentItem) => (
-            <div
-              key={item._id}
-              onClick={() => navigate(`/components/${item.type}/${item._id}`)}
-              className="cursor-pointer w-full"
-            >
+          // Filter components based on activeFilter
+          components
+            .filter((item: ComponentItem) => {
+              if (activeFilter === "All") return true;
+              // Map filter tab to type/title
+              switch (activeFilter) {
+                case "Button":
+                  return item.title?.toLowerCase().includes("button");
+                case "Toggle switch":
+                  return item.title?.toLowerCase().includes("toggle");
+                case "Checkbox":
+                  return item.title?.toLowerCase().includes("checkbox");
+                case "Card":
+                  return item.title?.toLowerCase().includes("card");
+                case "Loader":
+                  return item.title?.toLowerCase().includes("loader");
+                case "Input":
+                  return item.title?.toLowerCase().includes("input");
+                case "Form":
+                  return item.title?.toLowerCase().includes("form");
+                case "Pattern":
+                  return item.title?.toLowerCase().includes("pattern");
+                case "Radio buttons":
+                  return item.title?.toLowerCase().includes("radio");
+                case "Tooltips":
+                  return item.title?.toLowerCase().includes("tooltip");
+                default:
+                  return true;
+              }
+            })
+            .map((item: ComponentItem) => (
+              <div
+                key={item._id}
+                onClick={() => navigate(`/components/${item.type}/${item._id}`)}
+                className="cursor-pointer w-full"
+              >
               <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
                 <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
                   {/* Preview based on code and language */}
