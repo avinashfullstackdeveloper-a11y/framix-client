@@ -118,24 +118,43 @@ const Components = () => {
               className="cursor-pointer w-full"
             >
               <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
-                <div className="flex h-[calc(100%-5rem)] flex-col justify-center items-center shrink-0 absolute w-[calc(100%-4rem)] bg-black rounded-2xl sm:rounded-3xl left-8 top-4 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
+                <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
                   {/* Preview based on code and language */}
                   {item.language &&
                     item.code &&
                     (() => {
-                      // Direct full HTML document preview
+                      // Direct full HTML document preview (zoomed out)
                       if (
                         typeof item.code === "string" &&
                         item.code.trim().startsWith("<!DOCTYPE html")
                       ) {
                         return (
-                          <iframe
-                            title="Preview"
-                            srcDoc={item.code}
-                            className="w-full h-full rounded-lg border-0"
-                            style={{ margin: 0, padding: 0, background: "transparent" }}
-                            sandbox="allow-scripts allow-same-origin"
-                          />
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <iframe
+                              title="Preview"
+                              srcDoc={item.code}
+                              className="w-full h-full rounded-lg border-0"
+                              style={{
+                                margin: 0,
+                                padding: 0,
+                                background: "transparent",
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
                         );
                       }
                       // React preview
@@ -159,18 +178,22 @@ const Components = () => {
                       // Multi preview
                       if (item.language.toLowerCase() === "multi") {
                         return (
-                          <div className="w-full h-full flex items-center justify-center overflow-hidden">
+                          <div
+                            className="w-full h-full flex items-center justify-center overflow-hidden"
+                            style={{
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
                             <iframe
                               title="Preview"
                               srcDoc={item.code}
                               className="border-0"
                               style={{
-                                width: "160%",
-                                height: "160%",
+                                width: "100%",
+                                height: "100%",
                                 margin: 0,
                                 padding: 0,
-                                transform: "scale(0.6)",
-                                transformOrigin: "center",
                                 overflow: "hidden",
                                 background: "transparent",
                               }}
@@ -211,70 +234,108 @@ const Components = () => {
                           </html>
                         `;
                         return (
-                          <iframe
-                            title="Preview"
-                            srcDoc={srcDoc}
-                            className="w-full h-full rounded-lg border-0"
-                            style={{ margin: 0, padding: 0, background: "transparent" }}
-                            sandbox="allow-scripts allow-same-origin"
-                          />
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <iframe
+                              title="Preview"
+                              srcDoc={srcDoc}
+                              className="w-full h-full rounded-lg border-0"
+                              style={{
+                                margin: 0,
+                                padding: 0,
+                                background: "transparent",
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
                         );
                       }
                       // Fallback: HTML/CSS/JS preview
                       return (
-                        <iframe
-                          title="Preview"
-                          srcDoc={`<!DOCTYPE html>
-                            <html>
-                              <head>
-                                <style>
-                                  * {
-                                    margin: 0;
-                                    padding: 0;
-                                    box-sizing: border-box;
-                                  }
-                                  body, html {
-                                    width: 100%;
-                                    height: 100%;
-                                    overflow: hidden;
-                                    background: transparent;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                  }
-                                  #preview-wrapper {
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    transform: scale(0.5);
-                                    transform-origin: center;
-                                  }
-                                  ${
-                                    item.language.toLowerCase() === "css"
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden",
+                            transform: "scale(0.6)",
+                            transformOrigin: "center",
+                          }}
+                        >
+                          <iframe
+                            title="Preview"
+                            srcDoc={`<!DOCTYPE html>
+                              <html>
+                                <head>
+                                  <style>
+                                    * {
+                                      margin: 0;
+                                      padding: 0;
+                                      box-sizing: border-box;
+                                    }
+                                    body, html {
+                                      width: 100%;
+                                      height: 100%;
+                                      overflow: hidden;
+                                      background: transparent;
+                                      display: flex;
+                                      align-items: center;
+                                      justify-content: center;
+                                    }
+                                    #preview-wrapper {
+                                      display: flex;
+                                      align-items: center;
+                                      justify-content: center;
+                                      transform: scale(0.5);
+                                      transform-origin: center;
+                                    }
+                                    ${
+                                      item.language.toLowerCase() === "css"
+                                        ? item.code
+                                        : ""
+                                    }
+                                  </style>
+                                </head>
+                                <body>
+                                  <div id="preview-wrapper">
+                                    ${
+                                      item.language.toLowerCase() === "html"
+                                        ? item.code
+                                        : ""
+                                    }
+                                  </div>
+                                  <script>${
+                                    item.language.toLowerCase() === "javascript"
                                       ? item.code
                                       : ""
-                                  }
-                                </style>
-                              </head>
-                              <body>
-                                <div id="preview-wrapper">
-                                  ${
-                                    item.language.toLowerCase() === "html"
-                                      ? item.code
-                                      : ""
-                                  }
-                                </div>
-                                <script>${
-                                  item.language.toLowerCase() === "javascript"
-                                    ? item.code
-                                    : ""
-                                }</script>
-                              </body>
-                            </html>`}
-                          className="w-full h-full rounded-lg border-0"
-                          style={{ margin: 0, padding: 0, background: "transparent" }}
-                          sandbox="allow-scripts allow-same-origin"
-                        />
+                                  }</script>
+                                </body>
+                              </html>`}
+                            className="w-full h-full rounded-lg border-0"
+                            style={{
+                              margin: 0,
+                              padding: 0,
+                              background: "transparent",
+                              width: "100%",
+                              height: "100%",
+                            }}
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        </div>
                       );
                     })()}
                 </div>
