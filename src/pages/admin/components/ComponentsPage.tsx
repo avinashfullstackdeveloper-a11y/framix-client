@@ -18,6 +18,8 @@ type ComponentItem = {
   language?: string;
   badge?: "Free" | "Pro";
   stats?: string;
+  htmlCode?: string;
+  cssCode?: string;
 };
 
 const ComponentsPage: React.FC = () => {
@@ -45,7 +47,8 @@ const ComponentsPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!user || user.role !== "admin") return;
-    if (!window.confirm("Are you sure you want to delete this component?")) return;
+    if (!window.confirm("Are you sure you want to delete this component?"))
+      return;
     try {
       await apiRequest(`/api/components/${id}`, { method: "DELETE" });
       setComponents((prev) => prev.filter((c) => c._id !== id));
@@ -74,7 +77,8 @@ const ComponentsPage: React.FC = () => {
           <span className="text-[#FF9AC9]">Admin</span> Components
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
-          Manage all uploaded components with full administrative control and preview capabilities.
+          Manage all uploaded components with full administrative control and
+          preview capabilities.
         </p>
       </div>
 
@@ -106,7 +110,9 @@ const ComponentsPage: React.FC = () => {
           <div className="text-center w-full col-span-3 py-16">
             <Component className="w-16 h-16 text-[#767676] mx-auto mb-4" />
             <p className="text-[#767676] text-lg">No components found</p>
-            <p className="text-[#767676] text-sm mt-1">Upload some components to get started</p>
+            <p className="text-[#767676] text-sm mt-1">
+              Upload some components to get started
+            </p>
           </div>
         ) : (
           components.map((item) => (
@@ -116,91 +122,226 @@ const ComponentsPage: React.FC = () => {
               className="cursor-pointer w-full"
             >
               <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
-                
                 {/* Component Preview */}
-                <div className="flex h-[calc(100%-5rem)] flex-col justify-center items-center shrink-0 absolute w-[calc(100%-4rem)] bg-black rounded-2xl sm:rounded-3xl left-8 top-4 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
-                  {item.language && item.code && (
-                    item.language.toLowerCase() === "react" ? (
-                      <div className="w-full h-full flex items-center justify-center" style={{ transform: 'scale(0.6)', transformOrigin: 'center' }}>
-                        <LiveProvider code={item.code}>
-                          <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
-                          <LivePreview />
-                          <LiveError className="live-error" />
-                        </LiveProvider>
-                      </div>
-                    ) : item.language.toLowerCase() === "multi" ? (
-                      <div className="w-full h-full flex items-center justify-center overflow-hidden">
-                        <iframe
-                          title="Preview"
-                          srcDoc={item.code}
-                          className="border-0"
+                <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
+                  {item.language &&
+                    item.code &&
+                    (() => {
+                      // Direct full HTML document preview (zoomed out, centered)
+                      if (
+                        typeof item.code === "string" &&
+                        item.code.trim().startsWith("<!DOCTYPE html")
+                      ) {
+                        return (
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <iframe
+                              title="Preview"
+                              srcDoc={item.code}
+                              className="w-full h-full rounded-lg border-0"
+                              style={{
+                                margin: 0,
+                                padding: 0,
+                                background: "transparent",
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
+                        );
+                      }
+                      // React preview
+                      if (item.language.toLowerCase() === "react") {
+                        return (
+                          <div
+                            className="w-full h-full flex items-center justify-center"
+                            style={{
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <LiveProvider code={item.code}>
+                              <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
+                              <LivePreview />
+                              <LiveError className="live-error" />
+                            </LiveProvider>
+                          </div>
+                        );
+                      }
+                      // Multi preview
+                      if (item.language.toLowerCase() === "multi") {
+                        return (
+                          <div
+                            className="w-full h-full flex items-center justify-center overflow-hidden"
+                            style={{
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <iframe
+                              title="Preview"
+                              srcDoc={item.code}
+                              className="border-0"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                margin: 0,
+                                padding: 0,
+                                overflow: "hidden",
+                                background: "transparent",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
+                        );
+                      }
+                      // CSS + HTML combined preview (if both present)
+                      if (
+                        item.language.toLowerCase() === "css" &&
+                        item.htmlCode &&
+                        item.cssCode
+                      ) {
+                        const srcDoc = `
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                              * { margin: 0; padding: 0; box-sizing: border-box; }
+                              body, html {
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: transparent;
+                                overflow: hidden;
+                              }
+                              ${item.cssCode}
+                            </style>
+                          </head>
+                          <body>
+                            ${item.htmlCode}
+                          </body>
+                        </html>
+                      `;
+                        return (
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <iframe
+                              title="Preview"
+                              srcDoc={srcDoc}
+                              className="w-full h-full rounded-lg border-0"
+                              style={{
+                                margin: 0,
+                                padding: 0,
+                                background: "transparent",
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
+                        );
+                      }
+                      // Fallback: HTML/CSS/JS preview
+                      return (
+                        <div
                           style={{
-                            width: '160%',
-                            height: '160%',
-                            margin: 0,
-                            padding: 0,
-                            transform: 'scale(0.6)',
-                            transformOrigin: 'center',
-                            overflow: 'hidden'
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden",
+                            transform: "scale(0.6)",
+                            transformOrigin: "center",
                           }}
-                          sandbox="allow-scripts"
-                        />
-                      </div>
-                    ) : (
-                      <iframe
-                        title="Preview"
-                        srcDoc={`<!DOCTYPE html>
-                            <html>
-                              <head>
-                                <style>
-                                  * {
-                                    margin: 0;
-                                    padding: 0;
-                                    box-sizing: border-box;
-                                  }
-                                  body, html {
-                                    width: 100%;
-                                    height: 100%;
-                                    overflow: hidden;
-                                    background: transparent;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                  }
-                                  #preview-wrapper {
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    transform: scale(0.5);
-                                    transform-origin: center;
-                                  }
-                                  ${
-                                    item.language.toLowerCase() === "css"
+                        >
+                          <iframe
+                            title="Preview"
+                            srcDoc={`<!DOCTYPE html>
+                              <html>
+                                <head>
+                                  <style>
+                                    * {
+                                      margin: 0;
+                                      padding: 0;
+                                      box-sizing: border-box;
+                                    }
+                                    body, html {
+                                      width: 100%;
+                                      height: 100%;
+                                      overflow: hidden;
+                                      background: transparent;
+                                      display: flex;
+                                      align-items: center;
+                                      justify-content: center;
+                                    }
+                                    #preview-wrapper {
+                                      display: flex;
+                                      align-items: center;
+                                      justify-content: center;
+                                      transform: scale(0.5);
+                                      transform-origin: center;
+                                    }
+                                    ${
+                                      item.language.toLowerCase() === "css"
+                                        ? item.code
+                                        : ""
+                                    }
+                                  </style>
+                                </head>
+                                <body>
+                                  <div id="preview-wrapper">
+                                    ${
+                                      item.language.toLowerCase() === "html"
+                                        ? item.code
+                                        : ""
+                                    }
+                                  </div>
+                                  <script>${
+                                    item.language.toLowerCase() === "javascript"
                                       ? item.code
                                       : ""
-                                  }
-                                </style>
-                              </head>
-                              <body>
-                                <div id="preview-wrapper">
-                                  ${
-                                    item.language.toLowerCase() === "html"
-                                      ? item.code
-                                      : ""
-                                  }
-                                </div>
-                                <script>${
-                                  item.language.toLowerCase() === "javascript"
-                                    ? item.code
-                                    : ""
-                                }</script>
-                              </body>
-                            </html>`}
-                        className="w-full h-full rounded-lg border-0"
-                        style={{ margin: 0, padding: 0 }}
-                      />
-                    )
-                  )}
+                                  }</script>
+                                </body>
+                              </html>`}
+                            className="w-full h-full rounded-lg border-0"
+                            style={{
+                              margin: 0,
+                              padding: 0,
+                              background: "transparent",
+                              width: "100%",
+                              height: "100%",
+                            }}
+                            sandbox="allow-scripts allow-same-origin"
+                          />
+                        </div>
+                      );
+                    })()}
                 </div>
 
                 {/* Component Info */}
