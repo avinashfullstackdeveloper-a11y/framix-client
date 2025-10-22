@@ -3,15 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { CommunityUserProfile } from "@/components/CommunityUserProfile";
 
 const CommunityList = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,18 +21,18 @@ const CommunityList = () => {
     const fetchComponents = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/components', {
-          credentials: 'include'
+        const response = await fetch("/api/components", {
+          credentials: "include",
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch components');
+          throw new Error("Failed to fetch components");
         }
 
         const data = await response.json();
         setComponents(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error('Error fetching components:', error);
+        console.error("Error fetching components:", error);
         setComponents([]);
       } finally {
         setLoading(false);
@@ -54,12 +50,12 @@ const CommunityList = () => {
       author: {
         name: "Alex Chen",
         username: "@alexchen",
-        initials: "AC"
+        initials: "AC",
       },
       likes: 245,
       comments: 32,
       category: "Navigation",
-      preview: "/assets/videos/comp1.mp4"
+      preview: "/assets/videos/comp1.mp4",
     },
     {
       title: "Data Dashboard",
@@ -67,12 +63,12 @@ const CommunityList = () => {
       author: {
         name: "Sarah Kim",
         username: "@sarahk",
-        initials: "SK"
+        initials: "SK",
       },
       likes: 189,
       comments: 21,
       category: "Dashboard",
-      preview: "/assets/videos/comp2.mp4"
+      preview: "/assets/videos/comp2.mp4",
     },
     {
       title: "E-commerce Card",
@@ -80,12 +76,12 @@ const CommunityList = () => {
       author: {
         name: "Mike Rodriguez",
         username: "@miker",
-        initials: "MR"
+        initials: "MR",
       },
       likes: 156,
       comments: 18,
       category: "E-commerce",
-      preview: "/assets/videos/comp3.mp4"
+      preview: "/assets/videos/comp3.mp4",
     },
     {
       title: "Contact Form",
@@ -93,13 +89,13 @@ const CommunityList = () => {
       author: {
         name: "Jessica Wang",
         username: "@jessw",
-        initials: "JW"
+        initials: "JW",
       },
       likes: 132,
       comments: 15,
       category: "Forms",
-      preview: "/assets/videos/comp4.mp4"
-    }
+      preview: "/assets/videos/comp4.mp4",
+    },
   ];
 
   const allComponents = [
@@ -109,11 +105,11 @@ const CommunityList = () => {
       author: {
         name: "David Park",
         username: "@davidp",
-        initials: "DP"
+        initials: "DP",
       },
       likes: 98,
       comments: 12,
-      category: "Pricing"
+      category: "Pricing",
     },
     {
       title: "User Profile",
@@ -121,11 +117,11 @@ const CommunityList = () => {
       author: {
         name: "Lisa Thompson",
         username: "@lisat",
-        initials: "LT"
+        initials: "LT",
       },
       likes: 87,
       comments: 8,
-      category: "Profile"
+      category: "Profile",
     },
     {
       title: "Notification System",
@@ -133,11 +129,11 @@ const CommunityList = () => {
       author: {
         name: "Ryan Smith",
         username: "@ryans",
-        initials: "RS"
+        initials: "RS",
       },
       likes: 76,
       comments: 11,
-      category: "UI"
+      category: "UI",
     },
     {
       title: "Loading Animation",
@@ -145,11 +141,11 @@ const CommunityList = () => {
       author: {
         name: "Emma Davis",
         username: "@emmad",
-        initials: "ED"
+        initials: "ED",
       },
       likes: 143,
       comments: 9,
-      category: "Animation"
+      category: "Animation",
     },
     {
       title: "Search Interface",
@@ -157,11 +153,11 @@ const CommunityList = () => {
       author: {
         name: "Kevin Brown",
         username: "@kevinb",
-        initials: "KB"
+        initials: "KB",
       },
       likes: 112,
       comments: 14,
-      category: "Search"
+      category: "Search",
     },
     {
       title: "Calendar Widget",
@@ -169,35 +165,57 @@ const CommunityList = () => {
       author: {
         name: "Maria Garcia",
         username: "@mariag",
-        initials: "MG"
+        initials: "MG",
       },
       likes: 94,
       comments: 7,
-      category: "Widget"
-    }
+      category: "Widget",
+    },
   ];
 
   // Avatar Component
-  const Avatar = ({ initials, size = "sm", className = "" }: { initials: string; size?: "sm" | "md" | "lg"; className?: string }) => {
+  const Avatar = ({
+    initials,
+    size = "sm",
+    className = "",
+  }: {
+    initials: string;
+    size?: "sm" | "md" | "lg";
+    className?: string;
+  }) => {
     const sizeClasses = {
       sm: "w-6 h-6 text-xs",
       md: "w-8 h-8 text-sm",
-      lg: "w-12 h-12 text-base"
+      lg: "w-12 h-12 text-base",
     };
 
     return (
-      <div className={`flex items-center justify-center bg-gradient-primary rounded-full ${sizeClasses[size]} ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-gradient-primary rounded-full ${sizeClasses[size]} ${className}`}
+      >
         <span className="text-primary-foreground font-medium">{initials}</span>
       </div>
     );
   };
 
   // InteractionButtons Component
-  const InteractionButtons = ({ likes, comments }: { likes: number; comments: number }) => {
+  const InteractionButtons = ({
+    likes,
+    comments,
+  }: {
+    likes: number;
+    comments: number;
+  }) => {
     return (
       <div className="flex items-center gap-3">
         <button className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-          <svg width="16" height="16" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 17 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M13.1165 9.67708C14.1099 8.70375 15.1165 7.53708 15.1165 6.01042C15.1165 5.03796 14.7302 4.10533 14.0426 3.41769C13.355 2.73006 12.4223 2.34375 11.4499 2.34375C10.2765 2.34375 9.44987 2.67708 8.44987 3.67708C7.44987 2.67708 6.6232 2.34375 5.44987 2.34375C4.47741 2.34375 3.54478 2.73006 2.85714 3.41769C2.16951 4.10533 1.7832 5.03796 1.7832 6.01042C1.7832 7.54375 2.7832 8.71042 3.7832 9.67708L8.44987 14.3438L13.1165 9.67708Z"
               fill="#F14336"
@@ -213,7 +231,13 @@ const CommunityList = () => {
           </span>
         </button>
         <button className="flex items-center gap-1 hover:opacity-80 transition-opacity">
-          <svg width="16" height="16" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 17 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M6.12865 13.677C7.40103 14.3297 8.8647 14.5064 10.2559 14.1755C11.6471 13.8445 12.8743 13.0275 13.7165 11.8717C14.5586 10.716 14.9603 9.29742 14.849 7.87173C14.7378 6.44603 14.121 5.10693 13.1099 4.09575C12.0987 3.08456 10.7596 2.46779 9.33387 2.35656C7.90817 2.24534 6.48963 2.64698 5.33386 3.48912C4.17809 4.33125 3.36111 5.55849 3.03013 6.94969C2.69915 8.34089 2.87594 9.80457 3.52865 11.077L2.19531 15.0103L6.12865 13.677Z"
               stroke="white"
@@ -236,7 +260,7 @@ const CommunityList = () => {
     const renderPreview = () => {
       // Handle components with language and code fields (standard format)
       if (component.language && component.code) {
-        if (component.language.toLowerCase() === 'react') {
+        if (component.language.toLowerCase() === "react") {
           // React components need special handling - we'll use iframe for now
           const srcDoc = `
             <!DOCTYPE html>
@@ -268,17 +292,21 @@ const CommunityList = () => {
             <iframe
               srcDoc={srcDoc}
               className="absolute inset-0 w-full h-full object-cover"
-              style={{ background: 'transparent' }}
+              style={{ background: "transparent" }}
               sandbox="allow-scripts allow-same-origin"
               title="Preview"
             />
           );
-        } else if (component.language.toLowerCase() === 'multi') {
+        } else if (component.language.toLowerCase() === "multi") {
           return (
             <iframe
               srcDoc={component.code}
               className="absolute inset-0 w-full h-full"
-              style={{ background: 'transparent', transform: 'scale(0.6)', transformOrigin: 'center' }}
+              style={{
+                background: "transparent",
+                transform: "scale(0.6)",
+                transformOrigin: "center",
+              }}
               sandbox="allow-scripts allow-same-origin"
               title="Preview"
             />
@@ -311,14 +339,26 @@ const CommunityList = () => {
                     max-width: 100%;
                     max-height: 100%;
                   }
-                  ${component.language.toLowerCase() === 'css' ? component.code : ''}
+                  ${
+                    component.language.toLowerCase() === "css"
+                      ? component.code
+                      : ""
+                  }
                 </style>
               </head>
               <body>
                 <div id="preview-wrapper">
-                  ${component.language.toLowerCase() === 'html' ? component.code : ''}
+                  ${
+                    component.language.toLowerCase() === "html"
+                      ? component.code
+                      : ""
+                  }
                 </div>
-                <script>${component.language.toLowerCase() === 'javascript' ? component.code : ''}</script>
+                <script>${
+                  component.language.toLowerCase() === "javascript"
+                    ? component.code
+                    : ""
+                }</script>
               </body>
             </html>
           `;
@@ -326,7 +366,7 @@ const CommunityList = () => {
             <iframe
               srcDoc={srcDoc}
               className="absolute inset-0 w-full h-full"
-              style={{ background: 'transparent' }}
+              style={{ background: "transparent" }}
               sandbox="allow-scripts allow-same-origin"
               title="Preview"
             />
@@ -335,7 +375,11 @@ const CommunityList = () => {
       }
 
       // Handle components with technology field (submission format)
-      if (component.technology === 'css' && component.htmlCode && component.cssCode) {
+      if (
+        component.technology === "css" &&
+        component.htmlCode &&
+        component.cssCode
+      ) {
         const srcDoc = `
           <!DOCTYPE html>
           <html>
@@ -354,11 +398,11 @@ const CommunityList = () => {
                   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
                   overflow: hidden;
                 }
-                ${component.cssCode || ''}
+                ${component.cssCode || ""}
               </style>
             </head>
             <body>
-              ${component.htmlCode || ''}
+              ${component.htmlCode || ""}
             </body>
           </html>
         `;
@@ -366,12 +410,15 @@ const CommunityList = () => {
           <iframe
             srcDoc={srcDoc}
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: 'transparent' }}
+            style={{ background: "transparent" }}
             sandbox="allow-scripts allow-same-origin"
             title="Preview"
           />
         );
-      } else if (component.technology === 'tailwind' && component.tailwindCode) {
+      } else if (
+        component.technology === "tailwind" &&
+        component.tailwindCode
+      ) {
         const srcDoc = `
           <!DOCTYPE html>
           <html>
@@ -394,7 +441,7 @@ const CommunityList = () => {
               </style>
             </head>
             <body>
-              ${component.tailwindCode || ''}
+              ${component.tailwindCode || ""}
             </body>
           </html>
         `;
@@ -402,7 +449,7 @@ const CommunityList = () => {
           <iframe
             srcDoc={srcDoc}
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: 'transparent' }}
+            style={{ background: "transparent" }}
             sandbox="allow-scripts allow-same-origin"
             title="Preview"
           />
@@ -445,7 +492,8 @@ const CommunityList = () => {
           Components from Creators
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-          Browse thousands of production-ready UI components built by talented designers and developers from around the world.
+          Browse thousands of production-ready UI components built by talented
+          designers and developers from around the world.
         </p>
         <div className="flex gap-4 justify-center max-sm:flex-col max-sm:items-center">
           <button className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity">
@@ -476,16 +524,76 @@ const CommunityList = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
             <button className="flex items-center gap-2 bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-lg border border-border transition-colors">
-              <svg width="16" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14.7995 2.66675H10.1328" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M7.46647 2.66675H2.7998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M14.7998 8H8.7998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6.13314 8H2.7998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M14.8001 13.3333H11.4668" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M8.7998 13.3333H2.7998" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10.1328 1.33325V3.99992" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6.13281 6.66675V9.33341" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M11.4668 12V14.6667" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 17 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7995 2.66675H10.1328"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M7.46647 2.66675H2.7998"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M14.7998 8H8.7998"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M6.13314 8H2.7998"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M14.8001 13.3333H11.4668"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M8.7998 13.3333H2.7998"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M10.1328 1.33325V3.99992"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M6.13281 6.66675V9.33341"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M11.4668 12V14.6667"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <span className="text-sm">Categories</span>
             </button>
@@ -493,12 +601,32 @@ const CommunityList = () => {
               All Components
             </Badge>
           </div>
-          
+
           <div className="relative w-full md:w-96">
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <svg width="16" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14.2 14L11.3066 11.1067" stroke="currentColor" strokeOpacity="0.4" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M7.53255 12.6667C10.4781 12.6667 12.8659 10.2789 12.8659 7.33333C12.8659 4.38781 10.4781 2 7.53255 2C4.58703 2 2.19922 4.38781 2.19922 7.33333C2.19922 10.2789 4.58703 12.6667 7.53255 12.6667Z" stroke="currentColor" strokeOpacity="0.4" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 17 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.2 14L11.3066 11.1067"
+                  stroke="currentColor"
+                  strokeOpacity="0.4"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M7.53255 12.6667C10.4781 12.6667 12.8659 10.2789 12.8659 7.33333C12.8659 4.38781 10.4781 2 7.53255 2C4.58703 2 2.19922 4.38781 2.19922 7.33333C2.19922 10.2789 4.58703 12.6667 7.53255 12.6667Z"
+                  stroke="currentColor"
+                  strokeOpacity="0.4"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
             <input
@@ -516,38 +644,72 @@ const CommunityList = () => {
       <div className="mb-16">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">Featured Components</h2>
-          <p className="text-muted-foreground">Hand-picked components from top creators</p>
+          <p className="text-muted-foreground">
+            Hand-picked components from top creators
+          </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(components.length > 0 ? components.slice(0, 4) : featuredComponents).map((component, index) => (
-            <Link to={`/components/${component.type || 'component'}/${component._id || index}`} key={component._id || index}>
+          {(components.length > 0
+            ? components.slice(0, 4)
+            : featuredComponents
+          ).map((component, index) => (
+            <Link
+              to={`/components/${component.type || "component"}/${
+                component._id || index
+              }`}
+              key={component._id || index}
+            >
               <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                 <CardContent className="p-0">
                   <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
                     <LivePreview component={component} />
                     <div className="absolute top-3 right-3 z-10">
-                      <Badge variant="secondary" className="bg-black/50 text-white backdrop-blur-sm">
+                      <Badge
+                        variant="secondary"
+                        className="bg-black/50 text-white backdrop-blur-sm"
+                      >
                         {component.type || component.category}
                       </Badge>
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-1">{component.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-3">{component.description || 'Community component'}</p>
+                    <h3 className="font-semibold text-lg mb-1">
+                      {component.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-3">
+                      {component.description || "Community component"}
+                    </p>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar
-                          initials={component.createdBy?.name?.charAt(0).toUpperCase() || component.author?.initials || 'U'}
+                          initials={
+                            component.createdBy?.name
+                              ?.charAt(0)
+                              .toUpperCase() ||
+                            component.author?.initials ||
+                            "U"
+                          }
                           size="sm"
                         />
                         <div>
-                          <div className="text-sm font-medium">{component.createdBy?.name || component.author?.name || 'Anonymous'}</div>
-                          <div className="text-xs text-muted-foreground">{component.createdBy?.email || component.author?.username || ''}</div>
+                          <div className="text-sm font-medium">
+                            {component.createdBy?.name ||
+                              component.author?.name ||
+                              "Anonymous"}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {component.createdBy?.email ||
+                              component.author?.username ||
+                              ""}
+                          </div>
                         </div>
                       </div>
-                      <InteractionButtons likes={component.likes || 0} comments={component.comments || 0} />
+                      <InteractionButtons
+                        likes={component.likes || 0}
+                        comments={component.comments || 0}
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -561,50 +723,76 @@ const CommunityList = () => {
       <div className="mb-16">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">All Components</h2>
-          <p className="text-muted-foreground">Explore the complete collection of community components</p>
+          <p className="text-muted-foreground">
+            Explore the complete collection of community components
+          </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(components.length > 0 ? components.slice(4) : allComponents).map((component, index) => (
-            <Link to={`/components/${component.type || 'component'}/${component._id || index}`} key={component._id || index}>
-              <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="secondary" className="bg-secondary/50">
-                      {component.type || component.category}
-                    </Badge>
-                    <InteractionButtons likes={component.likes || 0} comments={component.comments || 0} />
-                  </div>
-
-                  <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                    <LivePreview component={component} />
-                  </div>
-
-                  <h3 className="font-semibold text-lg mb-2">{component.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4">{component.description || 'Community component'}</p>
-
-                  <div className="flex items-center gap-2">
-                    <Avatar
-                      initials={component.createdBy?.name?.charAt(0).toUpperCase() || component.author?.initials || 'U'}
-                      size="sm"
-                    />
-                    <div>
-                      <div className="text-sm font-medium">{component.createdBy?.name || component.author?.name || 'Anonymous'}</div>
-                      <div className="text-xs text-muted-foreground">{component.createdBy?.email || component.author?.username || ''}</div>
+          {(components.length > 0 ? components.slice(4) : allComponents).map(
+            (component, index) => (
+              <Link
+                to={`/components/${component.type || "component"}/${
+                  component._id || index
+                }`}
+                key={component._id || index}
+              >
+                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="secondary" className="bg-secondary/50">
+                        {component.type || component.category}
+                      </Badge>
+                      <InteractionButtons
+                        likes={component.likes || 0}
+                        comments={component.comments || 0}
+                      />
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+
+                    <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                      <LivePreview component={component} />
+                    </div>
+
+                    <h3 className="font-semibold text-lg mb-2">
+                      {component.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      {component.description || "Community component"}
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        initials={
+                          component.createdBy?.name?.charAt(0).toUpperCase() ||
+                          component.author?.initials ||
+                          "U"
+                        }
+                        size="sm"
+                      />
+                      <div>
+                        <div className="text-sm font-medium">
+                          {component.createdBy?.name ||
+                            component.author?.name ||
+                            "Anonymous"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {component.createdBy?.email ||
+                            component.author?.username ||
+                            ""}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          )}
         </div>
       </div>
 
       {/* CTA Section */}
       <div className="text-center py-16 bg-gradient-card rounded-2xl border border-border">
-        <h2 className="text-3xl font-bold mb-4">
-          Share your creations
-        </h2>
+        <h2 className="text-3xl font-bold mb-4">Share your creations</h2>
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
           Join thousands of creators sharing their best work with the community
         </p>
@@ -626,7 +814,7 @@ const CommunityList = () => {
           </DialogContent>
         </Dialog>
       </div>
-    {/* Popup now handled by Dialog above */}
+      {/* Popup now handled by Dialog above */}
     </div>
   );
 };

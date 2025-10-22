@@ -16,6 +16,12 @@ type ComponentData = {
   css?: string;
   js?: string;
   react?: string;
+  tailwind?: string;
+  createdBy?: {
+    name?: string;
+    email?: string;
+  };
+  creatorStatus?: "original" | "found" | "modified";
 };
 
 const ComponentDetail: React.FC = () => {
@@ -23,14 +29,12 @@ const ComponentDetail: React.FC = () => {
   const navigate = useNavigate();
   const [component, setComponent] = useState<ComponentData | null>(null);
   const [loading, setLoading] = useState(true);
-  // Multi-tab code states
+  /** --- Refactored: Use technology and tabs logic like ComponentEditor --- */
+  const [technology, setTechnology] = useState<"css" | "tailwind">("css");
   const [htmlCode, setHtmlCode] = useState<string>("");
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
-  const [reactCode, setReactCode] = useState<string>("");
-  // Dynamically track available code tabs
-  const [availableTabs, setAvailableTabs] = useState<Array<"html" | "css" | "tailwind" | "react">>([]);
-  const [activeTab, setActiveTab] = useState<"html" | "css" | "tailwind" | "react">("html");
+  const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(false);
 
   // Favourites state
@@ -48,61 +52,46 @@ const ComponentDetail: React.FC = () => {
     "";
 
   useEffect(() => {
-    fetch(`/api/components/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("API response:", data);
-        setComponent(data);
-
-        let htmlValue = "";
-        let cssValue = "";
-        let tailwindValue = "";
-        let reactValue = "";
-
-        if (data.html !== undefined) htmlValue = data.html;
-        if (data.css !== undefined) cssValue = data.css;
-        if (data.tailwind !== undefined) tailwindValue = data.tailwind;
-        if (data.react !== undefined) reactValue = data.react;
-
-        if (htmlValue === "" && (data.language === "html" || data.language === "multi")) htmlValue = data.code || "";
-        if (cssValue === "" && data.language === "css") cssValue = data.code || "";
-        if (tailwindValue === "" && data.language === "tailwind") tailwindValue = data.code || "";
-        if (reactValue === "" && (data.language === "react" || data.language === "jsx")) reactValue = data.code || "";
-
-        if (data.language === "multi" && data.code) htmlValue = data.code;
-        if (data.language === "html" && data.code && htmlValue === "") htmlValue = data.code;
-
-        if (!data.html && !data.css && !data.tailwind && !data.react && data.code && data.language) {
-          if (data.language === "html" || data.language === "multi") htmlValue = data.code;
-          else if (data.language === "css") cssValue = data.code;
-          else if (data.language === "tailwind") tailwindValue = data.code;
-          else if (data.language === "react" || data.language === "jsx") reactValue = data.code;
-        }
-
-        setHtmlCode(htmlValue);
-        setCssCode(cssValue);
-        setTailwindCode(tailwindValue);
-        setReactCode(reactValue);
-
-        // Dynamically determine available tabs
-        const tabs: Array<"html" | "css" | "tailwind" | "react"> = [];
-        if (htmlValue) tabs.push("html");
-        if (cssValue) tabs.push("css");
-        if (tailwindValue) tabs.push("tailwind");
-        if (reactValue) tabs.push("react");
-        setAvailableTabs(tabs);
-        // Set initial active tab to first available
-        if (tabs.length > 0) setActiveTab(tabs[0]);
-
-        setLoading(false);
+      fetch(`/api/components/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
       })
-      .catch(() => setLoading(false));
-  }, [id, token]);
+        .then((res) => res.json())
+        .then((data) => {
+          setComponent(data);
+  
+          // Determine technology type
+          let tech: "css" | "tailwind" = "css";
+          if (data.language === "tailwind" || data.tailwind) tech = "tailwind";
+          setTechnology(tech);
+  
+          if (tech === "css") {
+            // Prefer htmlCode/cssCode fields if present (like in DB)
+            let htmlValue = "";
+            let cssValue = "";
+            if (data.htmlCode !== undefined) htmlValue = data.htmlCode;
+            else if (data.html !== undefined) htmlValue = data.html;
+            if (data.cssCode !== undefined) cssValue = data.cssCode;
+            else if (data.css !== undefined) cssValue = data.css;
+            if (!htmlValue && data.code && (data.language === "html" || data.language === "multi" || data.language === "css")) htmlValue = data.code;
+            if (!cssValue && data.code && data.language === "css") cssValue = data.code;
+            setHtmlCode(htmlValue);
+            setCssCode(cssValue);
+            setActiveTab("html");
+          } else if (tech === "tailwind") {
+            let tailwindValue = "";
+            if (data.tailwindCode !== undefined) tailwindValue = data.tailwindCode;
+            else if (data.tailwind !== undefined) tailwindValue = data.tailwind;
+            if (!tailwindValue && data.code && data.language === "tailwind") tailwindValue = data.code;
+            setTailwindCode(tailwindValue);
+          }
+  
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    }, [id, token]);
 
   // Check if already favourited
   useEffect(() => {
@@ -195,19 +184,108 @@ const ComponentDetail: React.FC = () => {
     }
   };
 
-  // Editor language for Monaco
+  /** Editor language for Monaco (like ComponentEditor) */
   const getLanguageForEditor = () => {
-    if (activeTab === "html") return "html";
-    if (activeTab === "css") return "css";
-    if (activeTab === "tailwind") return "javascript";
-    if (activeTab === "react") return "javascript";
-    return "text";
+      if (technology === "css") return activeTab;
+      if (technology === "tailwind") return "javascript";
+      return "html";
   };
 
-  // Preview logic based on active tab
+  // Preview logic (like ComponentEditor)
   const renderPreview = () => {
-    if (activeTab === "html") {
-      if (!htmlCode) return (
+      if (technology === "css") {
+        if (!htmlCode && !cssCode) {
+          return (
+            <div className="w-full h-full flex items-center justify-center rounded-lg">
+              <div className="text-center text-gray-400">
+                <div className="text-2xl mb-2">👁️</div>
+                <p>No preview available</p>
+              </div>
+            </div>
+          );
+        }
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                  overflow: hidden;
+                }
+                ${cssCode}
+              </style>
+            </head>
+            <body>
+              ${htmlCode}
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            srcDoc={srcDoc}
+            className="w-full h-full border-0"
+            style={{ background: "transparent" }}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        );
+      }
+      if (technology === "tailwind") {
+        if (!tailwindCode) {
+          return (
+            <div className="w-full h-full flex items-center justify-center rounded-lg">
+              <div className="text-center text-gray-400">
+                <div className="text-2xl mb-2">👁️</div>
+                <p>No preview available</p>
+              </div>
+            </div>
+          );
+        }
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <script src="https://cdn.tailwindcss.com"></script>
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                  overflow: hidden;
+                }
+              </style>
+            </head>
+            <body>
+              ${tailwindCode}
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            srcDoc={srcDoc}
+            className="w-full h-full border-0"
+            style={{ background: "transparent" }}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        );
+      }
+      return (
         <div className="w-full h-full flex items-center justify-center rounded-lg">
           <div className="text-center text-gray-400">
             <div className="text-2xl mb-2">👁️</div>
@@ -215,191 +293,6 @@ const ComponentDetail: React.FC = () => {
           </div>
         </div>
       );
-      const srcDoc = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body, html {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: transparent;
-                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                overflow: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            ${htmlCode}
-          </body>
-        </html>
-      `;
-      return (
-        <iframe
-          srcDoc={srcDoc}
-          className="w-full h-full border-0"
-          style={{ background: 'transparent' }}
-          sandbox="allow-scripts allow-same-origin"
-        />
-      );
-    }
-    if (activeTab === "css") {
-      if (!cssCode) return (
-        <div className="w-full h-full flex items-center justify-center rounded-lg">
-          <div className="text-center text-gray-400">
-            <div className="text-2xl mb-2">👁️</div>
-            <p>No preview available</p>
-          </div>
-        </div>
-      );
-      const srcDoc = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body, html {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: transparent;
-                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                overflow: hidden;
-              }
-              ${cssCode}
-            </style>
-          </head>
-          <body>
-            <div>CSS Preview</div>
-          </body>
-        </html>
-      `;
-      return (
-        <iframe
-          srcDoc={srcDoc}
-          className="w-full h-full border-0"
-          style={{ background: 'transparent' }}
-          sandbox="allow-scripts allow-same-origin"
-        />
-      );
-    }
-    if (activeTab === "tailwind") {
-      if (!tailwindCode) return (
-        <div className="w-full h-full flex items-center justify-center rounded-lg">
-          <div className="text-center text-gray-400">
-            <div className="text-2xl mb-2">👁️</div>
-            <p>No preview available</p>
-          </div>
-        </div>
-      );
-      const srcDoc = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body, html {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: transparent;
-                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                overflow: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            ${tailwindCode}
-          </body>
-        </html>
-      `;
-      return (
-        <iframe
-          srcDoc={srcDoc}
-          className="w-full h-full border-0"
-          style={{ background: 'transparent' }}
-          sandbox="allow-scripts allow-same-origin"
-        />
-      );
-    }
-    if (activeTab === "react") {
-      if (!reactCode) return (
-        <div className="w-full h-full flex items-center justify-center rounded-lg">
-          <div className="text-center text-gray-400">
-            <div className="text-2xl mb-2">👁️</div>
-            <p>No preview available</p>
-          </div>
-        </div>
-      );
-      const reactPreviewHTML = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-            <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-            <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body, html {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: transparent;
-                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                overflow: hidden;
-              }
-              #root {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-            </style>
-          </head>
-          <body>
-            <div id="root"></div>
-            <script type="text/babel">
-              ${reactCode}
-              ReactDOM.render(React.createElement(${component?.name?.replace(/\s+/g, '') || 'Component'}), document.getElementById('root'));
-            </script>
-          </body>
-        </html>
-      `;
-      return (
-        <iframe
-          srcDoc={reactPreviewHTML}
-          className="w-full h-full border-0"
-          style={{ background: 'transparent' }}
-          sandbox="allow-scripts allow-same-origin"
-        />
-      );
-    }
-    return (
-      <div className="w-full h-full flex items-center justify-center rounded-lg">
-        <div className="text-center text-gray-400">
-          <div className="text-2xl mb-2">👁️</div>
-          <p>No preview available</p>
-        </div>
-      </div>
-    );
   };
 
   if (loading) {
@@ -518,7 +411,6 @@ const ComponentDetail: React.FC = () => {
                     if (activeTab === "html") codeToCopy = htmlCode;
                     else if (activeTab === "css") codeToCopy = cssCode;
                     else if (activeTab === "tailwind") codeToCopy = tailwindCode;
-                    else if (activeTab === "react") codeToCopy = reactCode;
                     navigator.clipboard.writeText(codeToCopy);
                     toast({
                       title: "Copied!",
@@ -538,62 +430,65 @@ const ComponentDetail: React.FC = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex border-b bg-muted/50">
-              {availableTabs.map((tab) => (
+            {technology === "css" && (
+              <div className="flex border-b bg-muted/50">
                 <button
-                  key={tab}
-                  className={`px-4 py-2 font-medium ${activeTab === tab ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
-                  onClick={() => {
-                    console.log(`Tab switch: ${tab}`);
-                    setActiveTab(tab);
-                  }}
+                  className={`px-4 py-2 font-medium ${activeTab === "html" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                  onClick={() => setActiveTab("html")}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  HTML
                 </button>
-              ))}
-            </div>
+                <button
+                  className={`px-4 py-2 font-medium ${activeTab === "css" ? "bg-background text-purple-700 border-b-2 border-purple-700" : "text-gray-500"}`}
+                  onClick={() => setActiveTab("css")}
+                >
+                  CSS
+                </button>
+              </div>
+            )}
             <div className="flex-1">
-              <Editor
-                height="100%"
-                language={getLanguageForEditor()}
-                value={
-                  activeTab === "html"
-                    ? htmlCode
-                    : activeTab === "css"
-                    ? cssCode
-                    : activeTab === "tailwind"
-                    ? tailwindCode
-                    : reactCode
-                }
-                onChange={(value) => {
-                  // Persist code for each tab independently, only update if value is not undefined
-                  if (activeTab === "html" && value !== undefined) {
-                    setHtmlCode(value);
-                    console.log("setHtmlCode (Editor):", value);
-                  } else if (activeTab === "css" && value !== undefined) {
-                    setCssCode(value);
-                    console.log("setCssCode (Editor):", value);
-                  } else if (activeTab === "tailwind" && value !== undefined) {
-                    setTailwindCode(value);
-                    console.log("setTailwindCode (Editor):", value);
-                  } else if (activeTab === "react" && value !== undefined) {
-                    setReactCode(value);
-                    console.log("setReactCode (Editor):", value);
-                  }
-                }}
-                theme="vs-dark"
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  scrollBeyondLastLine: false,
-                  readOnly: !isEditing,
-                  wordWrap: 'on',
-                  lineNumbers: 'on',
-                  folding: true,
-                  lineDecorationsWidth: 1,
-                  padding: { top: 16, bottom: 16 },
-                }}
-              />
+              {technology === "css" ? (
+                <Editor
+                  height="100%"
+                  language={getLanguageForEditor()}
+                  value={activeTab === "html" ? htmlCode : cssCode}
+                  onChange={(value) => {
+                    if (activeTab === "html") setHtmlCode(value || "");
+                    else setCssCode(value || "");
+                  }}
+                  theme="vs-dark"
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    scrollBeyondLastLine: false,
+                    readOnly: !isEditing,
+                    wordWrap: "on",
+                    lineNumbers: "on",
+                    folding: true,
+                    lineDecorationsWidth: 1,
+                    padding: { top: 16, bottom: 16 },
+                  }}
+                />
+              ) : (
+                <Editor
+                  height="100%"
+                  language={getLanguageForEditor()}
+                  value={tailwindCode}
+                  onChange={(value) => setTailwindCode(value || "")}
+                  theme="vs-dark"
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    scrollBeyondLastLine: false,
+                    readOnly: !isEditing,
+                    wordWrap: "on",
+                    lineNumbers: "on",
+                    folding: true,
+                    lineDecorationsWidth: 1,
+                    padding: { top: 16, bottom: 16 },
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
