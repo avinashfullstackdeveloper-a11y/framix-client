@@ -695,7 +695,6 @@ const CommunityList = () => {
             ? components.slice(0, 4)
             : featuredComponents
           ).map((component, index) => {
-            console.log("Featured Card Data:", component);
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -775,7 +774,6 @@ const CommunityList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(components.length > 0 ? components.slice(4) : allComponents).map(
             (component, index) => {
-              console.log("All Card Data:", component);
               return (
                 <Link
                   to={`/components/${component.type || "component"}/${
