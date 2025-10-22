@@ -58,12 +58,39 @@ export default function PersonalInformation() {
     if (user) {
       setProfileData({
         name: user?.username || user?.name || "",
-        location: "",
+        location: user?.location || "",
         email: user?.email || "",
-        socialMedia: "",
-        website: "",
-        bio: "",
+        socialMedia: user?.socialMedia || "",
+        website: user?.website || "",
+        bio: user?.bio || "",
       });
+    }
+  }, [user]);
+
+  // Fetch full profile after user is loaded
+  useEffect(() => {
+    if (user) {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      fetch(`${apiUrl}/api/user/profile`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((res) => res.ok ? res.json() : null)
+        .then((profile) => {
+          console.log("INSPECT: /api/user/profile response", profile);
+          if (profile && profile.user) {
+            setProfileData((prev) => ({
+              ...prev,
+              location: profile.user.location || "",
+              socialMedia: profile.user.socialMedia || "",
+              website: profile.user.website || "",
+              bio: profile.user.bio || "",
+            }));
+          }
+        })
+        .catch(() => {
+          // Ignore fetch errors for profile
+        });
     }
   }, [user]);
 
@@ -187,7 +214,63 @@ export default function PersonalInformation() {
       }
 
       // Add your additional profile update API calls here for other fields
-      console.log("Profile data to save:", profileData);
+      // Only update profile fields (location, socialMedia, website, bio) if changed
+      // Since user object does not contain profile fields, always send PATCH for these fields
+      const updatedFields: Partial<ProfileData> = {
+        location: profileData.location,
+        socialMedia: profileData.socialMedia,
+        website: profileData.website,
+        bio: profileData.bio,
+      };
+
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+        await fetch(`${apiUrl}/api/user/profile`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(updatedFields),
+        });
+
+        // Always refetch user data to update UI after profile PATCH
+        // Refetch user, then fetch latest profile fields and update form state
+        await refetchUser();
+
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+          const res = await fetch(`${apiUrl}/api/user/profile`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (res.ok) {
+            const profile = await res.json();
+            console.log("DEBUG: /api/user/profile GET response", profile);
+            if (profile && profile.user) {
+              setProfileData((prev) => ({
+                ...prev,
+                location: profile.user.location || "",
+                socialMedia: profile.user.socialMedia || "",
+                website: profile.user.website || "",
+                bio: profile.user.bio || "",
+              }));
+            }
+          }
+        } catch {
+          // Ignore errors when fetching profile after save
+        }
+
+        toast({
+          title: "Success",
+          description: "Profile updated successfully",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update profile",
+          variant: "destructive",
+        });
+        return;
+      }
 
       toast({
         title: "Success",
@@ -318,7 +401,7 @@ export default function PersonalInformation() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="socialMedia" className="text-neutral-300">
-                    Social Media
+                    X (Twitter) Handle
                   </Label>
                   <Input
                     id="socialMedia"
@@ -326,7 +409,7 @@ export default function PersonalInformation() {
                     onChange={(e) =>
                       handleProfileInputChange("socialMedia", e.target.value)
                     }
-                    placeholder="Your Twitter handle (without @)"
+                    placeholder="Your Social media handle"
                     className="bg-neutral-900 border-neutral-700 text-white"
                   />
                 </div>

@@ -14,7 +14,11 @@ type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, username: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    username: string
+  ) => Promise<void>;
   logout: () => Promise<void>;
   refetchUser: () => Promise<void>;
   deleteAccount: () => Promise<void>;
@@ -22,7 +26,9 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -77,7 +83,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, username: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    username: string
+  ) => {
     try {
       const result = await authClient.register({
         name: username,
@@ -86,7 +96,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (!result.success) {
-        throw new Error(result.error || result.message || "Registration failed");
+        throw new Error(
+          result.error || result.message || "Registration failed"
+        );
       }
 
       if (result.user) {
@@ -132,7 +144,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Call backend DELETE endpoint
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/user/${user.id}`,
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/user/${
+          user.id
+        }`,
         {
           method: "DELETE",
           credentials: "include",
@@ -155,7 +169,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-
   const refetchUser = async () => {
     try {
       const result = await authClient.getSession();
@@ -175,7 +188,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, refetchUser, deleteAccount }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        login,
+        register,
+        logout,
+        refetchUser,
+        deleteAccount,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -184,7 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
