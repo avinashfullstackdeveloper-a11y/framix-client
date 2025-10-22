@@ -40,6 +40,8 @@ interface UserProfile {
   name: string;
   username: string;
   social: SocialLinks;
+  website?: string;
+  bio?: string;
   profilePicture?: string;
   stats: UserStats;
   sharedComponents: SharedComponent[];
@@ -642,9 +644,11 @@ export const CommunityUserProfile = ({
           username: userObj?.username ? `@${userObj.username}` : "",
           social: {
             github: userObj?.github || "",
-            twitter: userObj?.twitter || "",
+            twitter: userObj?.twitter || userObj?.socialMedia || "",
             website: userObj?.website || "",
           },
+          website: userObj?.website || "",
+          bio: userObj?.bio || "",
           profilePicture: userObj?.avatar || userObj?.profilePicture || "",
           stats: {
             posts: filteredComponents.length,
@@ -809,7 +813,23 @@ export const CommunityUserProfile = ({
                     {socialIcons.website}
                   </a>
                 )}
+                {/* Show website as text if not in social */}
+                {!user.social.website && user.website && (
+                  <a
+                    href={user.website}
+                    className="p-2 rounded-md hover:bg-gray-800 transition-colors"
+                    aria-label="Website"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {socialIcons.website}
+                  </a>
+                )}
               </div>
+              {/* Show bio if present */}
+              {user.bio && (
+                <div className="text-neutral-300 text-base mb-2">{user.bio}</div>
+              )}
             </div>
 
             {/* Stats */}
