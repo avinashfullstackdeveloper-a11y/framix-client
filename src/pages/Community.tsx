@@ -625,9 +625,6 @@ const CommunityList = () => {
                       <h3 className="font-semibold text-lg mb-1">
                         {component.title}
                       </h3>
-                      <p className="text-muted-foreground text-sm mb-3">
-                        {component.description || "Community component"}
-                      </p>
 
                       <div className="flex items-center justify-between">
                         <div
@@ -664,7 +661,6 @@ const CommunityList = () => {
                             <div className="text-xs text-muted-foreground">
                               {component.createdBy?.username ||
                                 component.author?.username ||
-                                component.createdBy?.email ||
                                 ""}
                             </div>
                           </div>
@@ -901,9 +897,6 @@ const CommunityList = () => {
                         <h3 className="font-semibold text-lg mb-2">
                           {component.title}
                         </h3>
-                        <p className="text-muted-foreground text-sm mb-4">
-                          {component.description || "Community component"}
-                        </p>
   
                         <div
                           className="flex items-center gap-2 cursor-pointer group"
@@ -937,7 +930,6 @@ const CommunityList = () => {
                             <div className="text-xs text-muted-foreground">
                               {component.createdBy?.username ||
                                 component.author?.username ||
-                                component.createdBy?.email ||
                                 ""}
                             </div>
                           </div>
