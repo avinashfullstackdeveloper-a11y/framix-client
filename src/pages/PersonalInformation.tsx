@@ -26,7 +26,24 @@ interface ProfileData {
 }
 
 export default function PersonalInformation() {
-  const { user, isLoading, refetchUser } = useAuth();
+  // User type extended for profile fields
+  type UserProfile = {
+    username?: string;
+    name?: string;
+    location?: string;
+    email?: string;
+    socialMedia?: string;
+    website?: string;
+    bio?: string;
+    // Allow extra fields, but avoid 'any'
+    [key: string]: unknown;
+  };
+
+  const { user, isLoading, refetchUser } = useAuth() as {
+    user: UserProfile | null;
+    isLoading: boolean;
+    refetchUser: () => Promise<void>;
+  };
   const { toast } = useToast();
 
   // Profile form data
@@ -75,9 +92,8 @@ export default function PersonalInformation() {
         method: "GET",
         credentials: "include",
       })
-        .then((res) => res.ok ? res.json() : null)
+        .then((res) => (res.ok ? res.json() : null))
         .then((profile) => {
-          console.log("INSPECT: /api/user/profile response", profile);
           if (profile && profile.user) {
             setProfileData((prev) => ({
               ...prev,
@@ -237,7 +253,8 @@ export default function PersonalInformation() {
         await refetchUser();
 
         try {
-          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+          const apiUrl =
+            import.meta.env.VITE_API_URL || "http://localhost:5000";
           const res = await fetch(`${apiUrl}/api/user/profile`, {
             method: "GET",
             credentials: "include",
