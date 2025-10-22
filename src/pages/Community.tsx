@@ -561,9 +561,12 @@ const CommunityList = () => {
           designers and developers from around the world.
         </p>
         <div className="flex gap-4 justify-center max-sm:flex-col max-sm:items-center">
-          <button className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity">
+          <Link
+            to="/components"
+            className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity flex items-center justify-center"
+          >
             Browse components
-          </button>
+          </Link>
           <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
             <DialogTrigger asChild>
               <button
