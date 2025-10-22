@@ -123,6 +123,67 @@ const Components = () => {
                   {item.language &&
                     item.code &&
                     (() => {
+                      // Tailwind preview (language or technology)
+                      if (
+                        (item.language && item.language.toLowerCase() === "tailwind" && item.code) ||
+                        (item.language && item.language.toLowerCase() === "tailwindcss" && item.code)
+                      ) {
+                        const tailwindHtml = item.code || "";
+                        const srcDoc = `
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <meta charset="UTF-8">
+                              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                              <script src="https://cdn.tailwindcss.com"></script>
+                              <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body, html {
+                                  width: 100%;
+                                  height: 100%;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  background: transparent;
+                                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                                  overflow: hidden;
+                                }
+                              </style>
+                            </head>
+                            <body>
+                              ${tailwindHtml}
+                            </body>
+                          </html>
+                        `;
+                        return (
+                          <div
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                              transform: "scale(0.6)",
+                              transformOrigin: "center",
+                            }}
+                          >
+                            <iframe
+                              title="Preview"
+                              srcDoc={srcDoc}
+                              className="w-full h-full rounded-lg border-0"
+                              style={{
+                                margin: 0,
+                                padding: 0,
+                                background: "transparent",
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
+                          </div>
+                        );
+                      }
                       // Direct full HTML document preview (zoomed out)
                       if (
                         typeof item.code === "string" &&
@@ -157,8 +218,45 @@ const Components = () => {
                           </div>
                         );
                       }
-                      // React preview
+                      // React preview (iframe Babel)
                       if (item.language.toLowerCase() === "react") {
+                        const srcDoc = `
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <meta charset="UTF-8">
+                              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                              <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+                              <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+                              <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+                              <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body, html {
+                                  width: 100%;
+                                  height: 100%;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  background: transparent;
+                                  overflow: hidden;
+                                }
+                              </style>
+                            </head>
+                            <body>
+                              <div id="root"></div>
+                              <script type="text/babel">
+                                try {
+                                  ${item.code}
+                                  if (typeof Component !== "undefined") {
+                                    ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
+                                  }
+                                } catch (e) {
+                                  document.getElementById('root').innerHTML = '<pre style="color:red;">' + e.toString() + '</pre>';
+                                }
+                              </script>
+                            </body>
+                          </html>
+                        `;
                         return (
                           <div
                             className="w-full h-full flex items-center justify-center"
@@ -167,11 +265,19 @@ const Components = () => {
                               transformOrigin: "center",
                             }}
                           >
-                            <LiveProvider code={item.code}>
-                              <style>{`body,html,#root{margin:0;padding:0;box-sizing:border-box;overflow:hidden;}`}</style>
-                              <LivePreview />
-                              <LiveError className="live-error" />
-                            </LiveProvider>
+                            <iframe
+                              title="Preview"
+                              srcDoc={srcDoc}
+                              className="w-full h-full rounded-lg border-0"
+                              style={{
+                                margin: 0,
+                                padding: 0,
+                                background: "transparent",
+                                width: "100%",
+                                height: "100%",
+                              }}
+                              sandbox="allow-scripts allow-same-origin"
+                            />
                           </div>
                         );
                       }

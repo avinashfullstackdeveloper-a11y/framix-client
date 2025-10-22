@@ -278,163 +278,125 @@ const CommunityList = () => {
         );
       }
 
-      // Handle components with language and code fields (standard format)
-      if (component.language && component.code) {
-        if (component.language.toLowerCase() === "react") {
-          // React components need special handling - we'll use iframe for now
-          const srcDoc = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                  * { margin: 0; padding: 0; box-sizing: border-box; }
-                  body, html {
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: transparent;
-                    overflow: hidden;
-                  }
-                </style>
-              </head>
-              <body>
-                <div style="display: flex; align-items: center; justify-content: center; color: white;">
-                  React Component
-                </div>
-              </body>
-            </html>
-          `;
-          return (
-            <iframe
-              srcDoc={srcDoc}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ background: "transparent" }}
-              sandbox="allow-scripts allow-same-origin"
-              title="Preview"
-            />
-          );
-        } else if (component.language.toLowerCase() === "multi") {
-          return (
-            <iframe
-              srcDoc={component.code}
-              className="absolute inset-0 w-full h-full"
-              style={{
-                background: "transparent",
-                transform: "scale(0.6)",
-                transformOrigin: "center",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-              title="Preview"
-            />
-          );
-        } else if (component.language.toLowerCase() === "css" && component.htmlCode && component.cssCode) {
-          // If both htmlCode and cssCode are present, combine them
-          const srcDoc = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                  * { margin: 0; padding: 0; box-sizing: border-box; }
-                  body, html {
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: transparent;
-                    overflow: hidden;
-                  }
-                  ${component.cssCode}
-                </style>
-              </head>
-              <body>
-                ${component.htmlCode}
-              </body>
-            </html>
-          `;
-          return (
-            <iframe
-              srcDoc={srcDoc}
-              className="absolute inset-0 w-full h-full"
-              style={{ background: "transparent" }}
-              sandbox="allow-scripts allow-same-origin"
-              title="Preview"
-            />
-          );
-        } else {
-          // Handle HTML, CSS, JavaScript
-          const srcDoc = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                  * { margin: 0; padding: 0; box-sizing: border-box; }
-                  body, html {
-                    width: 100%;
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: transparent;
-                    overflow: hidden;
-                  }
-                  #preview-wrapper {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transform: scale(0.5);
-                    transform-origin: center;
-                    max-width: 100%;
-                    max-height: 100%;
-                  }
-                  ${
-                    component.language.toLowerCase() === "css"
-                      ? component.code
-                      : ""
-                  }
-                </style>
-              </head>
-              <body>
-                <div id="preview-wrapper">
-                  ${
-                    component.language.toLowerCase() === "html"
-                      ? component.code
-                      : ""
-                  }
-                </div>
-                <script>${
-                  component.language.toLowerCase() === "javascript"
-                    ? component.code
-                    : ""
-                }</script>
-              </body>
-            </html>
-          `;
-          return (
-            <iframe
-              srcDoc={srcDoc}
-              className="absolute inset-0 w-full h-full"
-              style={{ background: "transparent" }}
-              sandbox="allow-scripts allow-same-origin"
-              title="Preview"
-            />
-          );
-        }
+      // Tailwind preview (language or technology)
+      if (
+        (component.language && component.language.toLowerCase() === "tailwind" && component.code) ||
+        (component.technology === "tailwind" && component.tailwindCode)
+      ) {
+        const tailwindHtml =
+          component.code ||
+          component.tailwindCode ||
+          "";
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <script src="https://cdn.tailwindcss.com"></script>
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                  overflow: hidden;
+                }
+              </style>
+            </head>
+            <body>
+              ${tailwindHtml}
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            srcDoc={srcDoc}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ background: "transparent" }}
+            sandbox="allow-scripts allow-same-origin"
+            title="Preview"
+          />
+        );
       }
 
-      // Handle components with technology field (submission format)
+      // React preview (language)
+      if (component.language && component.language.toLowerCase() === "react" && component.code) {
+        // Try to render the React code using Babel
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+              <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+              <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  overflow: hidden;
+                }
+              </style>
+            </head>
+            <body>
+              <div id="root"></div>
+              <script type="text/babel">
+                try {
+                  ${component.code}
+                  if (typeof Component !== "undefined") {
+                    ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
+                  }
+                } catch (e) {
+                  document.getElementById('root').innerHTML = '<pre style="color:red;">' + e.toString() + '</pre>';
+                }
+              </script>
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            srcDoc={srcDoc}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ background: "transparent" }}
+            sandbox="allow-scripts allow-same-origin"
+            title="Preview"
+          />
+        );
+      }
+
+      // Multi-language (full HTML doc)
+      if (component.language && component.language.toLowerCase() === "multi" && component.code) {
+        return (
+          <iframe
+            srcDoc={component.code}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              background: "transparent",
+              transform: "scale(0.6)",
+              transformOrigin: "center",
+            }}
+            sandbox="allow-scripts allow-same-origin"
+            title="Preview"
+          />
+        );
+      }
+
+      // CSS + HTML code (language or technology)
       if (
-        component.technology === "css" &&
-        component.htmlCode &&
-        component.cssCode
+        ((component.language && component.language.toLowerCase() === "css") ||
+          component.technology === "css") &&
+        (component.htmlCode && component.cssCode)
       ) {
         const srcDoc = `
           <!DOCTYPE html>
@@ -471,17 +433,16 @@ const CommunityList = () => {
             title="Preview"
           />
         );
-      } else if (
-        component.technology === "tailwind" &&
-        component.tailwindCode
-      ) {
+      }
+
+      // Fallback: HTML, CSS, JS code
+      if (component.language && component.code) {
         const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <script src="https://cdn.tailwindcss.com"></script>
               <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body, html {
@@ -491,20 +452,44 @@ const CommunityList = () => {
                   align-items: center;
                   justify-content: center;
                   background: transparent;
-                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
                   overflow: hidden;
+                }
+                #preview-wrapper {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transform: scale(0.5);
+                  transform-origin: center;
+                  max-width: 100%;
+                  max-height: 100%;
+                }
+                ${
+                  component.language.toLowerCase() === "css"
+                    ? component.code
+                    : ""
                 }
               </style>
             </head>
             <body>
-              ${component.tailwindCode || ""}
+              <div id="preview-wrapper">
+                ${
+                  component.language.toLowerCase() === "html"
+                    ? component.code
+                    : ""
+                }
+              </div>
+              <script>${
+                component.language.toLowerCase() === "javascript"
+                  ? component.code
+                  : ""
+              }</script>
             </body>
           </html>
         `;
         return (
           <iframe
             srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full"
             style={{ background: "transparent" }}
             sandbox="allow-scripts allow-same-origin"
             title="Preview"
