@@ -4,6 +4,16 @@ import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type ComponentData = {
   id: string;
@@ -58,6 +68,7 @@ const ComponentDetail: React.FC = () => {
   const [likeLoading, setLikeLoading] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -793,14 +804,27 @@ const ComponentDetail: React.FC = () => {
                       
                       {/* Comment Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-sm">
-                            {comment.user?.name || "Anonymous User"}
-                          </span>
-                          {comment.timestamp && (
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(comment.timestamp).toLocaleDateString()}
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm">
+                              {comment.user?.name || "Anonymous User"}
                             </span>
+                            {comment.timestamp && (
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(comment.timestamp).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          {/* Delete button - only visible to comment author */}
+                          {user && comment.user?._id === user.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => setDeletingCommentId(comment._id)}
+                            >
+                              Delete
+                            </Button>
                           )}
                         </div>
                         
@@ -934,6 +958,65 @@ const ComponentDetail: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Comment Confirmation Dialog */}
+      <AlertDialog open={!!deletingCommentId} onOpenChange={(open) => !open && setDeletingCommentId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Comment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your comment and all its replies. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={async () => {
+                if (!deletingCommentId) return;
+                setCommentsLoading(true);
+                try {
+                  const res = await fetch(`/api/components/${id}/comments/${deletingCommentId}`, {
+                    method: "DELETE",
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                    credentials: "include",
+                  });
+                  
+                  if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.error || "Failed to delete comment");
+                  }
+                  
+                  const response = await res.json();
+                  
+                  if (response.success && response.comments) {
+                    setComments(response.comments);
+                    toast({
+                      title: "Comment deleted",
+                      description: "Your comment has been successfully deleted.",
+                      variant: "default",
+                    });
+                  }
+                } catch (err) {
+                  console.error("[Delete Comment] Error:", err);
+                  toast({
+                    title: "Error",
+                    description: err instanceof Error ? err.message : "Could not delete comment.",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setCommentsLoading(false);
+                  setDeletingCommentId(null);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
