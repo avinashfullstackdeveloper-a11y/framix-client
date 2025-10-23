@@ -81,9 +81,17 @@ const Templates = () => {
           <div className="text-primary mt-4">Designers</div>
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Explore hand-crafted UI templates and motion kits built with precision.
-          Copy instantly or purchase full-featured designs made by our in-house creators.
+          Explore hand-crafted UI templates and motion kits built with
+          precision. Copy instantly or purchase full-featured designs made by
+          our in-house creators.
         </p>
+        <div className="flex justify-center mt-6">
+          <button
+            className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity flex items-center justify-center"
+          >
+            Upload Templates
+          </button>
+        </div>
       </div>
 
       {/* Features Section */}
