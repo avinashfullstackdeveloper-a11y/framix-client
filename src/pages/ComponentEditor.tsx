@@ -955,7 +955,7 @@ const ComponentEditor: React.FC = () => {
                     language={getLanguageForEditor()}
                     value={activeTab === "html" ? htmlCode : cssCode}
                     onChange={(value) => {
-                      console.log("Editor change:", activeTab, value);
+
                       if (activeTab === "html") setHtmlCode(value || "");
                       else setCssCode(value || "");
                     }}
@@ -978,7 +978,6 @@ const ComponentEditor: React.FC = () => {
                     language={getLanguageForEditor()}
                     value={tailwindCode}
                     onChange={(value) => {
-                      console.log("Tailwind editor change:", value);
                       setTailwindCode(value || "");
                     }}
                     theme="vs-dark"
