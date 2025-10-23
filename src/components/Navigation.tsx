@@ -48,8 +48,8 @@ const Navigation = () => {
             <NavLink to="/components">Components</NavLink>
             <NavLink to="/templates">Templates</NavLink>
             <NavLink to="/community">Community</NavLink>
-            <NavLink to="/blogs">Blogs</NavLink>
-            <NavLink to="/pricing">Pricing</NavLink>
+            {/* <NavLink to="/blogs">Blogs</NavLink> */}
+            {/* <NavLink to="/pricing">Pricing</NavLink> */}
           </div>
 
           {/* Show user menu if logged in, otherwise show Explore Now button */}

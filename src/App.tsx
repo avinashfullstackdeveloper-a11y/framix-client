@@ -7,8 +7,8 @@ import Layout from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Components from "./pages/Components";
-import Blogs from "./pages/Blogs";
-import Pricing from "./pages/Pricing";
+// import Blogs from "./pages/Blogs";
+// import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
 import SettingsPage from "./pages/SettingsPage";
@@ -52,8 +52,8 @@ const App: React.FC = () => {
             {/* Community user profile route */}
             <Route path="/community/:username" element={<CommunityUserProfile />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/pricing" element={<Pricing />} />
+            {/* <Route path="/blogs" element={<Blogs />} /> */}
+            {/* <Route path="/pricing" element={<Pricing />} /> */}
             <Route path="/signin" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
             <Route path="/settings/personal" element={
