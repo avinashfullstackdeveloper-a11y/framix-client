@@ -5,6 +5,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -34,6 +39,30 @@ type ComponentData = {
   creatorStatus?: "original" | "found" | "modified";
 };
 
+// Helper function to determine if color is light or dark
+const isLightColor = (hexColor: string): boolean => {
+  const hex = hexColor.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 155;
+};
+
+// Preset colors for the palette
+const presetColors = [
+  { name: 'White', value: '#ffffff' },
+  { name: 'Light Gray', value: '#f9fafb' },
+  { name: 'Dark Gray', value: '#1f2937' },
+  { name: 'Black', value: '#0a0a0a' },
+  { name: 'Light Blue', value: '#dbeafe' },
+  { name: 'Blue', value: '#1e40af' },
+  { name: 'Light Purple', value: '#f3e8ff' },
+  { name: 'Purple', value: '#6b21a8' },
+  { name: 'Light Green', value: '#d1fae5' },
+  { name: 'Green', value: '#065f46' },
+];
+
 const ComponentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -48,6 +77,8 @@ const ComponentDetail: React.FC = () => {
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState<string>('#0a0a0a');
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Favourites state
   const [isFavourited, setIsFavourited] = useState(false);
@@ -264,8 +295,10 @@ const ComponentDetail: React.FC = () => {
     return "html";
   };
 
-  // Preview logic (like ComponentEditor)
+  // Preview logic with custom background color
   const renderPreview = () => {
+    const textColor = isLightColor(backgroundColor) ? '#1f2937' : '#f3f4f6';
+
     if (technology === "css") {
       if (!htmlCode && !cssCode) {
         return (
@@ -292,7 +325,7 @@ const ComponentDetail: React.FC = () => {
       }
       const srcDoc = `
         <!DOCTYPE html>
-        <html>
+        <html style="background: ${backgroundColor}; color: ${textColor};">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -304,7 +337,8 @@ const ComponentDetail: React.FC = () => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: transparent;
+                background: ${backgroundColor};
+                color: ${textColor};
                 font-family: -apple-system, BlinkMacSystemFont, sans-serif;
                 overflow: hidden;
               }
@@ -338,7 +372,7 @@ const ComponentDetail: React.FC = () => {
       }
       const srcDoc = `
           <!DOCTYPE html>
-          <html>
+          <html style="background: ${backgroundColor}; color: ${textColor};">
             <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -351,7 +385,8 @@ const ComponentDetail: React.FC = () => {
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  background: transparent;
+                  background: ${backgroundColor};
+                  color: ${textColor};
                   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
                   overflow: hidden;
                 }
@@ -480,8 +515,62 @@ const ComponentDetail: React.FC = () => {
           <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
             <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
               <h3 className="font-semibold">Preview</h3>
+              <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded border border-gray-300"
+                      style={{ backgroundColor }}
+                    />
+                    <span>Background</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Preset Colors</label>
+                      <div className="grid grid-cols-5 gap-2">
+                        {presetColors.map((color) => (
+                          <button
+                            key={color.value}
+                            className="w-10 h-10 rounded border-2 hover:scale-110 transition-transform"
+                            style={{
+                              backgroundColor: color.value,
+                              borderColor: backgroundColor === color.value ? '#8b5cf6' : '#d1d5db'
+                            }}
+                            onClick={() => {
+                              setBackgroundColor(color.value);
+                              setShowColorPicker(false);
+                            }}
+                            title={color.name}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Custom Color</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="color"
+                          value={backgroundColor}
+                          onChange={(e) => setBackgroundColor(e.target.value)}
+                          className="rounded border cursor-pointer"
+                          style={{ width: '60px', height: '40px', minWidth: '60px', minHeight: '40px' }}
+                        />
+                        <input
+                          type="text"
+                          value={backgroundColor}
+                          onChange={(e) => setBackgroundColor(e.target.value)}
+                          className="w-24 px-3 py-2 border rounded text-sm text-black bg-white"
+                          placeholder="#000000"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
-            <div className="flex-1 flex items-center justify-center p-8 bg-neutral-950 overflow-hidden">
+            <div className="flex-1 flex items-center justify-center p-8 overflow-hidden" style={{ backgroundColor }}>
               <div className="w-full h-full flex items-center justify-center">
                 {renderPreview()}
               </div>
