@@ -18,6 +18,7 @@ import ComponentDetail from "./pages/ComponentDetail";
 import Favourite from "./pages/Favourite";
 import Community from "./pages/Community";
 import Templates from "./pages/Template";
+import UploadTemplate from "./pages/UploadTemplate";
 import TemplateDetail from "./pages/TemplateDetail";
 import ReportBug from "./pages/ReportBug";
 import { CommunityUserProfile } from "./components/CommunityUserProfile";
@@ -48,6 +49,7 @@ const App: React.FC = () => {
             } />
             <Route path="/templates" element={<Templates />} />
             <Route path="/templates/:id" element={<TemplateDetail />} />
+            <Route path="/upload-template" element={<UploadTemplate />} />
             <Route path="/community" element={<Community />} />
             {/* Community user profile route */}
             <Route path="/community/:username" element={<CommunityUserProfile />} />

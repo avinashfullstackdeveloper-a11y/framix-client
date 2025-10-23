@@ -2,6 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+
 const Templates = () => {
   // Updated to include video paths
   const featuredTemplates = [
@@ -71,6 +73,8 @@ const Templates = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
@@ -88,6 +92,7 @@ const Templates = () => {
         <div className="flex justify-center mt-6">
           <button
             className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity flex items-center justify-center"
+            onClick={() => navigate("/upload-template")}
           >
             Upload Templates
           </button>
