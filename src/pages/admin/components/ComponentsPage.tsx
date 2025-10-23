@@ -1,51 +1,48 @@
+// Admin ComponentsPage: Lists all components with delete access for admin.
 
-
-import { useAuth } from "../context/AuthContext";
-import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, { useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { apiRequest } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import { LiveProvider, LivePreview, LiveError } from "react-live";
+import { Trash2, Component } from "lucide-react";
 
-const Components = () => {
-  // Filter tabs should match the fields in ComponentSelectorPopup.tsx
-  const filterTabs = [
-    "All",
-    "Button",
-    "Toggle switch",
-    "Checkbox",
-    "Card",
-    "Loader",
-    "Input",
-    "Form",
-    "Pattern",
-    "Radio buttons",
-    "Tooltips",
-  ];
-  type ComponentItem = {
-    _id: string;
-    title: string;
-    type: string;
-    code?: string;
-    language?: string;
-    badge?: "Free" | "Pro";
-    stats?: string;
-    htmlCode?: string;
-    cssCode?: string;
-  };
+type ComponentItem = {
+  _id: string;
+  title: string;
+  type: string;
+  code?: string;
+  language?: string;
+  badge?: "Free" | "Pro";
+  stats?: string;
+  htmlCode?: string;
+  cssCode?: string;
+};
+
+const ComponentsPage: React.FC = () => {
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState(filterTabs[0]);
-  const navigate = useNavigate();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const fetchComponents = () => {
+  const fetchComponents = async () => {
     setLoading(true);
-    fetch("/api/components", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        setComponents(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    try {
+      const data = await apiRequest<ComponentItem[]>("/api/components");
+      setComponents(data);
+    } catch (err) {
+      toast({
+        title: "Failed to fetch components",
+        description: err instanceof Error ? err.message : "Unknown error",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -53,16 +50,18 @@ const Components = () => {
     if (!window.confirm("Are you sure you want to delete this component?"))
       return;
     try {
-      const res = await fetch(`/api/components/${id}`, {
-        method: "DELETE",
-        credentials: "include",
+      await apiRequest(`/api/components/${id}`, { method: "DELETE" });
+      setComponents((prev) => prev.filter((c) => c._id !== id));
+      toast({
+        title: "Component deleted successfully",
+        variant: "default",
       });
-      if (!res.ok) throw new Error("Failed to delete component");
-      setComponents((prev: ComponentItem[]) =>
-        prev.filter((c) => c._id !== id)
-      );
     } catch (err) {
-      alert("Error deleting component");
+      toast({
+        title: "Error deleting component",
+        description: err instanceof Error ? err.message : "Unknown error",
+        variant: "destructive",
+      });
     }
   };
 
@@ -75,82 +74,56 @@ const Components = () => {
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          <span className="text-primary">Components</span> Showcase
+          <span className="text-[#FF9AC9]">Admin</span> Components
         </h1>
-        <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
-          Explore polished, scalable components — from simple buttons to full
-          dashboards — in both design and code.
+        <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
+          Manage all uploaded components with full administrative control and
+          preview capabilities.
         </p>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex justify-center items-center mb-8 sm:mb-12">
-        <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-4 justify-center items-center w-full max-w-4xl mx-auto px-2">
-          {filterTabs.map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => setActiveFilter(filter)}
-              className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
-                activeFilter === filter
-                  ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828]"
-                  : "bg-[rgba(0,0,0,0.80)] border-[#767676] text-white hover:border-[#FF9AC9]"
-              }`}
-            >
-              <span className="text-xs sm:text-sm font-medium truncate px-2 sm:px-3">
-                {filter}
-              </span>
-            </button>
-          ))}
+      {/* Stats Bar */}
+      <div className="flex justify-center mb-8">
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl px-6 py-3">
+          <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <Component className="w-4 h-4 text-[#FF9AC9]" />
+              <span className="text-white">{components.length}</span>
+              <span className="text-[#767676]">Total Components</span>
+            </div>
+            <div className="w-px h-6 bg-[#3A3A3A]"></div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#FF9AC9] font-medium">Admin Access</span>
+              <span className="text-[#767676]">Full Control</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Components Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto">
         {loading ? (
-          <div className="text-center text-lg w-full col-span-3">
-            Loading...
+          <div className="text-center text-lg text-white w-full col-span-3 py-12">
+            Loading components...
+          </div>
+        ) : components.length === 0 ? (
+          <div className="text-center w-full col-span-3 py-16">
+            <Component className="w-16 h-16 text-[#767676] mx-auto mb-4" />
+            <p className="text-[#767676] text-lg">No components found</p>
+            <p className="text-[#767676] text-sm mt-1">
+              Upload some components to get started
+            </p>
           </div>
         ) : (
-          // Filter components based on activeFilter
-          components
-            .filter((item: ComponentItem) => {
-              if (activeFilter === "All") return true;
-              // Map filter tab to type/title
-              switch (activeFilter) {
-                case "Button":
-                  return item.title?.toLowerCase().includes("button");
-                case "Toggle switch":
-                  return item.title?.toLowerCase().includes("toggle");
-                case "Checkbox":
-                  return item.title?.toLowerCase().includes("checkbox");
-                case "Card":
-                  return item.title?.toLowerCase().includes("card");
-                case "Loader":
-                  return item.title?.toLowerCase().includes("loader");
-                case "Input":
-                  return item.title?.toLowerCase().includes("input");
-                case "Form":
-                  return item.title?.toLowerCase().includes("form");
-                case "Pattern":
-                  return item.title?.toLowerCase().includes("pattern");
-                case "Radio buttons":
-                  return item.title?.toLowerCase().includes("radio");
-                case "Tooltips":
-                  return item.title?.toLowerCase().includes("tooltip");
-                default:
-                  return true;
-              }
-            })
-            .map((item: ComponentItem) => (
-              <div
-                key={item._id}
-                onClick={() => navigate(`/components/${item.type?.replace(/component/gi, '').trim().replace(/^\w/, c => c.toUpperCase())}/${item._id}`)}
-                className="cursor-pointer w-full"
-              >
+          components.map((item) => (
+            <div
+              key={item._id}
+              onClick={() => navigate(`/components/${item.type}/${item._id}`)}
+              className="cursor-pointer w-full"
+            >
               <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
+                {/* Component Preview */}
                 <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
-                  {/* Preview based on code and language */}
                   {item.language &&
                     item.code &&
                     (() => {
@@ -215,7 +188,7 @@ const Components = () => {
                           </div>
                         );
                       }
-                      // Direct full HTML document preview (zoomed out)
+                      // Direct full HTML document preview (zoomed out, centered)
                       if (
                         typeof item.code === "string" &&
                         item.code.trim().startsWith("<!DOCTYPE html")
@@ -346,30 +319,30 @@ const Components = () => {
                         item.cssCode
                       ) {
                         const srcDoc = `
-                          <!DOCTYPE html>
-                          <html>
-                            <head>
-                              <meta charset="UTF-8">
-                              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                              <style>
-                                * { margin: 0; padding: 0; box-sizing: border-box; }
-                                body, html {
-                                  width: 100%;
-                                  height: 100%;
-                                  display: flex;
-                                  align-items: center;
-                                  justify-content: center;
-                                  background: transparent;
-                                  overflow: hidden;
-                                }
-                                ${item.cssCode}
-                              </style>
-                            </head>
-                            <body>
-                              ${item.htmlCode}
-                            </body>
-                          </html>
-                        `;
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                              * { margin: 0; padding: 0; box-sizing: border-box; }
+                              body, html {
+                                width: 100%;
+                                height: 100%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: transparent;
+                                overflow: hidden;
+                              }
+                              ${item.cssCode}
+                            </style>
+                          </head>
+                          <body>
+                            ${item.htmlCode}
+                          </body>
+                        </html>
+                      `;
                         return (
                           <div
                             style={{
@@ -476,13 +449,12 @@ const Components = () => {
                       );
                     })()}
                 </div>
+
+                {/* Component Info */}
                 <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
                   <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
                     <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                      {/* Show cleaned type only, not title */}
-                      <span className="block text-base sm:text-lg font-semibold">
-                        {item.type?.replace(/component/gi, '').trim().replace(/^\w/, c => c.toUpperCase())}
-                      </span>
+                      {item.title}
                     </h3>
                     <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                       <span
@@ -496,11 +468,24 @@ const Components = () => {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-white text-xs sm:text-[13px] font-light">
-                      {item.stats || ""}
+                      {item.type} • {item.stats || ""}
                     </span>
                   </div>
                 </div>
-                {/* Admin delete button removed */}
+
+                {/* Admin Delete Button */}
+                {user?.role === "admin" && (
+                  <button
+                    className="absolute top-3 right-3 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 hover:border-red-500/50 rounded-lg text-xs font-medium transition-all duration-300 z-20 flex items-center gap-1 group/delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(item._id);
+                    }}
+                  >
+                    <Trash2 className="w-3 h-3 group-hover/delete:scale-110 transition-transform" />
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))
@@ -510,4 +495,4 @@ const Components = () => {
   );
 };
 
-export default Components;
+export default ComponentsPage;

@@ -7,15 +7,26 @@ import Layout from "@/components/Layout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Components from "./pages/Components";
-import Projects from "./pages/Projects";
-import Blogs from "./pages/Blogs";
-import Pricing from "./pages/Pricing";
+// import Blogs from "./pages/Blogs";
+// import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
-import ProjectDetail from "./pages/ProjectDetail";
+import SettingsPage from "./pages/SettingsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import AdminComponentUpload from "./pages/admin/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
-import PersonalInformation from "./pages/PersonalInformation";
-import NotFound from "./pages/NotFound";
+import Favourite from "./pages/Favourite";
+import Community from "./pages/Community";
+import Templates from "./pages/Template";
+import UploadTemplate from "./pages/UploadTemplate";
+import TemplateDetail from "./pages/TemplateDetail";
+import ReportBug from "./pages/ReportBug";
+import { CommunityUserProfile } from "./components/CommunityUserProfile";
+import ComponentEditor from "./pages/ComponentEditor";
+import AdminRoutes from "./pages/admin/AdminRoutes";
+import NotificationsPage from "./pages/NotificationsPage";
+
+import FeedbackForm from "./pages/Feedback";
 
 const queryClient = new QueryClient();
 
@@ -28,36 +39,52 @@ const App: React.FC = () => {
           <Sonner />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/components" element={
+            <Route path="/components" element={<Components />} />
+            <Route path="/components/:type/:id" element={<ComponentDetail />} />
+            <Route path="/component-editor" element={<ComponentEditor />} />
+            <Route path="/admin-component-upload" element={
               <ProtectedRoute>
-                <Components />
+                <AdminComponentUpload />
               </ProtectedRoute>
             } />
-            <Route path="/components/:type/:id" element={
-              <ProtectedRoute>
-                <ComponentDetail />
-              </ProtectedRoute>
-            } />
-            <Route path="/projects" element={
-              <ProtectedRoute>
-                <Projects />
-              </ProtectedRoute>
-            } />
-            <Route path="/projects/:id" element={
-              <ProtectedRoute>
-                <ProjectDetail />
-              </ProtectedRoute>
-            } />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/templates/:id" element={<TemplateDetail />} />
+            <Route path="/upload-template" element={<UploadTemplate />} />
+            <Route path="/community" element={<Community />} />
+            {/* Community user profile route */}
+            <Route path="/community/:username" element={<CommunityUserProfile />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            {/* <Route path="/blogs" element={<Blogs />} /> */}
+            {/* <Route path="/pricing" element={<Pricing />} /> */}
             <Route path="/signin" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
             <Route path="/settings/personal" element={
               <ProtectedRoute>
-                <PersonalInformation />
+                <SettingsPage />
               </ProtectedRoute>
             } />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/favourite" element={
+              <ProtectedRoute>
+                <Favourite />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings/favourite" element={
+              <ProtectedRoute>
+                <Favourite />
+              </ProtectedRoute>
+            } />
+            <Route path="/feedback" element={<FeedbackForm />} />
+            <Route path="*" element={<NotFoundPage />} />
+            <Route path="/report-bug" element={<ReportBug />} />
+            {/* Admin Panel Route */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute>
+                  <AdminRoutes />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Layout>
       </TooltipProvider>

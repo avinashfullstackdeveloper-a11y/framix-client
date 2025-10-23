@@ -46,9 +46,10 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/components">Components</NavLink>
-            <NavLink to="/projects">Projects</NavLink>
-            <NavLink to="/blogs">Blogs</NavLink>
-            <NavLink to="/pricing">Pricing</NavLink>
+            <NavLink to="/templates">Templates</NavLink>
+            <NavLink to="/community">Community</NavLink>
+            {/* <NavLink to="/blogs">Blogs</NavLink> */}
+            {/* <NavLink to="/pricing">Pricing</NavLink> */}
           </div>
 
           {/* Show user menu if logged in, otherwise show Explore Now button */}

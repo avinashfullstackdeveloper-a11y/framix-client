@@ -1,5 +1,5 @@
-// Define a type for a single project for better type-safety
-export interface Project {
+// Define a type for a single template for better type-safety
+export interface Template {
   id: string;
   title: string;
   subtitle: string;
@@ -18,12 +18,12 @@ export interface Project {
   media: {
     mainVideo: string;
     galleryImages: string[];
-    relatedProjectVideos: string[];
+    relatedTemplateVideos: string[];
   };
 }
 
 // Export the array of projects, typed with the Project interface
-export const projectsData: Project[] = [
+export const templatesData: Template[] = [
   {
     id: 'mind-scape',
     title: 'Mind Scape',
@@ -50,7 +50,7 @@ export const projectsData: Project[] = [
         "/assets/images/pd3.png",
         "/assets/images/pd4.png",
       ],
-      relatedProjectVideos: [
+      relatedTemplateVideos: [
         "/assets/videos/a.mp4",
         "/assets/videos/b.mp4",
         "/assets/videos/c.mp4",
@@ -78,7 +78,7 @@ export const projectsData: Project[] = [
     media: {
       mainVideo: '/assets/videos/b.mp4',
       galleryImages: [],
-      relatedProjectVideos: [],
+      relatedTemplateVideos: [],
     }
   }
 ];

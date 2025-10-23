@@ -7,21 +7,28 @@ type User = {
   email: string;
   username?: string;
   name?: string;
+  role?: string;
 };
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, username: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    username: string
+  ) => Promise<void>;
   logout: () => Promise<void>;
-  googleSignIn: () => Promise<void>;
   refetchUser: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: result.user.email,
             name: result.user.name,
             username: result.user.name, // Use name as username for display
+            role: result.user.role,
           });
         }
       } catch (error) {
@@ -65,15 +73,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
+          role: result.user.role, // Ensure role is set on login
         });
       }
+      // Do not use localStorage for user state
     } catch (error: any) {
       console.error("Login error:", error);
       throw error;
     }
   };
 
-  const register = async (email: string, password: string, username: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    username: string
+  ) => {
     try {
       const result = await authClient.register({
         name: username,
@@ -82,7 +96,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (!result.success) {
-        throw new Error(result.error || result.message || "Registration failed");
+        throw new Error(
+          result.error || result.message || "Registration failed"
+        );
       }
 
       if (result.user) {
@@ -99,6 +115,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * Logs out the user and resets authentication state.
+   */
   const logout = async () => {
     try {
       await authClient.logout();
@@ -109,10 +128,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const googleSignIn = async () => {
-    // TODO: Implement Google Sign-In when configured
-    console.log("Google sign-in attempt");
-    throw new Error("Google Sign-In not implemented yet");
+  /**
+   * Frontend-only Delete Account workflow.
+   * - Clears all user data from localStorage and sessionStorage.
+   * - Sets user state to null.
+   * - Triggers redirect via protected route logic.
+   */
+  /**
+   * Deletes the user account by calling backend API.
+   * - Waits for backend confirmation before clearing local data and logging out.
+   * - Handles errors gracefully.
+   */
+  const deleteAccount = async () => {
+    if (!user?.id) throw new Error("User ID not found.");
+    try {
+      // Call backend DELETE endpoint
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/user/${
+          user.id
+        }`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete account.");
+      }
+      // Backend confirmed deletion, clear local data
+      localStorage.clear();
+      sessionStorage.clear();
+      setUser(null);
+    } catch (error) {
+      console.error("Delete account error:", error);
+      throw error;
+    }
   };
 
   const refetchUser = async () => {
@@ -124,7 +178,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
+          role: result.user.role, // Ensure role is set on refetch
         });
+        // Do not use localStorage for user state
       }
     } catch (error) {
       console.error("Failed to refetch user:", error);
@@ -132,7 +188,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, googleSignIn, refetchUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        login,
+        register,
+        logout,
+        refetchUser,
+        deleteAccount,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -141,7 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
