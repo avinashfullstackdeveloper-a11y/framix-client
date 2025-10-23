@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import ProgressIndicator, { ProgressStep } from './ProgressIndicator';
 import UploadStep from './UploadStep';
 import DetailsFormStep, { FormData } from './DetailsFormStep';
+import ReviewStep from './ReviewStep';
 
 const CombinedTemplateUpload: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -145,10 +146,21 @@ const CombinedTemplateUpload: React.FC = () => {
     setImageFiles(files);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Handle form submission
+  const handleNextToReview = () => {
+    setCurrentStep(3);
+  };
+
+  const handleSubmit = () => {
+    console.log('Final submission:', formData);
+    // Handle final submission logic
+  };
+
+  const handleEditUpload = () => {
+    setCurrentStep(1);
+  };
+
+  const handleEditDetails = () => {
+    setCurrentStep(2);
   };
 
   return (
@@ -189,8 +201,21 @@ const CombinedTemplateUpload: React.FC = () => {
           onVideoUpload={handleVideoUpload}
           onImageUpload={handleImageUpload}
           onDropdownToggle={() => setIsDropdownOpen(!isDropdownOpen)}
-          onSubmit={handleSubmit}
+          onNext={handleNextToReview}
           onGoBack={handleGoBack}
+        />
+      )}
+
+      {/* Step 3: Review/Preview */}
+      {currentStep === 3 && (
+        <ReviewStep
+          formData={formData}
+          selectedFile={selectedFile}
+          imageFiles={imageFiles}
+          onBack={handleGoBack}
+          onSubmit={handleSubmit}
+          onEditUpload={handleEditUpload}
+          onEditDetails={handleEditDetails}
         />
       )}
     </div>

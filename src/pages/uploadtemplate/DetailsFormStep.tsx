@@ -26,7 +26,7 @@ export interface DetailsFormStepProps {
   onVideoUpload: (files: FileList | null) => void;
   onImageUpload: (files: FileList | null) => void;
   onDropdownToggle: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onNext: () => void;
   onGoBack: () => void;
 }
 
@@ -45,7 +45,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
   onVideoUpload,
   onImageUpload,
   onDropdownToggle,
-  onSubmit,
+  onNext,
   onGoBack,
 }) => {
   return (
@@ -63,10 +63,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
         </div>
       </header>
 
-      <form
-        onSubmit={onSubmit}
-        className="flex flex-col items-start gap-12 shrink-0 self-stretch box-border bg-black px-8 py-[73px] rounded-2xl border-[0.667px] border-solid border-[rgba(255,154,201,0.60)] max-md:w-full max-md:px-5 max-md:py-10 max-sm:gap-8 max-sm:px-4 max-sm:py-[30px]"
-      >
+      <div className="flex flex-col items-start gap-12 shrink-0 self-stretch box-border bg-black px-8 py-[73px] rounded-2xl border-[0.667px] border-solid border-[rgba(255,154,201,0.60)] max-md:w-full max-md:px-5 max-md:py-10 max-sm:gap-8 max-sm:px-4 max-sm:py-[30px]">
         {/* Template Name */}
         <div className="flex w-full h-[58px] flex-col items-start gap-4 shrink-0 box-border max-md:w-full">
           <label className="flex h-3.5 items-center gap-2 shrink-0 self-stretch box-border max-md:w-full">
@@ -314,13 +311,14 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
             Back
           </button>
           <button
-            type="submit"
+            type="button"
+            onClick={onNext}
             className="flex w-[260px] h-9 justify-center items-center gap-2 box-border bg-[#FF9AC9] px-8 py-2 rounded-[14px] text-black text-sm font-bold leading-5 hover:bg-[#FF7AB8] transition-colors max-md:w-full"
           >
             Set Price &amp; License
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
