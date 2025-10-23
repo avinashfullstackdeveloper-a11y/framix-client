@@ -46,10 +46,18 @@ const ComponentDetail: React.FC = () => {
   // Likes/comments state
   const [likesCount, setLikesCount] = useState(0);
   const [likedByMe, setLikedByMe] = useState(false);
-  const [comments, setComments] = useState<{_id: string; text: string; user?: {name?: string}}[]>([]);
+  const [comments, setComments] = useState<{
+    _id: string;
+    text: string;
+    user?: {name?: string; _id?: string};
+    replies?: {_id: string; text: string; user?: {name?: string; _id?: string}; timestamp?: string}[];
+    timestamp?: string;
+  }[]>([]);
   const [commentText, setCommentText] = useState("");
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -137,9 +145,13 @@ const ComponentDetail: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setComments(Array.isArray(data) ? data : []);
+        console.log("[Comments] Fetched comments:", data);
+        // API returns { comments: [...] }
+        setComments(Array.isArray(data.comments) ? data.comments : (Array.isArray(data) ? data : []));
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error("[Comments] Error fetching:", err);
+      })
       .finally(() => setCommentsLoading(false));
   }, [id, token]);
 
@@ -692,9 +704,91 @@ const ComponentDetail: React.FC = () => {
                 <div className="text-muted-foreground text-sm">No comments yet.</div>
               )}
               {comments.map((c) => (
-                <div key={c._id} className="p-2 rounded bg-background border">
-                  <div className="font-medium">{c.user?.name || "User"}</div>
-                  <div className="text-sm">{c.text}</div>
+                <div key={c._id} className="rounded bg-background border">
+                  <div className="p-3">
+                    <div className="font-medium text-sm">{c.user?.name || "User"}</div>
+                    <div className="text-sm mt-1">{c.text}</div>
+                    <button
+                      className="text-xs text-primary hover:underline mt-2"
+                      onClick={() => {
+                        if (replyingTo === c._id) {
+                          setReplyingTo(null);
+                          setReplyText("");
+                        } else {
+                          setReplyingTo(c._id);
+                          setReplyText("");
+                        }
+                      }}
+                    >
+                      {replyingTo === c._id ? "Cancel" : "Reply"}
+                    </button>
+
+                    {/* Reply form */}
+                    {replyingTo === c._id && (
+                      <form
+                        className="flex gap-2 mt-2"
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          if (!replyText.trim()) return;
+                          setCommentsLoading(true);
+                          try {
+                            const res = await fetch(`/api/components/${id}/comments/${c._id}/reply`, {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                              },
+                              credentials: "include",
+                              body: JSON.stringify({ text: replyText }),
+                            });
+                            if (!res.ok) throw new Error("Failed to post reply");
+                            const response = await res.json();
+                            if (response.success && response.comments) {
+                              setComments(response.comments);
+                            }
+                            setReplyText("");
+                            setReplyingTo(null);
+                          } catch (err) {
+                            console.error("[Reply] Error:", err);
+                            toast({
+                              title: "Error",
+                              description: "Could not post reply.",
+                              variant: "destructive",
+                            });
+                          } finally {
+                            setCommentsLoading(false);
+                          }
+                        }}
+                      >
+                        <input
+                          className="flex-1 border rounded px-2 py-1 text-sm"
+                          type="text"
+                          placeholder="Write a reply..."
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          disabled={commentsLoading}
+                          autoFocus
+                        />
+                        <Button size="sm" type="submit" disabled={commentsLoading || !replyText.trim()}>
+                          {commentsLoading ? "..." : "Reply"}
+                        </Button>
+                      </form>
+                    )}
+
+                    {/* Display replies */}
+                    {c.replies && c.replies.length > 0 && (
+                      <div className="mt-3 ml-4 space-y-2 border-l-2 border-border pl-3">
+                        {c.replies.map((reply) => (
+                          <div key={reply._id} className="text-sm">
+                            <div className="font-medium text-xs text-muted-foreground">
+                              {reply.user?.name || "User"}
+                            </div>
+                            <div className="mt-1">{reply.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
