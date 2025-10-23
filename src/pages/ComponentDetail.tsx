@@ -43,6 +43,14 @@ const ComponentDetail: React.FC = () => {
   const [isFavourited, setIsFavourited] = useState(false);
   const [savingFavourite, setSavingFavourite] = useState(false);
 
+  // Likes/comments state
+  const [likesCount, setLikesCount] = useState(0);
+  const [likedByMe, setLikedByMe] = useState(false);
+  const [comments, setComments] = useState<{_id: string; text: string; user?: {name?: string}}[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
+
   const { toast } = useToast();
   const { user } = useAuth();
   const token =
@@ -103,6 +111,36 @@ const ComponentDetail: React.FC = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  }, [id, token]);
+
+  // Fetch likes and comments on mount
+  useEffect(() => {
+    if (!id) return;
+    // Likes
+    setLikeLoading(true);
+    fetch(`/api/components/${id}/like`, {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLikesCount(data.count || 0);
+        setLikedByMe(!!data.likedByMe);
+      })
+      .catch(() => {})
+      .finally(() => setLikeLoading(false));
+    // Comments
+    setCommentsLoading(true);
+    fetch(`/api/components/${id}/comments`, {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setComments(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {})
+      .finally(() => setCommentsLoading(false));
   }, [id, token]);
 
   // Check if already favourited
@@ -535,19 +573,128 @@ const ComponentDetail: React.FC = () => {
         </div>
 
         {/* Action Bar */}
-        <div className="flex justify-end gap-4 mt-6 pt-6 border-t">
-          <Button
-            variant="default"
-            disabled={savingFavourite}
-            onClick={handleToggleFavourite}
-          >
-            {savingFavourite
-              ? "Saving..."
-              : isFavourited
-              ? "Unfavourite"
-              : "Save to Favourite"}
-          </Button>
-          <Button variant="outline">Export</Button>
+        <div className="flex flex-col gap-6 mt-6 pt-6 border-t">
+          <div className="flex gap-4 items-center">
+            {/* Likes UI */}
+            <Button
+              variant={likedByMe ? "default" : "outline"}
+              disabled={likeLoading}
+              onClick={async () => {
+                setLikeLoading(true);
+                try {
+                  const method = likedByMe ? "DELETE" : "POST";
+                  const url = `/api/components/${id}/like`;
+                  const payload = undefined; // No body sent
+                  console.log("[Like] Request:", { method, url, payload });
+                  const res = await fetch(url, {
+                    method,
+                    headers: { Authorization: `Bearer ${token}` },
+                    credentials: "include",
+                  });
+                  console.log("[Like] Response status:", res.status);
+                  if (!res.ok) throw new Error("Failed to update like");
+                  setLikedByMe(!likedByMe);
+                  setLikesCount((prev) => likedByMe ? prev - 1 : prev + 1);
+                  console.log("[Like] Updated state: likedByMe =", !likedByMe, "likesCount =", likedByMe ? likesCount - 1 : likesCount + 1);
+                } catch (err) {
+                  console.error("[Like] Error:", err);
+                  toast({
+                    title: "Error",
+                    description: "Could not update like.",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setLikeLoading(false);
+                }
+              }}
+            >
+              {likeLoading
+                ? "Processing..."
+                : likedByMe
+                ? "Unlike"
+                : "Like"}
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              👍 {likesCount} {likesCount === 1 ? "Like" : "Likes"}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              💬 {comments.length} {comments.length === 1 ? "Comment" : "Comments"}
+            </span>
+            <Button
+              variant="default"
+              disabled={savingFavourite}
+              onClick={handleToggleFavourite}
+            >
+              {savingFavourite
+                ? "Saving..."
+                : isFavourited
+                ? "Unfavourite"
+                : "Save to Favourite"}
+            </Button>
+            <Button variant="outline">Export</Button>
+          </div>
+          {/* Comments UI */}
+          <div className="bg-muted rounded-lg p-4">
+            <h4 className="font-semibold mb-2">Comments</h4>
+            <form
+              className="flex gap-2 mb-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!commentText.trim()) return;
+                setCommentsLoading(true);
+                try {
+                  console.log("[Comment] Posting comment for component", id, "text:", commentText);
+                  const res = await fetch(`/api/components/${id}/comments`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({ text: commentText }),
+                  });
+                  console.log("[Comment] Response status:", res.status);
+                  if (!res.ok) throw new Error("Failed to post comment");
+                  const newComment = await res.json();
+                  setComments((prev) => [newComment, ...prev]);
+                  setCommentText("");
+                  console.log("[Comment] Added new comment:", newComment);
+                } catch (err) {
+                  console.error("[Comment] Error:", err);
+                  toast({
+                    title: "Error",
+                    description: "Could not post comment.",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setCommentsLoading(false);
+                }
+              }}
+            >
+              <input
+                className="flex-1 border rounded px-3 py-2"
+                type="text"
+                placeholder="Add a comment..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                disabled={commentsLoading}
+              />
+              <Button type="submit" disabled={commentsLoading || !commentText.trim()}>
+                {commentsLoading ? "Posting..." : "Post"}
+              </Button>
+            </form>
+            <div className="space-y-3">
+              {comments.length === 0 && (
+                <div className="text-muted-foreground text-sm">No comments yet.</div>
+              )}
+              {comments.map((c) => (
+                <div key={c._id} className="p-2 rounded bg-background border">
+                  <div className="font-medium">{c.user?.name || "User"}</div>
+                  <div className="text-sm">{c.text}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
