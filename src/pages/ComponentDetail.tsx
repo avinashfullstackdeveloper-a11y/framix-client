@@ -586,211 +586,350 @@ const ComponentDetail: React.FC = () => {
 
         {/* Action Bar */}
         <div className="flex flex-col gap-6 mt-6 pt-6 border-t">
-          <div className="flex gap-4 items-center">
-            {/* Likes UI */}
-            <Button
-              variant={likedByMe ? "default" : "outline"}
-              disabled={likeLoading}
-              onClick={async () => {
-                setLikeLoading(true);
-                try {
-                  const method = likedByMe ? "DELETE" : "POST";
-                  const url = `/api/components/${id}/like`;
-                  const payload = undefined; // No body sent
-                  console.log("[Like] Request:", { method, url, payload });
-                  const res = await fetch(url, {
-                    method,
-                    headers: { Authorization: `Bearer ${token}` },
-                    credentials: "include",
-                  });
-                  console.log("[Like] Response status:", res.status);
-                  if (!res.ok) throw new Error("Failed to update like");
-                  setLikedByMe(!likedByMe);
-                  setLikesCount((prev) => likedByMe ? prev - 1 : prev + 1);
-                  console.log("[Like] Updated state: likedByMe =", !likedByMe, "likesCount =", likedByMe ? likesCount - 1 : likesCount + 1);
-                } catch (err) {
-                  console.error("[Like] Error:", err);
-                  toast({
-                    title: "Error",
-                    description: "Could not update like.",
-                    variant: "destructive",
-                  });
-                } finally {
-                  setLikeLoading(false);
-                }
-              }}
-            >
-              {likeLoading
-                ? "Processing..."
-                : likedByMe
-                ? "Unlike"
-                : "Like"}
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              👍 {likesCount} {likesCount === 1 ? "Like" : "Likes"}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              💬 {comments.length} {comments.length === 1 ? "Comment" : "Comments"}
-            </span>
-            <Button
-              variant="default"
-              disabled={savingFavourite}
-              onClick={handleToggleFavourite}
-            >
-              {savingFavourite
-                ? "Saving..."
-                : isFavourited
-                ? "Unfavourite"
-                : "Save to Favourite"}
-            </Button>
-            <Button variant="outline">Export</Button>
-          </div>
-          {/* Comments UI */}
-          <div className="bg-muted rounded-lg p-4">
-            <h4 className="font-semibold mb-2">Comments</h4>
-            <form
-              className="flex gap-2 mb-4"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!commentText.trim()) return;
-                setCommentsLoading(true);
-                try {
-                  console.log("[Comment] Posting comment for component", id, "text:", commentText);
-                  const res = await fetch(`/api/components/${id}/comments`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({ text: commentText }),
-                  });
-                  console.log("[Comment] Response status:", res.status);
-                  if (!res.ok) throw new Error("Failed to post comment");
-                  const response = await res.json();
-                  console.log("[Comment] Response:", response);
-                  // Replace all comments with the updated list from server
-                  if (response.success && response.comments) {
-                    setComments(response.comments);
-                  }
-                  setCommentText("");
-                  console.log("[Comment] Updated comments list");
-                } catch (err) {
-                  console.error("[Comment] Error:", err);
-                  toast({
-                    title: "Error",
-                    description: "Could not post comment.",
-                    variant: "destructive",
-                  });
-                } finally {
-                  setCommentsLoading(false);
-                }
-              }}
-            >
-              <input
-                className="flex-1 border rounded px-3 py-2"
-                type="text"
-                placeholder="Add a comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                disabled={commentsLoading}
-              />
-              <Button type="submit" disabled={commentsLoading || !commentText.trim()}>
-                {commentsLoading ? "Posting..." : "Post"}
+          {/* Improved Stats and Actions Bar */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-6">
+              {/* Likes with improved styling */}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant={likedByMe ? "default" : "outline"}
+                  size="sm"
+                  disabled={likeLoading}
+                  onClick={async () => {
+                    setLikeLoading(true);
+                    try {
+                      const method = likedByMe ? "DELETE" : "POST";
+                      const url = `/api/components/${id}/like`;
+                      const payload = undefined; // No body sent
+                      console.log("[Like] Request:", { method, url, payload });
+                      const res = await fetch(url, {
+                        method,
+                        headers: { Authorization: `Bearer ${token}` },
+                        credentials: "include",
+                      });
+                      console.log("[Like] Response status:", res.status);
+                      if (!res.ok) throw new Error("Failed to update like");
+                      setLikedByMe(!likedByMe);
+                      setLikesCount((prev) => likedByMe ? prev - 1 : prev + 1);
+                      console.log("[Like] Updated state: likedByMe =", !likedByMe, "likesCount =", likedByMe ? likesCount - 1 : likesCount + 1);
+                    } catch (err) {
+                      console.error("[Like] Error:", err);
+                      toast({
+                        title: "Error",
+                        description: "Could not update like.",
+                        variant: "destructive",
+                      });
+                    } finally {
+                      setLikeLoading(false);
+                    }
+                  }}
+                  className={`flex items-center gap-2 transition-all ${
+                    likedByMe 
+                      ? "bg-red-500 hover:bg-red-600 text-white" 
+                      : "hover:bg-red-50 hover:text-red-600"
+                  }`}
+                >
+                  <span className={`text-lg ${likedByMe ? 'text-white' : 'text-red-500'}`}>
+                    {likeLoading ? "⋯" : likedByMe ? "❤️" : "🤍"}
+                  </span>
+                  {likeLoading ? "Processing" : likedByMe ? "Liked" : "Like"}
+                </Button>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-bold text-foreground">
+                    {likesCount}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {likesCount === 1 ? "Like" : "Likes"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Comments count */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="text-lg">💬</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-bold text-foreground">
+                    {comments.length}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {comments.length === 1 ? "Comment" : "Comments"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                variant={isFavourited ? "default" : "outline"}
+                disabled={savingFavourite}
+                onClick={handleToggleFavourite}
+                className="flex items-center gap-2 transition-all"
+              >
+                <span className="text-lg">
+                  {savingFavourite ? "⋯" : isFavourited ? "⭐" : "☆"}
+                </span>
+                {savingFavourite ? "Saving..." : isFavourited ? "Favourited" : "Add to Favourites"}
               </Button>
-            </form>
-            <div className="space-y-3">
-              {comments.length === 0 && (
-                <div className="text-muted-foreground text-sm">No comments yet.</div>
-              )}
-              {comments.map((c) => (
-                <div key={c._id} className="rounded bg-background border">
-                  <div className="p-3">
-                    <div className="font-medium text-sm">{c.user?.name || "User"}</div>
-                    <div className="text-sm mt-1">{c.text}</div>
-                    <button
-                      className="text-xs text-primary hover:underline mt-2"
-                      onClick={() => {
-                        if (replyingTo === c._id) {
-                          setReplyingTo(null);
-                          setReplyText("");
-                        } else {
-                          setReplyingTo(c._id);
-                          setReplyText("");
-                        }
-                      }}
-                    >
-                      {replyingTo === c._id ? "Cancel" : "Reply"}
-                    </button>
+              
+              <Button variant="outline" className="flex items-center gap-2">
+                <span>📤</span>
+                Export
+              </Button>
+            </div>
+          </div>
 
-                    {/* Reply form */}
-                    {replyingTo === c._id && (
-                      <form
-                        className="flex gap-2 mt-2"
-                        onSubmit={async (e) => {
-                          e.preventDefault();
-                          if (!replyText.trim()) return;
-                          setCommentsLoading(true);
-                          try {
-                            const res = await fetch(`/api/components/${id}/comments/${c._id}/reply`, {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${token}`,
-                              },
-                              credentials: "include",
-                              body: JSON.stringify({ text: replyText }),
-                            });
-                            if (!res.ok) throw new Error("Failed to post reply");
-                            const response = await res.json();
-                            if (response.success && response.comments) {
-                              setComments(response.comments);
-                            }
-                            setReplyText("");
-                            setReplyingTo(null);
-                          } catch (err) {
-                            console.error("[Reply] Error:", err);
-                            toast({
-                              title: "Error",
-                              description: "Could not post reply.",
-                              variant: "destructive",
-                            });
-                          } finally {
-                            setCommentsLoading(false);
-                          }
-                        }}
+          {/* Improved Comments Section */}
+          <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
+            <div className="p-6 border-b">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <span>💬</span>
+                Discussion ({comments.length})
+              </h3>
+              <p className="text-muted-foreground text-sm mt-1">
+                Share your thoughts and feedback about this component
+              </p>
+            </div>
+
+            {/* Comment Input */}
+            <div className="p-6 border-b">
+              <form
+                className="flex flex-col gap-3"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!commentText.trim()) return;
+                  setCommentsLoading(true);
+                  try {
+                    console.log("[Comment] Posting comment for component", id, "text:", commentText);
+                    const res = await fetch(`/api/components/${id}/comments`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      credentials: "include",
+                      body: JSON.stringify({ text: commentText }),
+                    });
+                    console.log("[Comment] Response status:", res.status);
+                    if (!res.ok) throw new Error("Failed to post comment");
+                    const response = await res.json();
+                    console.log("[Comment] Response:", response);
+                    // Replace all comments with the updated list from server
+                    if (response.success && response.comments) {
+                      setComments(response.comments);
+                    }
+                    setCommentText("");
+                    console.log("[Comment] Updated comments list");
+                  } catch (err) {
+                    console.error("[Comment] Error:", err);
+                    toast({
+                      title: "Error",
+                      description: "Could not post comment.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setCommentsLoading(false);
+                  }
+                }}
+              >
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                    {user?.name?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <div className="flex-1">
+                    <textarea
+                      className="w-full border border-border rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white text-black"
+                      placeholder="Add a comment..."
+                      rows={3}
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      disabled={commentsLoading}
+                    />
+                    <div className="flex justify-between items-center mt-2">
+                      <span className={`text-xs ${
+                        commentText.length > 500 ? 'text-red-500' : 'text-muted-foreground'
+                      }`}>
+                        {commentText.length}/500
+                      </span>
+                      <Button 
+                        type="submit" 
+                        disabled={commentsLoading || !commentText.trim() || commentText.length > 500}
+                        size="sm"
                       >
-                        <input
-                          className="flex-1 border rounded px-2 py-1 text-sm"
-                          type="text"
-                          placeholder="Write a reply..."
-                          value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
-                          disabled={commentsLoading}
-                          autoFocus
-                        />
-                        <Button size="sm" type="submit" disabled={commentsLoading || !replyText.trim()}>
-                          {commentsLoading ? "..." : "Reply"}
-                        </Button>
-                      </form>
-                    )}
-
-                    {/* Display replies */}
-                    {c.replies && c.replies.length > 0 && (
-                      <div className="mt-3 ml-4 space-y-2 border-l-2 border-border pl-3">
-                        {c.replies.map((reply) => (
-                          <div key={reply._id} className="text-sm">
-                            <div className="font-medium text-xs text-muted-foreground">
-                              {reply.user?.name || "User"}
-                            </div>
-                            <div className="mt-1">{reply.text}</div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                        {commentsLoading ? (
+                          <span className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Posting...
+                          </span>
+                        ) : (
+                          "Post Comment"
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              ))}
+              </form>
+            </div>
+
+            {/* Comments List */}
+            <div className="divide-y">
+              {comments.length === 0 ? (
+                <div className="p-8 text-center">
+                  <div className="text-4xl mb-3">💬</div>
+                  <p className="text-muted-foreground">No comments yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Be the first to share your thoughts!
+                  </p>
+                </div>
+              ) : (
+                comments.map((comment) => (
+                  <div key={comment._id} className="p-6 hover:bg-muted/30 transition-colors">
+                    <div className="flex gap-3">
+                      {/* User Avatar */}
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                        {comment.user?.name?.charAt(0).toUpperCase() || "U"}
+                      </div>
+                      
+                      {/* Comment Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-sm">
+                            {comment.user?.name || "Anonymous User"}
+                          </span>
+                          {comment.timestamp && (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(comment.timestamp).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <p className="text-sm text-foreground mb-3 leading-relaxed">
+                          {comment.text}
+                        </p>
+
+                        {/* Reply Button */}
+                        <button
+                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                          onClick={() => {
+                            if (replyingTo === comment._id) {
+                              setReplyingTo(null);
+                              setReplyText("");
+                            } else {
+                              setReplyingTo(comment._id);
+                              setReplyText("");
+                            }
+                          }}
+                        >
+                          {replyingTo === comment._id ? "Cancel" : "Reply"}
+                        </button>
+
+                        {/* Reply Form */}
+                        {replyingTo === comment._id && (
+                          <form
+                            className="flex gap-3 mt-3"
+                            onSubmit={async (e) => {
+                              e.preventDefault();
+                              if (!replyText.trim()) return;
+                              setCommentsLoading(true);
+                              try {
+                                const res = await fetch(`/api/components/${id}/comments/${comment._id}/reply`, {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${token}`,
+                                  },
+                                  credentials: "include",
+                                  body: JSON.stringify({ text: replyText }),
+                                });
+                                if (!res.ok) throw new Error("Failed to post reply");
+                                const response = await res.json();
+                                if (response.success && response.comments) {
+                                  setComments(response.comments);
+                                }
+                                setReplyText("");
+                                setReplyingTo(null);
+                              } catch (err) {
+                                console.error("[Reply] Error:", err);
+                                toast({
+                                  title: "Error",
+                                  description: "Could not post reply.",
+                                  variant: "destructive",
+                                });
+                              } finally {
+                                setCommentsLoading(false);
+                              }
+                            }}
+                          >
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                              {user?.name?.charAt(0).toUpperCase() || "U"}
+                            </div>
+                            <div className="flex-1">
+                              <input
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                                type="text"
+                                placeholder="Write a reply..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                disabled={commentsLoading}
+                                autoFocus
+                              />
+                              <div className="flex justify-end gap-2 mt-2">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setReplyingTo(null);
+                                    setReplyText("");
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  type="submit"
+                                  disabled={commentsLoading || !replyText.trim()}
+                                >
+                                  {commentsLoading ? "..." : "Reply"}
+                                </Button>
+                              </div>
+                            </div>
+                          </form>
+                        )}
+
+                        {/* Replies List */}
+                        {comment.replies && comment.replies.length > 0 && (
+                          <div className="mt-4 space-y-4 border-l-2 border-border pl-4 ml-2">
+                            {comment.replies.map((reply) => (
+                              <div key={reply._id} className="flex gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                                  {reply.user?.name?.charAt(0).toUpperCase() || "U"}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="font-medium text-sm">
+                                      {reply.user?.name || "Anonymous User"}
+                                    </span>
+                                    {reply.timestamp && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {new Date(reply.timestamp).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-foreground leading-relaxed">
+                                    {reply.text}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
