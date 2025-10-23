@@ -669,8 +669,8 @@ const CommunityList = () => {
                           </div>
                         </div>
                         <InteractionButtons
-                          likes={component.likes || 0}
-                          comments={component.comments || 0}
+                          likes={component.likeCount || component.likedBy?.length || 0}
+                          comments={component.commentCount || (Array.isArray(component.comments) ? component.comments.length : 0)}
                         />
                       </div>
                     </div>
@@ -888,8 +888,8 @@ const CommunityList = () => {
                             {component.type || component.category}
                           </Badge>
                           <InteractionButtons
-                            likes={component.likes || 0}
-                            comments={component.comments || 0}
+                            likes={component.likeCount || component.likedBy?.length || 0}
+                            comments={component.commentCount || (Array.isArray(component.comments) ? component.comments.length : 0)}
                           />
                         </div>
   

@@ -655,10 +655,14 @@ const ComponentDetail: React.FC = () => {
                   });
                   console.log("[Comment] Response status:", res.status);
                   if (!res.ok) throw new Error("Failed to post comment");
-                  const newComment = await res.json();
-                  setComments((prev) => [newComment, ...prev]);
+                  const response = await res.json();
+                  console.log("[Comment] Response:", response);
+                  // Replace all comments with the updated list from server
+                  if (response.success && response.comments) {
+                    setComments(response.comments);
+                  }
                   setCommentText("");
-                  console.log("[Comment] Added new comment:", newComment);
+                  console.log("[Comment] Updated comments list");
                 } catch (err) {
                   console.error("[Comment] Error:", err);
                   toast({
