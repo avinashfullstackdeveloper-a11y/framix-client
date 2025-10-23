@@ -28,8 +28,6 @@ const CommunityList = () => {
     "tooltip",
   ];
 
-  // Remove unused popup handlers
-
   // Fetch approved components from API
   useEffect(() => {
     const fetchComponents = async () => {
@@ -58,12 +56,17 @@ const CommunityList = () => {
 
   // Get all unique categories from both API and fallback data
   const getAllCategories = () => {
-    const apiCategories = components.map((c) => c.category || c.type).filter(Boolean);
+    const apiCategories = components
+      .map((c) => c.category || c.type)
+      .filter(Boolean);
     const fallbackCategories = [
       ...featuredComponents.map((c) => c.category || c.type),
       ...allComponents.map((c) => c.category || c.type),
     ].filter(Boolean);
-    return ["All", ...Array.from(new Set([...apiCategories, ...fallbackCategories]))];
+    return [
+      "All",
+      ...Array.from(new Set([...apiCategories, ...fallbackCategories])),
+    ];
   };
 
   // Sample data for components (fallback)
@@ -304,13 +307,12 @@ const CommunityList = () => {
 
       // Tailwind preview (language or technology)
       if (
-        (component.language && component.language.toLowerCase() === "tailwind" && component.code) ||
+        (component.language &&
+          component.language.toLowerCase() === "tailwind" &&
+          component.code) ||
         (component.technology === "tailwind" && component.tailwindCode)
       ) {
-        const tailwindHtml =
-          component.code ||
-          component.tailwindCode ||
-          "";
+        const tailwindHtml = component.code || component.tailwindCode || "";
         const srcDoc = `
           <!DOCTYPE html>
           <html>
@@ -349,7 +351,11 @@ const CommunityList = () => {
       }
 
       // React preview (language)
-      if (component.language && component.language.toLowerCase() === "react" && component.code) {
+      if (
+        component.language &&
+        component.language.toLowerCase() === "react" &&
+        component.code
+      ) {
         // Try to render the React code using Babel
         const srcDoc = `
           <!DOCTYPE html>
@@ -400,7 +406,11 @@ const CommunityList = () => {
       }
 
       // Multi-language (full HTML doc)
-      if (component.language && component.language.toLowerCase() === "multi" && component.code) {
+      if (
+        component.language &&
+        component.language.toLowerCase() === "multi" &&
+        component.code
+      ) {
         return (
           <iframe
             srcDoc={component.code}
@@ -420,7 +430,8 @@ const CommunityList = () => {
       if (
         ((component.language && component.language.toLowerCase() === "css") ||
           component.technology === "css") &&
-        (component.htmlCode && component.cssCode)
+        component.htmlCode &&
+        component.cssCode
       ) {
         const srcDoc = `
           <!DOCTYPE html>
@@ -620,15 +631,14 @@ const CommunityList = () => {
                           variant="secondary"
                           className="bg-black/50 text-white backdrop-blur-sm"
                         >
-                          {component.type || component.category}
+                          {(component.type || component.category)
+                            ?.replace(/component/gi, "")
+                            .trim()
+                            .replace(/^\w/, (c) => c.toUpperCase())}
                         </Badge>
                       </div>
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-1">
-                        {component.title}
-                      </h3>
-
                       <div className="flex items-center justify-between">
                         <div
                           className="flex items-center gap-2 cursor-pointer group"
@@ -669,8 +679,17 @@ const CommunityList = () => {
                           </div>
                         </div>
                         <InteractionButtons
-                          likes={component.likeCount || component.likedBy?.length || 0}
-                          comments={component.commentCount || (Array.isArray(component.comments) ? component.comments.length : 0)}
+                          likes={
+                            component.likeCount ||
+                            component.likedBy?.length ||
+                            0
+                          }
+                          comments={
+                            component.commentCount ||
+                            (Array.isArray(component.comments)
+                              ? component.comments.length
+                              : 0)
+                          }
                         />
                       </div>
                     </div>
@@ -766,7 +785,10 @@ const CommunityList = () => {
               <span className="text-sm">Categories</span>
             </button>
             <Badge variant="secondary" className="bg-primary/20 text-primary">
-              {selectedCategory === "All" ? "All Components" : selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
+              {selectedCategory === "All"
+                ? "All Components"
+                : selectedCategory.charAt(0).toUpperCase() +
+                  selectedCategory.slice(1)}
             </Badge>
             {showTypeFilter && (
               <div className="absolute z-20 mt-2 bg-background border border-border rounded-lg shadow-lg p-3 flex flex-wrap gap-2">
@@ -849,100 +871,119 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(
-            (components.length > 0
-              ? [...components]
-              : [...featuredComponents, ...allComponents]
-            )
-              .filter((component) => {
-                // Type/category filter
-                if (selectedCategory !== "All") {
-                  const type = (component.type || component.category || "").toLowerCase();
-                  if (type !== selectedCategory.toLowerCase()) return false;
-                }
-                // Search filter
-                if (searchQuery.trim() !== "") {
-                  const q = searchQuery.toLowerCase();
-                  return (
-                    (component.title && component.title.toLowerCase().includes(q)) ||
-                    (component.description && component.description.toLowerCase().includes(q)) ||
-                    (component.category && component.category.toLowerCase().includes(q)) ||
-                    (component.type && component.type.toLowerCase().includes(q)) ||
-                    (component.author?.name && component.author.name.toLowerCase().includes(q)) ||
-                    (component.createdBy?.name && component.createdBy.name.toLowerCase().includes(q))
-                  );
-                }
-                return true;
-              })
-            ).map(
-              (component, index) => {
+          {(components.length > 0
+            ? [...components]
+            : [...featuredComponents, ...allComponents]
+          )
+            .filter((component) => {
+              // Type/category filter
+              if (selectedCategory !== "All") {
+                const type = (
+                  component.type ||
+                  component.category ||
+                  ""
+                ).toLowerCase();
+                if (type !== selectedCategory.toLowerCase()) return false;
+              }
+              // Search filter
+              if (searchQuery.trim() !== "") {
+                const q = searchQuery.toLowerCase();
                 return (
-                  <Link
-                    to={`/components/${component.type || "component"}/${component._id || index}`}
-                    key={component._id || index}
-                  >
-                    <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <Badge variant="secondary" className="bg-secondary/50">
-                            {component.type || component.category}
-                          </Badge>
-                          <InteractionButtons
-                            likes={component.likeCount || component.likedBy?.length || 0}
-                            comments={component.commentCount || (Array.isArray(component.comments) ? component.comments.length : 0)}
-                          />
-                        </div>
-  
-                        <div className="h-56 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                          <LivePreview component={component} />
-                        </div>
-  
-                        <h3 className="font-semibold text-lg mb-2">
-                          {component.title}
-                        </h3>
-  
-                        <div
-                          className="flex items-center gap-2 cursor-pointer group"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const userId =
-                              component.createdBy?._id ||
-                              component.author?._id ||
-                              "";
-                            if (userId) {
-                              window.location.href = `/community/${userId}`;
-                            }
-                          }}
-                          title="View user profile"
-                        >
-                          <Avatar
-                            initials={
-                              component.createdBy?.name?.charAt(0).toUpperCase() ||
-                              component.author?.initials ||
-                              "U"
-                            }
-                            size="sm"
-                          />
-                          <div>
-                            <div className="text-sm font-medium group-hover:underline">
-                              {component.createdBy?.name ||
-                                component.author?.name ||
-                                "Anonymous"}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {component.createdBy?.username ||
-                                component.author?.username ||
-                                ""}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                  (component.title &&
+                    component.title.toLowerCase().includes(q)) ||
+                  (component.description &&
+                    component.description.toLowerCase().includes(q)) ||
+                  (component.category &&
+                    component.category.toLowerCase().includes(q)) ||
+                  (component.type &&
+                    component.type.toLowerCase().includes(q)) ||
+                  (component.author?.name &&
+                    component.author.name.toLowerCase().includes(q)) ||
+                  (component.createdBy?.name &&
+                    component.createdBy.name.toLowerCase().includes(q))
                 );
               }
-            )}
+              return true;
+            })
+            .map((component, index) => {
+              return (
+                <Link
+                  to={`/components/${component.type || "component"}/${
+                    component._id || index
+                  }`}
+                  key={component._id || index}
+                >
+                  <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge variant="secondary" className="bg-secondary/50">
+                          {(component.type || component.category)
+                            ?.replace(/component/gi, "")
+                            .trim()
+                            .replace(/^\w/, (c) => c.toUpperCase())}
+                        </Badge>
+                        <InteractionButtons
+                          likes={
+                            component.likeCount ||
+                            component.likedBy?.length ||
+                            0
+                          }
+                          comments={
+                            component.commentCount ||
+                            (Array.isArray(component.comments)
+                              ? component.comments.length
+                              : 0)
+                          }
+                        />
+                      </div>
+
+                      <div className="h-96 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                        <LivePreview component={component} />
+                      </div>
+
+                      <div
+                        className="flex items-center gap-2 cursor-pointer group"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const userId =
+                            component.createdBy?._id ||
+                            component.author?._id ||
+                            "";
+                          if (userId) {
+                            window.location.href = `/community/${userId}`;
+                          }
+                        }}
+                        title="View user profile"
+                      >
+                        <Avatar
+                          initials={
+                            component.createdBy?.name
+                              ?.charAt(0)
+                              .toUpperCase() ||
+                            component.author?.initials ||
+                            "U"
+                          }
+                          size="sm"
+                        />
+                        <div>
+                          <div className="text-sm font-medium group-hover:underline">
+                            {component.createdBy?.name ||
+                              component.author?.name ||
+                              "Anonymous"}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {component.createdBy?.username ||
+                              component.author?.username ||
+                              ""}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
         </div>
       </div>
 

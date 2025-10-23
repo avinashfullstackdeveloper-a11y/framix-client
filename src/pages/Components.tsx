@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+
 
 import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
@@ -147,7 +145,7 @@ const Components = () => {
             .map((item: ComponentItem) => (
               <div
                 key={item._id}
-                onClick={() => navigate(`/components/${item.type}/${item._id}`)}
+                onClick={() => navigate(`/components/${item.type?.replace(/component/gi, '').trim().replace(/^\w/, c => c.toUpperCase())}/${item._id}`)}
                 className="cursor-pointer w-full"
               >
               <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
@@ -481,7 +479,10 @@ const Components = () => {
                 <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
                   <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
                     <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                      {item.title}
+                      {/* Show cleaned type only, not title */}
+                      <span className="block text-base sm:text-lg font-semibold">
+                        {item.type?.replace(/component/gi, '').trim().replace(/^\w/, c => c.toUpperCase())}
+                      </span>
                     </h3>
                     <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                       <span
