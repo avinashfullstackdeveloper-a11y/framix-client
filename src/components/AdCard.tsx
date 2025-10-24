@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface AdCardProps {
   adKey: string;
@@ -6,25 +6,30 @@ interface AdCardProps {
 }
 
 const AdCard: React.FC<AdCardProps> = ({ adKey, adType = '300x250' }) => {
-  // Define ad configurations for different ad types
-  const adConfigs = {
-    '300x250': {
-      key: 'c72f109b40a75d322698efe5dd2b7573',
-      width: 300,
-      height: 250,
-    },
-    '160x300': {
-      key: 'b1019f4a7b126df1547ac70a40bdb85c',
-      width: 160,
-      height: 300,
-    },
-  };
+  const adContainerRef = useRef<HTMLDivElement>(null);
 
-  const config = adConfigs[adType];
+  useEffect(() => {
+    if (adContainerRef.current && !adContainerRef.current.querySelector('script')) {
+      // Configuration for different ad types
+      const adConfigs = {
+        '300x250': {
+          key: 'c72f109b40a75d322698efe5dd2b7573',
+          width: 300,
+          height: 250,
+        },
+        '160x300': {
+          key: 'b1019f4a7b126df1547ac70a40bdb85c',
+          width: 160,
+          height: 300,
+        },
+      };
 
-  const adHTML = `
-    <div id="adsterra-${adKey}" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-      <script type="text/javascript">
+      const config = adConfigs[adType];
+
+      // Create the atOptions script
+      const atOptionsScript = document.createElement('script');
+      atOptionsScript.type = 'text/javascript';
+      atOptionsScript.innerHTML = `
         atOptions = {
           'key' : '${config.key}',
           'format' : 'iframe',
@@ -32,15 +37,25 @@ const AdCard: React.FC<AdCardProps> = ({ adKey, adType = '300x250' }) => {
           'width' : ${config.width},
           'params' : {}
         };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/${config.key}/invoke.js"></script>
-    </div>
-  `;
+      `;
+      
+      // Create the invoke script
+      const invokeScript = document.createElement('script');
+      invokeScript.type = 'text/javascript';
+      invokeScript.src = `//www.highperformanceformat.com/${config.key}/invoke.js`;
+      
+      // Append both scripts
+      adContainerRef.current.appendChild(atOptionsScript);
+      adContainerRef.current.appendChild(invokeScript);
+    }
+  }, [adType]);
 
   return (
     <div className="w-full">
       <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-center items-center border overflow-hidden bg-black rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]">
-        <div dangerouslySetInnerHTML={{ __html: adHTML }} />
+        <div ref={adContainerRef} className="w-full h-full flex items-center justify-center">
+          {/* Adsterra ad will be injected here */}
+        </div>
       </div>
     </div>
   );
