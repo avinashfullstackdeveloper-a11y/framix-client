@@ -3,7 +3,13 @@ import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Upload, Code, FileText, Palette, Settings2, X } from "lucide-react";
@@ -29,7 +35,9 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     react: "",
     tailwind: "",
   });
-  const [activeTab, setActiveTab] = useState<"html" | "css" | "react" | "tailwind">("html");
+  const [activeTab, setActiveTab] = useState<
+    "html" | "css" | "react" | "tailwind"
+  >("html");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -59,13 +67,21 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     const warnings: string[] = [];
 
     // Check for viewport units that might cause issues
-    if (form.css.includes('100vw') || form.css.includes('100vh')) {
-      warnings.push('Using 100vw/100vh may cause preview issues. Consider using fixed dimensions or percentages.');
+    if (form.css.includes("100vw") || form.css.includes("100vh")) {
+      warnings.push(
+        "Using 100vw/100vh may cause preview issues. Consider using fixed dimensions or percentages."
+      );
     }
 
     // Check if HTML contains full document structure
-    if (form.html.includes('<html>') || form.html.includes('<head>') || form.html.includes('<body>')) {
-      warnings.push('Remove <html>, <head>, and <body> tags. Only provide the component HTML.');
+    if (
+      form.html.includes("<html>") ||
+      form.html.includes("<head>") ||
+      form.html.includes("<body>")
+    ) {
+      warnings.push(
+        "Remove <html>, <head>, and <body> tags. Only provide the component HTML."
+      );
     }
 
     return warnings;
@@ -73,7 +89,9 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
 
   const formatCode = () => {
     // Determine if multiple code fields are filled
-    const codeFields = [form.html, form.css, form.react, form.tailwind].filter(Boolean);
+    const codeFields = [form.html, form.css, form.react, form.tailwind].filter(
+      Boolean
+    );
     const multiLang = codeFields.length > 1;
 
     if (multiLang) {
@@ -98,13 +116,17 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
         align-items: center;
         justify-content: center;
       }
-      ${form.css || ''}
-      ${form.tailwind || ''}
+      ${form.css || ""}
+      ${form.tailwind || ""}
     </style>
   </head>
   <body>
     ${form.html}
-    ${form.react ? `<script type="text/babel">\n${form.react}\n    </script>` : ''}
+    ${
+      form.react
+        ? `<script type="text/babel">\n${form.react}\n    </script>`
+        : ""
+    }
   </body>
 </html>`;
     }
@@ -123,7 +145,12 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
 
     try {
       // Validate that at least HTML is provided if multi-language
-      const codeFields = [form.html, form.css, form.react, form.tailwind].filter(Boolean);
+      const codeFields = [
+        form.html,
+        form.css,
+        form.react,
+        form.tailwind,
+      ].filter(Boolean);
       const multiLang = codeFields.length > 1;
 
       if (multiLang && !form.html) {
@@ -134,7 +161,9 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
       const warnings = validateAndCleanCode();
       if (warnings.length > 0) {
         const confirmUpload = window.confirm(
-          `⚠️ Warnings detected:\n\n${warnings.join('\n')}\n\nDo you want to continue uploading?`
+          `⚠️ Warnings detected:\n\n${warnings.join(
+            "\n"
+          )}\n\nDo you want to continue uploading?`
         );
         if (!confirmUpload) {
           setLoading(false);
@@ -239,9 +268,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                 <Upload className="w-5 h-5 text-[#282828]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">
-                  New Component
-                </h2>
+                <h2 className="text-xl font-bold text-white">New Component</h2>
                 <p className="text-[#767676] text-sm mt-1">
                   Fill in the details below
                 </p>
@@ -272,23 +299,75 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
             </Label>
             <Select
               value={form.type}
-              onValueChange={(value) => setForm((prev) => ({ ...prev, type: value as ComponentType }))}
+              onValueChange={(value) =>
+                setForm((prev) => ({ ...prev, type: value as ComponentType }))
+              }
               required
             >
               <SelectTrigger className="w-full bg-black border-[#3A3A3A] text-white placeholder:text-[#767676] focus:border-[#FF9AC9] transition-all duration-300">
                 <SelectValue placeholder="Select component type" />
               </SelectTrigger>
               <SelectContent className="bg-black border-[#3A3A3A]">
-                <SelectItem value="button" className="text-white hover:bg-[#3A3A3A]">Button</SelectItem>
-                <SelectItem value="toggle" className="text-white hover:bg-[#3A3A3A]">Toggle</SelectItem>
-                <SelectItem value="checkbox" className="text-white hover:bg-[#3A3A3A]">Checkbox</SelectItem>
-                <SelectItem value="card" className="text-white hover:bg-[#3A3A3A]">Card</SelectItem>
-                <SelectItem value="loader" className="text-white hover:bg-[#3A3A3A]">Loader</SelectItem>
-                <SelectItem value="input" className="text-white hover:bg-[#3A3A3A]">Input</SelectItem>
-                <SelectItem value="form" className="text-white hover:bg-[#3A3A3A]">Form</SelectItem>
-                <SelectItem value="pattern" className="text-white hover:bg-[#3A3A3A]">Pattern</SelectItem>
-                <SelectItem value="radio" className="text-white hover:bg-[#3A3A3A]">Radio</SelectItem>
-                <SelectItem value="tooltip" className="text-white hover:bg-[#3A3A3A]">Tooltip</SelectItem>
+                <SelectItem
+                  value="button"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Button
+                </SelectItem>
+                <SelectItem
+                  value="toggle"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Toggle
+                </SelectItem>
+                <SelectItem
+                  value="checkbox"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Checkbox
+                </SelectItem>
+                <SelectItem
+                  value="card"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Card
+                </SelectItem>
+                <SelectItem
+                  value="loader"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Loader
+                </SelectItem>
+                <SelectItem
+                  value="input"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Input
+                </SelectItem>
+                <SelectItem
+                  value="form"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Form
+                </SelectItem>
+                <SelectItem
+                  value="pattern"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Pattern
+                </SelectItem>
+                <SelectItem
+                  value="radio"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Radio
+                </SelectItem>
+                <SelectItem
+                  value="tooltip"
+                  className="text-white hover:bg-[#3A3A3A]"
+                >
+                  Tooltip
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -299,11 +378,26 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
               📋 Upload Guidelines
             </h3>
             <ul className="text-xs text-[#767676] space-y-1">
-              <li>• <span className="text-white">HTML:</span> Required if using CSS/React/Tailwind. Provide only component markup</li>
-              <li>• <span className="text-white">CSS:</span> Avoid viewport units (100vw, 100vh) - components are scaled</li>
-              <li>• <span className="text-white">React:</span> Provide React/JSX code for interactive components</li>
-              <li>• <span className="text-white">Tailwind:</span> Provide Tailwind CSS utility classes</li>
-              <li>• <span className="text-white">Preview:</span> Components scaled to 50% in card view, full size on detail page</li>
+              <li>
+                • <span className="text-white">HTML:</span> Required if using
+                CSS/React/Tailwind. Provide only component markup
+              </li>
+              <li>
+                • <span className="text-white">CSS:</span> Avoid viewport units
+                (100vw, 100vh) - components are scaled
+              </li>
+              <li>
+                • <span className="text-white">React:</span> Provide React/JSX
+                code for interactive components
+              </li>
+              <li>
+                • <span className="text-white">Tailwind:</span> Provide Tailwind
+                CSS utility classes
+              </li>
+              <li>
+                • <span className="text-white">Preview:</span> Components scaled
+                to 50% in card view, full size on detail page
+              </li>
             </ul>
           </div>
 
@@ -371,31 +465,33 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
             </div>
 
             {/* Live Preview */}
-            {showPreview && (form.html || form.css || form.react || form.tailwind) && (
-              <div className="border border-[#3A3A3A] rounded-lg overflow-hidden">
-                <div className="bg-black px-3 py-1.5 text-xs font-medium text-white border-b border-[#3A3A3A]">
-                  Live Preview
-                </div>
-                <div className="bg-black p-4 h-[200px] flex items-center justify-center">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <iframe
-                      title="Live Preview"
-                      srcDoc={formatCode()}
-                      className="w-full h-full border-0"
-                      style={{
-                        background: 'transparent',
-                        transform: 'scale(0.5)',
-                        transformOrigin: 'center'
-                      }}
-                      sandbox="allow-scripts"
-                    />
+            {showPreview &&
+              (form.html || form.css || form.react || form.tailwind) && (
+                <div className="border border-[#3A3A3A] rounded-lg overflow-hidden">
+                  <div className="bg-black px-3 py-1.5 text-xs font-medium text-white border-b border-[#3A3A3A]">
+                    Live Preview
+                  </div>
+                  <div className="bg-black p-4 h-[200px] flex items-center justify-center">
+                    <div className="w-full h-full flex items-center justify-center">
+                      <iframe
+                        title="Live Preview"
+                        srcDoc={formatCode()}
+                        className="w-full h-full border-0"
+                        style={{
+                          background: "transparent",
+                          transform: "scale(0.5)",
+                          transformOrigin: "center",
+                        }}
+                        sandbox="allow-scripts"
+                      />
+                    </div>
+                  </div>
+                  <div className="bg-[#1A1A1A] border-t border-[#3A3A3A] px-3 py-1.5 text-[10px] text-[#FF9AC9]">
+                    ⚠️ Preview at 50% scale (card view). Full size on detail
+                    page.
                   </div>
                 </div>
-                <div className="bg-[#1A1A1A] border-t border-[#3A3A3A] px-3 py-1.5 text-[10px] text-[#FF9AC9]">
-                  ⚠️ Preview at 50% scale (card view). Full size on detail page.
-                </div>
-              </div>
-            )}
+              )}
           </div>
 
           {/* Status Messages */}
