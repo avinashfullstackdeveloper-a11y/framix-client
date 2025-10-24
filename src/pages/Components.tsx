@@ -2,6 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AdCard from "../components/AdCard";
 
 const Components = () => {
   // Filter tabs should match the fields in ComponentSelectorPopup.tsx
@@ -117,8 +118,8 @@ const Components = () => {
           </div>
         ) : (
           // Filter components based on activeFilter
-          components
-            .filter((item: ComponentItem) => {
+          (() => {
+            const filteredComponents = components.filter((item: ComponentItem) => {
               if (activeFilter === "All") return true;
               // Map filter tab to type/title
               switch (activeFilter) {
@@ -145,33 +146,55 @@ const Components = () => {
                 default:
                   return true;
               }
-            })
-            .map((item: ComponentItem) => (
-              <div
-                key={item._id}
-                onClick={() =>
-                  navigate(
-                    `/components/${item.type
+            });
+
+            // Create array with ads interleaved every 6 components
+            const itemsWithAds: Array<ComponentItem | { isAd: true; adIndex: number; adType: '300x250' | '160x300' }> = [];
+            filteredComponents.forEach((component, index) => {
+              itemsWithAds.push(component);
+              // Insert ad after every 6th component (index 5, 11, 17, etc.)
+              if ((index + 1) % 6 === 0 && index < filteredComponents.length - 1) {
+                // Alternate ad types: odd positions get 300x250, even positions get 160x300
+                const adCount = Math.floor(index / 6);
+                const adType = adCount % 2 === 0 ? '300x250' : '160x300';
+                itemsWithAds.push({ isAd: true, adIndex: adCount, adType });
+              }
+            });
+
+            return itemsWithAds.map((item, index) => {
+              // Check if this is an ad item
+              if ('isAd' in item && item.isAd) {
+                return <AdCard key={`ad-${item.adIndex}`} adKey={`ad-${item.adIndex}`} adType={item.adType} />;
+              }
+
+              // Regular component item
+              const componentItem = item as ComponentItem;
+              return (
+                <div
+                  key={componentItem._id}
+                  onClick={() =>
+                    navigate(
+                      `/components/${componentItem.type
                       ?.replace(/component/gi, "")
                       .trim()
-                      .replace(/^\w/, (c) => c.toUpperCase())}/${item._id}`
-                  )
-                }
-                className="cursor-pointer w-full"
-              >
-                <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
-                  <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
-                    {/* Preview based on code and language */}
-                    {item.language &&
+                        .replace(/^\w/, (c) => c.toUpperCase())}/${componentItem._id}`
+                    )
+                  }
+                  className="cursor-pointer w-full"
+                >
+                  <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] bg-black pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group">
+                    <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
+                      {/* Preview based on code and language */}
+                      {componentItem.language &&
                       (() => {
                         // Tailwind preview (language or technology)
                         if (
-                          item.language &&
-                          (item.language.toLowerCase() === "tailwind" ||
-                           item.language.toLowerCase() === "tailwindcss") &&
-                          (item.code || item.tailwind)
+                          componentItem.language &&
+                          (componentItem.language.toLowerCase() === "tailwind" ||
+                           componentItem.language.toLowerCase() === "tailwindcss") &&
+                          (componentItem.code || componentItem.tailwind)
                         ) {
-                          const tailwindHtml = item.code || item.tailwind || "";
+                          const tailwindHtml = componentItem.code || componentItem.tailwind || "";
                           const srcDoc = `
                           <!DOCTYPE html>
                           <html>
@@ -229,8 +252,8 @@ const Components = () => {
                         }
                         // Direct full HTML document preview (zoomed out)
                         if (
-                          typeof item.code === "string" &&
-                          item.code.trim().startsWith("<!DOCTYPE html")
+                          typeof componentItem.code === "string" &&
+                          componentItem.code.trim().startsWith("<!DOCTYPE html")
                         ) {
                           return (
                             <div
@@ -247,7 +270,7 @@ const Components = () => {
                             >
                               <iframe
                                 title="Preview"
-                                srcDoc={item.code}
+                                srcDoc={componentItem.code}
                                 className="w-full h-full rounded-lg border-0"
                                 style={{
                                   margin: 0,
@@ -262,7 +285,7 @@ const Components = () => {
                           );
                         }
                         // React preview (iframe Babel)
-                        if (item.language.toLowerCase() === "react") {
+                        if (componentItem.language.toLowerCase() === "react") {
                           const srcDoc = `
                           <!DOCTYPE html>
                           <html>
@@ -289,7 +312,7 @@ const Components = () => {
                               <div id="root"></div>
                               <script type="text/babel">
                                 try {
-                                  ${item.code}
+                                  ${componentItem.code}
                                   if (typeof Component !== "undefined") {
                                     ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
                                   }
@@ -325,9 +348,9 @@ const Components = () => {
                           );
                         }
                         // Multi preview
-                        if (item.language.toLowerCase() === "multi") {
+                        if (componentItem.language.toLowerCase() === "multi") {
                           // Build srcDoc from separate fields if code field is missing
-                          const srcDoc = item.code || `
+                          const srcDoc = componentItem.code || `
                             <!DOCTYPE html>
                             <html>
                               <head>
@@ -344,11 +367,11 @@ const Components = () => {
                                     background: transparent;
                                     overflow: hidden;
                                   }
-                                  ${item.cssCode || ""}
+                                  ${componentItem.cssCode || ""}
                                 </style>
                               </head>
                               <body>
-                                ${item.htmlCode || ""}
+                                ${componentItem.htmlCode || ""}
                               </body>
                             </html>
                           `;
@@ -380,9 +403,9 @@ const Components = () => {
                         }
                         // CSS + HTML combined preview (if both present)
                         if (
-                          item.language.toLowerCase() === "css" &&
-                          item.htmlCode &&
-                          item.cssCode
+                          componentItem.language.toLowerCase() === "css" &&
+                          componentItem.htmlCode &&
+                          componentItem.cssCode
                         ) {
                           const srcDoc = `
                             <!DOCTYPE html>
@@ -401,11 +424,11 @@ const Components = () => {
                                     background: transparent;
                                     overflow: hidden;
                                   }
-                                  ${item.cssCode}
+                                  ${componentItem.cssCode}
                                 </style>
                               </head>
                               <body>
-                                ${item.htmlCode}
+                                ${componentItem.htmlCode}
                               </body>
                             </html>
                           `;
@@ -480,8 +503,8 @@ const Components = () => {
                                       transform-origin: center;
                                     }
                                     ${
-                                      item.language.toLowerCase() === "css"
-                                        ? item.code
+                                      componentItem.language.toLowerCase() === "css"
+                                        ? componentItem.code
                                         : ""
                                     }
                                   </style>
@@ -489,14 +512,14 @@ const Components = () => {
                                 <body>
                                   <div id="preview-wrapper">
                                     ${
-                                      item.language.toLowerCase() === "html"
-                                        ? item.code
+                                      componentItem.language.toLowerCase() === "html"
+                                        ? componentItem.code
                                         : ""
                                     }
                                   </div>
                                   <script>${
-                                    item.language.toLowerCase() === "javascript"
-                                      ? item.code
+                                    componentItem.language.toLowerCase() === "javascript"
+                                      ? componentItem.code
                                       : ""
                                   }</script>
                                 </body>
@@ -513,41 +536,43 @@ const Components = () => {
                             />
                           </div>
                         );
-                      })()}
-                  </div>
-                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
-                      <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                        {/* Show cleaned type only, not title */}
-                        <span className="block text-base sm:text-lg font-semibold">
-                          {item.type
+                        })()}
+                    </div>
+                    <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+                      <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
+                        <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                          {/* Show cleaned type only, not title */}
+                          <span className="block text-base sm:text-lg font-semibold">
+                            {componentItem.type
                             ?.replace(/component/gi, "")
                             .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </span>
-                      </h3>
-                      <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                        <span
-                          className={`text-xs sm:text-sm font-normal ${
-                            item.badge === "Pro"
+                              .replace(/^\w/, (c) => c.toUpperCase())}
+                          </span>
+                        </h3>
+                        <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                          <span
+                            className={`text-xs sm:text-sm font-normal ${
+                              componentItem.badge === "Pro"
                               ? "text-[#FF9AC9]"
-                              : "text-white"
-                          }`}
-                        >
-                          {item.badge || "Free"}
+                                : "text-white"
+                            }`}
+                          >
+                            {componentItem.badge || "Free"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-white text-xs sm:text-[13px] font-light">
+                          {componentItem.stats || ""}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-white text-xs sm:text-[13px] font-light">
-                        {item.stats || ""}
-                      </span>
-                    </div>
+                    {/* Admin delete button removed */}
                   </div>
-                  {/* Admin delete button removed */}
                 </div>
-              </div>
-            ))
+              );
+            });
+          })()
         )}
       </div>
     </div>
