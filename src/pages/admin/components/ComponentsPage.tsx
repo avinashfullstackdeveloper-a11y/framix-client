@@ -20,6 +20,7 @@ type ComponentItem = {
   stats?: string;
   htmlCode?: string;
   cssCode?: string;
+  tailwind?: string;
 };
 
 const ComponentsPage: React.FC = () => {
@@ -128,10 +129,12 @@ const ComponentsPage: React.FC = () => {
                     (() => {
                       // Tailwind preview (language or technology)
                       if (
-                        (item.language && item.language.toLowerCase() === "tailwind" && item.code) ||
-                        (item.language && item.language.toLowerCase() === "tailwindcss" && item.code)
+                        item.language &&
+                        (item.language.toLowerCase() === "tailwind" ||
+                         item.language.toLowerCase() === "tailwindcss") &&
+                        (item.code || item.tailwind)
                       ) {
-                        const tailwindHtml = item.code || "";
+                        const tailwindHtml = item.code || item.tailwind || "";
                         const srcDoc = `
                           <!DOCTYPE html>
                           <html>

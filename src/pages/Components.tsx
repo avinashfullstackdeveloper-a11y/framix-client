@@ -28,6 +28,7 @@ const Components = () => {
     stats?: string;
     htmlCode?: string;
     cssCode?: string;
+    tailwind?: string;
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,14 +166,12 @@ const Components = () => {
                       (() => {
                         // Tailwind preview (language or technology)
                         if (
-                          (item.language &&
-                            item.language.toLowerCase() === "tailwind" &&
-                            item.code) ||
-                          (item.language &&
-                            item.language.toLowerCase() === "tailwindcss" &&
-                            item.code)
+                          item.language &&
+                          (item.language.toLowerCase() === "tailwind" ||
+                           item.language.toLowerCase() === "tailwindcss") &&
+                          (item.code || item.tailwind)
                         ) {
-                          const tailwindHtml = item.code || "";
+                          const tailwindHtml = item.code || item.tailwind || "";
                           const srcDoc = `
                           <!DOCTYPE html>
                           <html>

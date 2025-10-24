@@ -311,11 +311,12 @@ const CommunityList = () => {
       // Tailwind preview (language or technology)
       if (
         (component.language &&
-          component.language.toLowerCase() === "tailwind" &&
-          component.code) ||
+          (component.language.toLowerCase() === "tailwind" ||
+           component.language.toLowerCase() === "tailwindcss") &&
+          (component.code || component.tailwind)) ||
         (component.technology === "tailwind" && component.tailwindCode)
       ) {
-        const tailwindHtml = component.code || component.tailwindCode || "";
+        const tailwindHtml = component.code || component.tailwind || component.tailwindCode || "";
         const srcDoc = `
           <!DOCTYPE html>
           <html>
