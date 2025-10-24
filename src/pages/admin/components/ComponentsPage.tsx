@@ -20,6 +20,7 @@ type ComponentItem = {
   stats?: string;
   htmlCode?: string;
   cssCode?: string;
+  tailwind?: string;
 };
 
 const ComponentsPage: React.FC = () => {
@@ -125,14 +126,15 @@ const ComponentsPage: React.FC = () => {
                 {/* Component Preview */}
                 <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full bg-black rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden">
                   {item.language &&
-                    item.code &&
                     (() => {
                       // Tailwind preview (language or technology)
                       if (
-                        (item.language && item.language.toLowerCase() === "tailwind" && item.code) ||
-                        (item.language && item.language.toLowerCase() === "tailwindcss" && item.code)
+                        item.language &&
+                        (item.language.toLowerCase() === "tailwind" ||
+                         item.language.toLowerCase() === "tailwindcss") &&
+                        (item.code || item.tailwind)
                       ) {
-                        const tailwindHtml = item.code || "";
+                        const tailwindHtml = item.code || item.tailwind || "";
                         const srcDoc = `
                           <!DOCTYPE html>
                           <html>
@@ -287,6 +289,33 @@ const ComponentsPage: React.FC = () => {
                       }
                       // Multi preview
                       if (item.language.toLowerCase() === "multi") {
+                        // Build srcDoc from separate fields if code field is missing
+                        const srcDoc = item.code || `
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <meta charset="UTF-8">
+                              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                              <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body, html {
+                                  width: 100%;
+                                  height: 100%;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  background: transparent;
+                                  overflow: hidden;
+                                }
+                                ${item.cssCode || ""}
+                              </style>
+                            </head>
+                            <body>
+                              ${item.htmlCode || ""}
+                            </body>
+                          </html>
+                        `;
+                        
                         return (
                           <div
                             className="w-full h-full flex items-center justify-center overflow-hidden"
@@ -297,7 +326,7 @@ const ComponentsPage: React.FC = () => {
                           >
                             <iframe
                               title="Preview"
-                              srcDoc={item.code}
+                              srcDoc={srcDoc}
                               className="border-0"
                               style={{
                                 width: "100%",
