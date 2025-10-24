@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card } from "../components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 import { Skeleton } from "../components/ui/skeleton";
+import { Badge } from "../components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
-import { LiveProvider, LivePreview, LiveError } from "react-live";
-import { Heart, ExternalLink, Eye, Trash2 } from "lucide-react";
+import { Heart, ExternalLink, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 
 type FavouriteComponent = {
@@ -13,7 +13,324 @@ type FavouriteComponent = {
   language: string;
   code: string;
   preview?: string;
-  createdBy?: string;
+  createdBy?: {
+    _id?: string;
+    id?: string;
+    name?: string;
+    username?: string;
+  };
+  htmlCode?: string;
+  cssCode?: string;
+  tailwindCode?: string;
+  technology?: string;
+};
+
+type ComponentPreview = {
+  code?: string;
+  language?: string;
+  technology?: string;
+  htmlCode?: string;
+  cssCode?: string;
+  tailwindCode?: string;
+  preview?: string;
+};
+
+// Avatar Component (from Community.tsx)
+const Avatar = ({
+  initials,
+  size = "sm",
+  className = "",
+}: {
+  initials: string;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}) => {
+  const sizeClasses = {
+    sm: "w-6 h-6 text-xs",
+    md: "w-8 h-8 text-sm",
+    lg: "w-12 h-12 text-base",
+  };
+
+  return (
+    <div
+      className={`flex items-center justify-center bg-gradient-primary rounded-full ${sizeClasses[size]} ${className}`}
+    >
+      <span className="text-primary-foreground font-medium">{initials}</span>
+    </div>
+  );
+};
+
+// LivePreview Component (extracted from Community.tsx)
+const LivePreview = ({ component }: { component: ComponentPreview }) => {
+  const renderPreview = () => {
+    // If code is a full HTML document, use it directly
+    if (
+      typeof component.code === "string" &&
+      component.code.trim().startsWith("<!DOCTYPE html")
+    ) {
+      return (
+        <iframe
+          srcDoc={component.code}
+          className="absolute inset-0 w-full h-full"
+          style={{
+            background: "transparent",
+            transform: "scale(0.7)",
+            transformOrigin: "center",
+          }}
+          sandbox="allow-scripts allow-same-origin"
+          title="Preview"
+        />
+      );
+    }
+
+    // Tailwind preview (language or technology)
+    if (
+      (component.language &&
+        component.language.toLowerCase() === "tailwind" &&
+        component.code) ||
+      (component.technology === "tailwind" && component.tailwindCode)
+    ) {
+      const tailwindHtml = component.code || component.tailwindCode || "";
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                overflow: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            ${tailwindHtml}
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ background: "transparent" }}
+          sandbox="allow-scripts allow-same-origin"
+          title="Preview"
+        />
+      );
+    }
+
+    // React preview (language)
+    if (
+      component.language &&
+      component.language.toLowerCase() === "react" &&
+      component.code
+    ) {
+      // Try to render the React code using Babel
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+            <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+            <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                overflow: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div id="root"></div>
+            <script type="text/babel">
+              try {
+                ${component.code}
+                if (typeof Component !== "undefined") {
+                  ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
+                }
+              } catch (e) {
+                document.getElementById('root').innerHTML = '<pre style="color:red;">' + e.toString() + '</pre>';
+              }
+            </script>
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ background: "transparent" }}
+          sandbox="allow-scripts allow-same-origin"
+          title="Preview"
+        />
+      );
+    }
+
+    // Multi-language (full HTML doc)
+    if (
+      component.language &&
+      component.language.toLowerCase() === "multi" &&
+      component.code
+    ) {
+      return (
+        <iframe
+          srcDoc={component.code}
+          className="absolute inset-0 w-full h-full"
+          style={{
+            background: "transparent",
+            transform: "scale(0.6)",
+            transformOrigin: "center",
+          }}
+          sandbox="allow-scripts allow-same-origin"
+          title="Preview"
+        />
+      );
+    }
+
+    // CSS + HTML code (language or technology)
+    if (
+      ((component.language && component.language.toLowerCase() === "css") ||
+        component.technology === "css") &&
+      component.htmlCode &&
+      component.cssCode
+    ) {
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                overflow: hidden;
+              }
+              ${component.cssCode || ""}
+            </style>
+          </head>
+          <body>
+            ${component.htmlCode || ""}
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ background: "transparent" }}
+          sandbox="allow-scripts allow-same-origin"
+          title="Preview"
+        />
+      );
+    }
+
+    // Fallback: HTML, CSS, JS code
+    if (component.language && component.code) {
+      const srcDoc = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body, html {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                overflow: hidden;
+              }
+              #preview-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transform: scale(0.5);
+                transform-origin: center;
+                max-width: 100%;
+                max-height: 100%;
+              }
+              ${
+                component.language.toLowerCase() === "css" ? component.code : ""
+              }
+            </style>
+          </head>
+          <body>
+            <div id="preview-wrapper">
+              ${
+                component.language.toLowerCase() === "html"
+                  ? component.code
+                  : ""
+              }
+            </div>
+            <script>${
+              component.language.toLowerCase() === "javascript"
+                ? component.code
+                : ""
+            }</script>
+          </body>
+        </html>
+      `;
+      return (
+        <iframe
+          srcDoc={srcDoc}
+          className="absolute inset-0 w-full h-full"
+          style={{ background: "transparent" }}
+          sandbox="allow-scripts allow-same-origin"
+          title="Preview"
+        />
+      );
+    }
+
+    // Fallback to preview video if available
+    if (component.preview) {
+      return (
+        <video
+          src={component.preview}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      );
+    }
+
+    // No preview available
+    return (
+      <div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500">
+        No preview available
+      </div>
+    );
+  };
+
+  return renderPreview();
 };
 
 const Favourite: React.FC = () => {
@@ -34,22 +351,45 @@ const Favourite: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await apiRequest<any[]>("/api/favourites", {
+        const data = await apiRequest<
+          Array<{
+            component: Partial<FavouriteComponent> & {
+              _id?: string;
+              id?: string;
+            };
+          }>
+        >("/api/favourites", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         // Map backend favourites to FavouriteComponent[]
-        const mapped = Array.isArray(data)
-          ? data.map((fav) => ({
-              id: fav.component?._id || fav.component?.id || fav.component,
-              title: fav.component?.title || "Untitled",
-              type: fav.component?.type || "",
-              language: fav.component?.language || "",
-              code: fav.component?.code || "",
-              preview: fav.component?.preview || "",
-              createdBy: fav.component?.createdBy || "",
-            }))
+        const mapped: FavouriteComponent[] = Array.isArray(data)
+          ? data.map((fav) => {
+              const component = fav.component;
+              const createdBy = component?.createdBy;
+              
+              return {
+                id: String(component?._id || component?.id || ""),
+                title: component?.title || "Untitled",
+                type: component?.type || "",
+                language: component?.language || "",
+                code: component?.code || "",
+                preview: component?.preview || "",
+                createdBy: createdBy
+                  ? {
+                      _id: createdBy._id || createdBy.id,
+                      id: createdBy.id || createdBy._id,
+                      name: createdBy.name,
+                      username: createdBy.username,
+                    }
+                  : undefined,
+                htmlCode: component?.htmlCode || "",
+                cssCode: component?.cssCode || "",
+                tailwindCode: component?.tailwindCode || "",
+                technology: component?.technology || "",
+              };
+            })
           : [];
         setFavourites(mapped);
       } catch (err) {
@@ -82,202 +422,210 @@ const Favourite: React.FC = () => {
 
   const getLanguageColor = (language: string) => {
     const lang = language.toLowerCase();
-    if (lang === "react") return "text-blue-500";
-    if (lang === "html") return "text-orange-500";
-    if (lang === "css") return "text-purple-500";
-    if (lang === "javascript") return "text-yellow-500";
-    if (lang === "multi") return "text-green-500";
-    return "text-gray-500";
+    if (lang === "react")
+      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+    if (lang === "html")
+      return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+    if (lang === "css")
+      return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+    if (lang === "javascript")
+      return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    if (lang === "multi")
+      return "bg-green-500/20 text-green-400 border-green-500/30";
+    if (lang === "tailwind")
+      return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+    return "bg-gray-500/20 text-gray-400 border-gray-500/30";
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-red-50 rounded-lg">
-          <Heart className="w-6 h-6 text-red-500" fill="currentColor" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-white">
-            Your Favourite Components
-          </h1>
-          <p className="text-gray-100 mt-1">
-            {favourites.length}{" "}
-            {favourites.length === 1 ? "component" : "components"} saved
-          </p>
-        </div>
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, idx) => (
-            <Card key={idx} className="p-4 space-y-4">
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-32 w-full rounded-lg" />
-              <div className="flex gap-2">
-                <Skeleton className="h-9 flex-1" />
-                <Skeleton className="h-9 w-9" />
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && (
-        <Card className="p-6 border-red-200 bg-red-50">
-          <div className="flex items-center gap-3 mb-3">
-            <Trash2 className="w-5 h-5 text-red-600" />
-            <h3 className="text-lg font-semibold text-red-800">
-              Failed to Load Favourites
-            </h3>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-xl border border-red-500/30">
+            <Heart className="w-7 h-7 text-red-500" fill="currentColor" />
           </div>
-          <p className="text-red-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
-          >
-            Try Again
-          </button>
-        </Card>
-      )}
-
-      {/* Empty State */}
-      {!loading && !error && favourites.length === 0 && (
-        <Card className="p-8 text-center max-w-md mx-auto">
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Heart className="w-6 h-6 text-gray-400" />
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">
+              Your Favourite Components
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {favourites.length}{" "}
+              {favourites.length === 1 ? "component" : "components"} saved
+            </p>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            No Favourites Yet
-          </h3>
-          <p className="text-gray-600 mb-4 text-sm">
-            Start exploring components and add them to your favourites to see
-            them here.
-          </p>
-          <button
-            onClick={() => (window.location.href = "/components")}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            Browse Components
-          </button>
-        </Card>
-      )}
+        </div>
 
-      {/* Favourites Grid */}
-      {!loading && !error && favourites.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {favourites.map((component) => (
-            <Card
-              key={component.id}
-              className="p-4 flex flex-col group hover:shadow-lg transition-shadow"
-            >
-              {/* Component Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 truncate text-lg mb-1">
-                    {component.title}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-medium ${getLanguageColor(
-                        component.language
-                      )}`}
-                    >
-                      {component.language.toUpperCase()}
-                    </span>
-                    <span className="text-gray-300">•</span>
-                    <span className="text-sm text-gray-600 capitalize">
-                      {component.type}
-                    </span>
+        {/* Loading State */}
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, idx) => (
+              <Card key={idx} className="bg-gradient-card border-border">
+                <CardContent className="p-0">
+                  <Skeleton className="h-64 w-full rounded-t-lg" />
+                  <div className="p-4 space-y-3">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="flex gap-2">
+                      <Skeleton className="h-10 flex-1" />
+                      <Skeleton className="h-10 w-10" />
+                    </div>
                   </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <Card className="bg-gradient-card border-red-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-red-500/20 rounded-lg">
+                  <Trash2 className="w-5 h-5 text-red-500" />
                 </div>
+                <h3 className="text-lg font-semibold text-foreground">
+                  Failed to Load Favourites
+                </h3>
               </div>
+              <p className="text-red-400 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium"
+              >
+                Try Again
+              </button>
+            </CardContent>
+          </Card>
+        )}
 
-              {/* Preview Section */}
-              <div className="mb-4 relative">
-                <div className="w-full aspect-square flex items-center justify-center bg-neutral-900 rounded-lg overflow-auto relative group">
-                  {component.language &&
-                    component.code &&
-                    (component.language.toLowerCase() === "react" ? (
-                      <LiveProvider code={component.code}>
-                        <LivePreview />
-                        <LiveError className="live-error" />
-                      </LiveProvider>
-                    ) : component.language.toLowerCase() === "multi" ? (
-                      <iframe
-                        title="Preview"
-                        srcDoc={component.code}
-                        className="w-full aspect-square min-h-[6rem] rounded-lg border overflow-auto"
+        {/* Empty State */}
+        {!loading && !error && favourites.length === 0 && (
+          <Card className="bg-gradient-card border-border max-w-md mx-auto">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+                <Heart className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                No Favourites Yet
+              </h3>
+              <p className="text-muted-foreground mb-6 text-sm">
+                Start exploring components and add them to your favourites to
+                see them here.
+              </p>
+              <button
+                onClick={() => (window.location.href = "/components")}
+                className="px-6 py-2.5 bg-gradient-primary hover:opacity-90 text-primary-foreground rounded-lg transition-opacity text-sm font-medium"
+              >
+                Browse Components
+              </button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Favourites Grid */}
+        {!loading && !error && favourites.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {favourites.map((component) => (
+              <Card
+                key={component.id}
+                className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group"
+              >
+                <CardContent className="p-0">
+                  {/* Preview Section */}
+                  <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
+                    <LivePreview component={component} />
+                    <div className="absolute top-3 right-3 z-10">
+                      <Badge
+                        variant="secondary"
+                        className={`${getLanguageColor(
+                          component.language
+                        )} border font-medium text-xs`}
+                      >
+                        {component.language.toUpperCase()}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Component Info */}
+                  <div className="p-4">
+                    <div className="mb-3">
+                      <Badge
+                        variant="secondary"
+                        className="bg-secondary/50 text-xs"
+                      >
+                        {component.type
+                          ?.replace(/component/gi, "")
+                          .trim()
+                          .replace(/^\w/, (c) => c.toUpperCase())}
+                      </Badge>
+                    </div>
+
+                    {/* Author Information */}
+                    <div
+                      className="flex items-center gap-2 mb-3 cursor-pointer group/author"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const userId =
+                          component.createdBy?._id || component.createdBy?.id;
+                        if (userId) {
+                          window.location.href = `/community/${userId}`;
+                        }
+                      }}
+                      title="View user profile"
+                    >
+                      <Avatar
+                        initials={
+                          component.createdBy?.name
+                            ?.charAt(0)
+                            .toUpperCase() || "U"
+                        }
+                        size="sm"
                       />
-                    ) : (
-                      <iframe
-                        title="Preview"
-                        srcDoc={`<!DOCTYPE html>
-                          <html>
-                            <head>
-                              <style>
-                                body { margin: 0; padding: 10px; background: #f8f9fa; }
-                                ${
-                                  component.language.toLowerCase() === "css"
-                                    ? component.code
-                                    : ""
-                                }
-                              </style>
-                            </head>
-                            <body>
-                              ${
-                                component.language.toLowerCase() === "html"
-                                  ? component.code
-                                  : ""
-                              }
-                              <script>${
-                                component.language.toLowerCase() ===
-                                "javascript"
-                                  ? component.code
-                                  : ""
-                              }</script>
-                            </body>
-                          </html>`}
-                        className="w-full aspect-square min-h-[6rem] rounded-lg border overflow-auto"
-                      />
-                    ))}
+                      <div>
+                        <div className="text-sm font-medium group-hover/author:underline">
+                          {component.createdBy?.name || "Anonymous"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {component.createdBy?.username || ""}
+                        </div>
+                      </div>
+                    </div>
 
-                  {/* Hover Overlay */}
-                </div>
-              </div>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          window.location.href = `/components/${component.type}/${component.id}`;
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-primary hover:opacity-90 text-primary-foreground rounded-lg transition-opacity text-sm font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Details
+                      </button>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 mt-auto">
-                <button
-                  onClick={() => {
-                    window.location.href = `/components/${component.type}/${component.id}`;
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  View Details
-                </button>
-
-                <button
-                  disabled={removingId === component.id}
-                  onClick={() => handleRemoveFavourite(component.id)}
-                  className="p-2 text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  title="Remove from favourites"
-                >
-                  {removingId === component.id ? (
-                    <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Heart className="w-4 h-4" fill="currentColor" />
-                  )}
-                </button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+                      <button
+                        disabled={removingId === component.id}
+                        onClick={() => handleRemoveFavourite(component.id)}
+                        className="p-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-red-500/30"
+                        title="Remove from favourites"
+                      >
+                        {removingId === component.id ? (
+                          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Heart className="w-4 h-4" fill="currentColor" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

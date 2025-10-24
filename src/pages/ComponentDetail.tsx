@@ -19,6 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 type ComponentData = {
   id: string;
@@ -68,16 +73,14 @@ const ComponentDetail: React.FC = () => {
   const navigate = useNavigate();
   const [component, setComponent] = useState<ComponentData | null>(null);
   const [loading, setLoading] = useState(true);
-  /** --- Refactored: Use technology and tabs logic like ComponentEditor --- */
   const [technology, setTechnology] = useState<"css" | "tailwind">("css");
   const [htmlCode, setHtmlCode] = useState<string>("");
-  // Store the last non-empty HTML code for preview
   const [previewHtmlCode, setPreviewHtmlCode] = useState<string>("");
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState<string>('#0a0a0a');
+  const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Favourites state
@@ -127,7 +130,6 @@ const ComponentDetail: React.FC = () => {
         setTechnology(tech);
 
         if (tech === "css") {
-          // Prefer htmlCode/cssCode fields if present (like in DB)
           let htmlValue = "";
           let cssValue = "";
           if (data.htmlCode !== undefined) htmlValue = data.htmlCode;
@@ -188,7 +190,6 @@ const ComponentDetail: React.FC = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log("[Comments] Fetched comments:", data);
-        // API returns { comments: [...] }
         setComments(Array.isArray(data.comments) ? data.comments : (Array.isArray(data) ? data : []));
       })
       .catch((err) => {
@@ -288,7 +289,6 @@ const ComponentDetail: React.FC = () => {
     }
   };
 
-  /** Editor language for Monaco (like ComponentEditor) */
   const getLanguageForEditor = () => {
     if (technology === "css") return activeTab;
     if (technology === "tailwind") return "javascript";
@@ -303,20 +303,19 @@ const ComponentDetail: React.FC = () => {
       if (!htmlCode && !cssCode) {
         return (
           <div className="w-full h-full flex items-center justify-center rounded-lg">
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <div className="text-2xl mb-2">👁️</div>
               <p>No preview available</p>
             </div>
           </div>
         );
       }
-      // Always render the preview using htmlCode and cssCode, never show code as text
       const hasHtml = htmlCode && htmlCode.trim() !== "";
       const hasCss = cssCode && cssCode.trim() !== "";
       if (!hasHtml) {
         return (
           <div className="w-full h-full flex items-center justify-center rounded-lg">
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <div className="text-2xl mb-2">👁️</div>
               <p>No preview available</p>
             </div>
@@ -363,7 +362,7 @@ const ComponentDetail: React.FC = () => {
       if (!tailwindCode) {
         return (
           <div className="w-full h-full flex items-center justify-center rounded-lg">
-            <div className="text-center text-gray-400">
+            <div className="text-center text-muted-foreground">
               <div className="text-2xl mb-2">👁️</div>
               <p>No preview available</p>
             </div>
@@ -408,7 +407,7 @@ const ComponentDetail: React.FC = () => {
     }
     return (
       <div className="w-full h-full flex items-center justify-center rounded-lg">
-        <div className="text-center text-gray-400">
+        <div className="text-center text-muted-foreground">
           <div className="text-2xl mb-2">👁️</div>
           <p>No preview available</p>
         </div>
@@ -433,7 +432,7 @@ const ComponentDetail: React.FC = () => {
         <div className="text-center">
           <div className="text-4xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold mb-2">Component not found</h2>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             The component you're looking for doesn't exist or has been removed.
           </p>
         </div>
@@ -442,8 +441,8 @@ const ComponentDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Button
@@ -451,432 +450,419 @@ const ComponentDetail: React.FC = () => {
             onClick={() => navigate(-1)}
             className="flex items-center gap-2"
           >
-            ← Back
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back
           </Button>
 
-          <div className="flex items-center gap-4">
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="text-sm font-medium">
               {component.language}
-            </span>
+            </Badge>
           </div>
         </div>
 
+        {/* Component Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">{component.name}</h1>
           {component.description && (
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
               {component.description}
             </p>
           )}
 
           {/* Creator Information */}
           {component.createdBy && (
-            <div className="flex items-center justify-center gap-3 mt-6 p-4 bg-muted rounded-lg max-w-md mx-auto">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-lg font-semibold">
-                {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
-              </div>
-              <div className="text-left">
-                <div className="font-semibold text-base">
-                  {component.createdBy.name || "Anonymous"}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {component.createdBy.email || ""}
-                </div>
-                {component.creatorStatus && (
-                  <div className="text-xs text-primary mt-1">
-                    {component.creatorStatus === "original" &&
-                      "✓ Original Creator"}
-                    {component.creatorStatus === "found" && "Found & Shared"}
-                    {component.creatorStatus === "modified" &&
-                      "Found & Modified"}
+            <Card className="max-w-md mx-auto mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold">
+                    {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
                   </div>
-                )}
-              </div>
-            </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-base">
+                      {component.createdBy.name || "Anonymous"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {component.createdBy.email || ""}
+                    </div>
+                    {component.creatorStatus && (
+                      <div className="text-xs text-primary mt-1">
+                        {component.creatorStatus === "original" && "✓ Original Creator"}
+                        {component.creatorStatus === "found" && "Found & Shared"}
+                        {component.creatorStatus === "modified" && "Found & Modified"}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {component.tags && component.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
+            <div className="flex flex-wrap justify-center gap-2">
               {component.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                >
+                <Badge key={index} variant="outline" className="text-sm">
                   #{tag}
-                </span>
+                </Badge>
               ))}
             </div>
           )}
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
           {/* Preview Panel */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
-            <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
-              <h3 className="font-semibold">Preview</h3>
-              <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded border border-gray-300"
-                      style={{ backgroundColor }}
-                    />
-                    <span>Background</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Preset Colors</label>
-                      <div className="grid grid-cols-5 gap-2">
-                        {presetColors.map((color) => (
-                          <button
-                            key={color.value}
-                            className="w-10 h-10 rounded border-2 hover:scale-110 transition-transform"
-                            style={{
-                              backgroundColor: color.value,
-                              borderColor: backgroundColor === color.value ? '#8b5cf6' : '#d1d5db'
-                            }}
-                            onClick={() => {
-                              setBackgroundColor(color.value);
-                              setShowColorPicker(false);
-                            }}
-                            title={color.name}
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">Preview</CardTitle>
+                <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded border"
+                        style={{ backgroundColor }}
+                      />
+                      <span>Background</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Preset Colors</label>
+                        <div className="grid grid-cols-5 gap-2">
+                          {presetColors.map((color) => (
+                            <button
+                              key={color.value}
+                              className="w-8 h-8 rounded border-2 hover:scale-110 transition-transform"
+                              style={{
+                                backgroundColor: color.value,
+                                borderColor: backgroundColor === color.value ? 'hsl(var(--primary))' : 'hsl(var(--border))'
+                              }}
+                              onClick={() => {
+                                setBackgroundColor(color.value);
+                                setShowColorPicker(false);
+                              }}
+                              title={color.name}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Custom Color</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            value={backgroundColor}
+                            onChange={(e) => setBackgroundColor(e.target.value)}
+                            className="rounded border cursor-pointer w-12 h-10"
                           />
-                        ))}
+                          <Input
+                            type="text"
+                            value={backgroundColor}
+                            onChange={(e) => setBackgroundColor(e.target.value)}
+                            className="flex-1"
+                            placeholder="#000000"
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Custom Color</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="color"
-                          value={backgroundColor}
-                          onChange={(e) => setBackgroundColor(e.target.value)}
-                          className="rounded border cursor-pointer"
-                          style={{ width: '60px', height: '40px', minWidth: '60px', minHeight: '40px' }}
-                        />
-                        <input
-                          type="text"
-                          value={backgroundColor}
-                          onChange={(e) => setBackgroundColor(e.target.value)}
-                          className="w-24 px-3 py-2 border rounded text-sm text-black bg-white"
-                          placeholder="#000000"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="flex-1 flex items-center justify-center p-8 overflow-hidden" style={{ backgroundColor }}>
-              <div className="w-full h-full flex items-center justify-center">
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="h-[500px] flex items-center justify-center" style={{ backgroundColor }}>
                 {renderPreview()}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Code Panel */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
-            <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
-              <h3 className="font-semibold">
-                {component.name}.{getLanguageForEditor()}
-              </h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    let codeToCopy = "";
-                    if (activeTab === "html") codeToCopy = htmlCode;
-                    else if (activeTab === "css") codeToCopy = cssCode;
-                    else if (activeTab === "tailwind")
-                      codeToCopy = tailwindCode;
-                    navigator.clipboard.writeText(codeToCopy);
-                    toast({
-                      title: "Copied!",
-                      description: "Code copied to clipboard.",
-                      variant: "default",
-                    });
-                  }}
-                >
-                  Copy
-                </Button>
-                <Button
-                  variant={isEditing ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? "Save" : "Edit"}
-                </Button>
+          <Card className="overflow-hidden">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">
+                  {component.name}.{getLanguageForEditor()}
+                </CardTitle>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      let codeToCopy = "";
+                      if (activeTab === "html") codeToCopy = htmlCode;
+                      else if (activeTab === "css") codeToCopy = cssCode;
+                      else if (activeTab === "tailwind") codeToCopy = tailwindCode;
+                      navigator.clipboard.writeText(codeToCopy);
+                      toast({
+                        title: "Copied!",
+                        description: "Code copied to clipboard.",
+                        variant: "default",
+                      });
+                    }}
+                  >
+                    Copy
+                  </Button>
+                  <Button
+                    variant={isEditing ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </Button>
+                </div>
               </div>
-            </div>
-            {technology === "css" && (
-              <div className="flex border-b bg-muted/50">
-                <button
-                  className={`px-4 py-2 font-medium ${
-                    activeTab === "html"
-                      ? "bg-background text-purple-700 border-b-2 border-purple-700"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("html")}
-                >
-                  HTML
-                </button>
-                <button
-                  className={`px-4 py-2 font-medium ${
-                    activeTab === "css"
-                      ? "bg-background text-purple-700 border-b-2 border-purple-700"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("css")}
-                >
-                  CSS
-                </button>
-              </div>
-            )}
-            <div className="flex-1">
-              {technology === "css" ? (
-                <Editor
-                  key={activeTab}
-                  height="100%"
-                  language={getLanguageForEditor()}
-                  value={activeTab === "html" ? htmlCode : cssCode}
-                  onChange={(value) => {
-                    if (activeTab === "html") setHtmlCode(value || "");
-                    else setCssCode(value || "");
-                  }}
-                  theme="vs-dark"
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    scrollBeyondLastLine: false,
-                    readOnly: !isEditing,
-                    wordWrap: "on",
-                    lineNumbers: "on",
-                    folding: true,
-                    lineDecorationsWidth: 1,
-                    padding: { top: 16, bottom: 16 },
-                  }}
-                />
-              ) : (
-                <Editor
-                  height="100%"
-                  language={getLanguageForEditor()}
-                  value={tailwindCode}
-                  onChange={(value) => setTailwindCode(value || "")}
-                  theme="vs-dark"
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    scrollBeyondLastLine: false,
-                    readOnly: !isEditing,
-                    wordWrap: "on",
-                    lineNumbers: "on",
-                    folding: true,
-                    lineDecorationsWidth: 1,
-                    padding: { top: 16, bottom: 16 },
-                  }}
-                />
+            </CardHeader>
+            <CardContent className="p-0">
+              {technology === "css" && (
+                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "html" | "css")}>
+                  <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
+                    <TabsTrigger value="html">HTML</TabsTrigger>
+                    <TabsTrigger value="css">CSS</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               )}
-            </div>
-          </div>
+              <div className="h-[500px]">
+                {technology === "css" ? (
+                  <Editor
+                    key={activeTab}
+                    height="100%"
+                    language={getLanguageForEditor()}
+                    value={activeTab === "html" ? htmlCode : cssCode}
+                    onChange={(value) => {
+                      if (activeTab === "html") setHtmlCode(value || "");
+                      else setCssCode(value || "");
+                    }}
+                    theme="vs-dark"
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      readOnly: !isEditing,
+                      wordWrap: "on",
+                      lineNumbers: "on",
+                      folding: true,
+                      lineDecorationsWidth: 1,
+                      padding: { top: 16, bottom: 16 },
+                    }}
+                  />
+                ) : (
+                  <Editor
+                    height="100%"
+                    language={getLanguageForEditor()}
+                    value={tailwindCode}
+                    onChange={(value) => setTailwindCode(value || "")}
+                    theme="vs-dark"
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      readOnly: !isEditing,
+                      wordWrap: "on",
+                      lineNumbers: "on",
+                      folding: true,
+                      lineDecorationsWidth: 1,
+                      padding: { top: 16, bottom: 16 },
+                    }}
+                  />
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Action Bar */}
-        <div className="flex flex-col gap-6 mt-6 pt-6 border-t">
-          {/* Improved Stats and Actions Bar */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 bg-muted/30 rounded-lg">
-            <div className="flex items-center gap-6">
-              {/* Likes with improved styling */}
+        {/* Stats and Actions */}
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row gap-6 items-center justify-between">
+              <div className="flex items-center gap-8">
+                {/* Likes */}
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant={likedByMe ? "default" : "outline"}
+                    size="sm"
+                    disabled={likeLoading}
+                    onClick={async () => {
+                      setLikeLoading(true);
+                      try {
+                        const method = likedByMe ? "DELETE" : "POST";
+                        const url = `${import.meta.env.VITE_API_URL}/api/components/${id}/like`;
+                        const res = await fetch(url, {
+                          method,
+                          headers: { Authorization: `Bearer ${token}` },
+                          credentials: "include",
+                        });
+                        if (!res.ok) throw new Error("Failed to update like");
+                        setLikedByMe(!likedByMe);
+                        setLikesCount((prev) => likedByMe ? prev - 1 : prev + 1);
+                      } catch (err) {
+                        console.error("[Like] Error:", err);
+                        toast({
+                          title: "Error",
+                          description: "Could not update like.",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setLikeLoading(false);
+                      }
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    {likeLoading ? (
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    ) : likedByMe ? (
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 18.35L8.55 17.03C3.4 12.36 0 9.28 0 5.5 0 2.42 2.42 0 5.5 0 7.24 0 8.91 0.81 10 2.09 11.09 0.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.5 20 9.28 16.6 12.36 11.45 17.04L10 18.35Z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    )}
+                    {likeLoading ? "Processing" : likedByMe ? "Liked" : "Like"}
+                  </Button>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{likesCount}</div>
+                    <div className="text-xs text-muted-foreground">Likes</div>
+                  </div>
+                </div>
+
+                {/* Comments Count */}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{comments.length}</div>
+                    <div className="text-xs text-muted-foreground">Comments</div>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center gap-3">
                 <Button
-                  variant={likedByMe ? "default" : "outline"}
-                  size="sm"
-                  disabled={likeLoading}
-                  onClick={async () => {
-                    setLikeLoading(true);
-                    try {
-                      const method = likedByMe ? "DELETE" : "POST";
-                      const url = `${import.meta.env.VITE_API_URL}/api/components/${id}/like`;
-                      const payload = undefined; // No body sent
-                      console.log("[Like] Request:", { method, url, payload });
-                      const res = await fetch(url, {
-                        method,
-                        headers: { Authorization: `Bearer ${token}` },
-                        credentials: "include",
-                      });
-                      console.log("[Like] Response status:", res.status);
-                      if (!res.ok) throw new Error("Failed to update like");
-                      setLikedByMe(!likedByMe);
-                      setLikesCount((prev) => likedByMe ? prev - 1 : prev + 1);
-                      console.log("[Like] Updated state: likedByMe =", !likedByMe, "likesCount =", likedByMe ? likesCount - 1 : likesCount + 1);
-                    } catch (err) {
-                      console.error("[Like] Error:", err);
-                      toast({
-                        title: "Error",
-                        description: "Could not update like.",
-                        variant: "destructive",
-                      });
-                    } finally {
-                      setLikeLoading(false);
-                    }
-                  }}
-                  className={`flex items-center gap-2 transition-all ${
-                    likedByMe 
-                      ? "bg-red-500 hover:bg-red-600 text-white" 
-                      : "hover:bg-red-50 hover:text-red-600"
-                  }`}
+                  variant={isFavourited ? "default" : "outline"}
+                  disabled={savingFavourite}
+                  onClick={handleToggleFavourite}
+                  className="flex items-center gap-2"
                 >
-                  <span className={`text-lg ${likedByMe ? 'text-white' : 'text-red-500'}`}>
-                    {likeLoading ? "⋯" : likedByMe ? "❤️" : "🤍"}
-                  </span>
-                  {likeLoading ? "Processing" : likedByMe ? "Liked" : "Like"}
+                  {savingFavourite ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : isFavourited ? (
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  )}
+                  {savingFavourite ? "Saving..." : isFavourited ? "Favourited" : "Add to Favourites"}
                 </Button>
-                <div className="flex flex-col">
-                  <span className="text-2xl font-bold text-foreground">
-                    {likesCount}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {likesCount === 1 ? "Like" : "Likes"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Comments count */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-lg">💬</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-2xl font-bold text-foreground">
-                    {comments.length}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {comments.length === 1 ? "Comment" : "Comments"}
-                  </span>
-                </div>
+                
+                <Button variant="outline" className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  </svg>
+                  Export
+                </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="flex items-center gap-3">
-              <Button
-                variant={isFavourited ? "default" : "outline"}
-                disabled={savingFavourite}
-                onClick={handleToggleFavourite}
-                className="flex items-center gap-2 transition-all"
-              >
-                <span className="text-lg">
-                  {savingFavourite ? "⋯" : isFavourited ? "⭐" : "☆"}
-                </span>
-                {savingFavourite ? "Saving..." : isFavourited ? "Favourited" : "Add to Favourites"}
-              </Button>
-              
-              <Button variant="outline" className="flex items-center gap-2">
-                <span>📤</span>
-                Export
-              </Button>
-            </div>
-          </div>
+        {/* Comments Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              Discussion ({comments.length})
+            </CardTitle>
+            <p className="text-muted-foreground text-sm">
+              Share your thoughts and feedback about this component
+            </p>
+          </CardHeader>
 
-          {/* Improved Comments Section */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-            <div className="p-6 border-b">
-              <h3 className="text-xl font-semibold flex items-center gap-2">
-                <span>💬</span>
-                Discussion ({comments.length})
-              </h3>
-              <p className="text-muted-foreground text-sm mt-1">
-                Share your thoughts and feedback about this component
-              </p>
-            </div>
-
+          <CardContent className="space-y-6">
             {/* Comment Input */}
-            <div className="p-6 border-b">
-              <form
-                className="flex flex-col gap-3"
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!commentText.trim()) return;
-                  setCommentsLoading(true);
-                  try {
-                    console.log("[Comment] Posting comment for component", id, "text:", commentText);
-                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments`, {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                      },
-                      credentials: "include",
-                      body: JSON.stringify({ text: commentText }),
-                    });
-                    console.log("[Comment] Response status:", res.status);
-                    if (!res.ok) throw new Error("Failed to post comment");
-                    const response = await res.json();
-                    console.log("[Comment] Response:", response);
-                    // Replace all comments with the updated list from server
-                    if (response.success && response.comments) {
-                      setComments(response.comments);
-                    }
-                    setCommentText("");
-                    console.log("[Comment] Updated comments list");
-                  } catch (err) {
-                    console.error("[Comment] Error:", err);
-                    toast({
-                      title: "Error",
-                      description: "Could not post comment.",
-                      variant: "destructive",
-                    });
-                  } finally {
-                    setCommentsLoading(false);
-                  }
-                }}
-              >
-                <div className="flex gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                    {user?.name?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                  <div className="flex-1">
-                    <textarea
-                      className="w-full border border-border rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-white text-black"
-                      placeholder="Add a comment..."
-                      rows={3}
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      disabled={commentsLoading}
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                      <span className={`text-xs ${
-                        commentText.length > 500 ? 'text-red-500' : 'text-muted-foreground'
-                      }`}>
-                        {commentText.length}/500
-                      </span>
-                      <Button 
-                        type="submit" 
-                        disabled={commentsLoading || !commentText.trim() || commentText.length > 500}
-                        size="sm"
-                      >
-                        {commentsLoading ? (
-                          <span className="flex items-center gap-2">
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            Posting...
-                          </span>
-                        ) : (
-                          "Post Comment"
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold flex-shrink-0">
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </div>
+              <div className="flex-1 space-y-3">
+                <Textarea
+                  placeholder="Add a comment..."
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  disabled={commentsLoading}
+                  className="min-h-[100px] resize-none"
+                />
+                <div className="flex justify-between items-center">
+                  <span className={`text-xs ${
+                    commentText.length > 500 ? 'text-destructive' : 'text-muted-foreground'
+                  }`}>
+                    {commentText.length}/500
+                  </span>
+                  <Button 
+                    onClick={async () => {
+                      if (!commentText.trim()) return;
+                      setCommentsLoading(true);
+                      try {
+                        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments`, {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                          },
+                          credentials: "include",
+                          body: JSON.stringify({ text: commentText }),
+                        });
+                        if (!res.ok) throw new Error("Failed to post comment");
+                        const response = await res.json();
+                        if (response.success && response.comments) {
+                          setComments(response.comments);
+                        }
+                        setCommentText("");
+                      } catch (err) {
+                        console.error("[Comment] Error:", err);
+                        toast({
+                          title: "Error",
+                          description: "Could not post comment.",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setCommentsLoading(false);
+                      }
+                    }}
+                    disabled={commentsLoading || !commentText.trim() || commentText.length > 500}
+                  >
+                    {commentsLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                        Posting...
+                      </>
+                    ) : (
+                      "Post Comment"
+                    )}
+                  </Button>
                 </div>
-              </form>
+              </div>
             </div>
 
             {/* Comments List */}
-            <div className="divide-y">
+            <div className="space-y-6">
               {comments.length === 0 ? (
-                <div className="p-8 text-center">
-                  <div className="text-4xl mb-3">💬</div>
+                <div className="text-center py-8">
+                  <svg className="w-12 h-12 text-muted-foreground mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
                   <p className="text-muted-foreground">No comments yet</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Be the first to share your thoughts!
@@ -884,46 +870,42 @@ const ComponentDetail: React.FC = () => {
                 </div>
               ) : (
                 comments.map((comment) => (
-                  <div key={comment._id} className="p-6 hover:bg-muted/30 transition-colors">
-                    <div className="flex gap-3">
-                      {/* User Avatar */}
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                        {comment.user?.name?.charAt(0).toUpperCase() || "U"}
-                      </div>
-                      
-                      {/* Comment Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-sm">
-                              {comment.user?.name || "Anonymous User"}
+                  <div key={comment._id} className="flex gap-4 pb-6 border-b last:border-b-0 last:pb-0">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-sm flex-shrink-0">
+                      {comment.user?.name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">
+                            {comment.user?.name || "Anonymous User"}
+                          </span>
+                          {comment.timestamp && (
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(comment.timestamp).toLocaleDateString()}
                             </span>
-                            {comment.timestamp && (
-                              <span className="text-xs text-muted-foreground">
-                                {new Date(comment.timestamp).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                          {/* Delete button - only visible to comment author */}
-                          {user && comment.user?._id === user.id && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => setDeletingCommentId(comment._id)}
-                            >
-                              Delete
-                            </Button>
                           )}
                         </div>
-                        
-                        <p className="text-sm text-foreground mb-3 leading-relaxed">
-                          {comment.text}
-                        </p>
+                        {user && comment.user?._id === user.id && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => setDeletingCommentId(comment._id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {comment.text}
+                      </p>
 
-                        {/* Reply Button */}
+                      <div className="flex items-center gap-4">
                         <button
-                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
                           onClick={() => {
                             if (replyingTo === comment._id) {
                               setReplyingTo(null);
@@ -934,118 +916,115 @@ const ComponentDetail: React.FC = () => {
                             }
                           }}
                         >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                          </svg>
                           {replyingTo === comment._id ? "Cancel" : "Reply"}
                         </button>
-
-                        {/* Reply Form */}
-                        {replyingTo === comment._id && (
-                          <form
-                            className="flex gap-3 mt-3"
-                            onSubmit={async (e) => {
-                              e.preventDefault();
-                              if (!replyText.trim()) return;
-                              setCommentsLoading(true);
-                              try {
-                                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments/${comment._id}/reply`, {
-                                  method: "POST",
-                                  headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${token}`,
-                                  },
-                                  credentials: "include",
-                                  body: JSON.stringify({ text: replyText }),
-                                });
-                                if (!res.ok) throw new Error("Failed to post reply");
-                                const response = await res.json();
-                                if (response.success && response.comments) {
-                                  setComments(response.comments);
-                                }
-                                setReplyText("");
-                                setReplyingTo(null);
-                              } catch (err) {
-                                console.error("[Reply] Error:", err);
-                                toast({
-                                  title: "Error",
-                                  description: "Could not post reply.",
-                                  variant: "destructive",
-                                });
-                              } finally {
-                                setCommentsLoading(false);
-                              }
-                            }}
-                          >
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
-                              {user?.name?.charAt(0).toUpperCase() || "U"}
-                            </div>
-                            <div className="flex-1">
-                              <input
-                                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                type="text"
-                                placeholder="Write a reply..."
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                disabled={commentsLoading}
-                                autoFocus
-                              />
-                              <div className="flex justify-end gap-2 mt-2">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setReplyingTo(null);
-                                    setReplyText("");
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  type="submit"
-                                  disabled={commentsLoading || !replyText.trim()}
-                                >
-                                  {commentsLoading ? "..." : "Reply"}
-                                </Button>
-                              </div>
-                            </div>
-                          </form>
-                        )}
-
-                        {/* Replies List */}
-                        {comment.replies && comment.replies.length > 0 && (
-                          <div className="mt-4 space-y-4 border-l-2 border-border pl-4 ml-2">
-                            {comment.replies.map((reply) => (
-                              <div key={reply._id} className="flex gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
-                                  {reply.user?.name?.charAt(0).toUpperCase() || "U"}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="font-medium text-sm">
-                                      {reply.user?.name || "Anonymous User"}
-                                    </span>
-                                    {reply.timestamp && (
-                                      <span className="text-xs text-muted-foreground">
-                                        {new Date(reply.timestamp).toLocaleDateString()}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-sm text-foreground leading-relaxed">
-                                    {reply.text}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
+
+                      {/* Reply Form */}
+                      {replyingTo === comment._id && (
+                        <div className="flex gap-3 pt-2">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-xs flex-shrink-0">
+                            {user?.name?.charAt(0).toUpperCase() || "U"}
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <Input
+                              type="text"
+                              placeholder="Write a reply..."
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              disabled={commentsLoading}
+                              autoFocus
+                            />
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setReplyingTo(null);
+                                  setReplyText("");
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={async () => {
+                                  if (!replyText.trim()) return;
+                                  setCommentsLoading(true);
+                                  try {
+                                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments/${comment._id}/reply`, {
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                        Authorization: `Bearer ${token}`,
+                                      },
+                                      credentials: "include",
+                                      body: JSON.stringify({ text: replyText }),
+                                    });
+                                    if (!res.ok) throw new Error("Failed to post reply");
+                                    const response = await res.json();
+                                    if (response.success && response.comments) {
+                                      setComments(response.comments);
+                                    }
+                                    setReplyText("");
+                                    setReplyingTo(null);
+                                  } catch (err) {
+                                    console.error("[Reply] Error:", err);
+                                    toast({
+                                      title: "Error",
+                                      description: "Could not post reply.",
+                                      variant: "destructive",
+                                    });
+                                  } finally {
+                                    setCommentsLoading(false);
+                                  }
+                                }}
+                                disabled={commentsLoading || !replyText.trim()}
+                              >
+                                {commentsLoading ? "..." : "Reply"}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Replies List */}
+                      {comment.replies && comment.replies.length > 0 && (
+                        <div className="space-y-4 border-l-2 border-border pl-4 ml-2 mt-4">
+                          {comment.replies.map((reply) => (
+                            <div key={reply._id} className="flex gap-3">
+                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-xs flex-shrink-0">
+                                {reply.user?.name?.charAt(0).toUpperCase() || "U"}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-medium text-sm">
+                                    {reply.user?.name || "Anonymous User"}
+                                  </span>
+                                  {reply.timestamp && (
+                                    <span className="text-xs text-muted-foreground">
+                                      {new Date(reply.timestamp).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-foreground leading-relaxed">
+                                  {reply.text}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
               )}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Delete Comment Confirmation Dialog */}
@@ -1060,7 +1039,7 @@ const ComponentDetail: React.FC = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={async () => {
                 if (!deletingCommentId) return;
                 setCommentsLoading(true);
