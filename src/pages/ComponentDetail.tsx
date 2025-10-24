@@ -111,7 +111,7 @@ const ComponentDetail: React.FC = () => {
     "";
 
   useEffect(() => {
-    fetch(`/api/components/${id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -168,7 +168,7 @@ const ComponentDetail: React.FC = () => {
     if (!id) return;
     // Likes
     setLikeLoading(true);
-    fetch(`/api/components/${id}/like`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/like`, {
       headers: { Authorization: `Bearer ${token}` },
       credentials: "include",
     })
@@ -181,7 +181,7 @@ const ComponentDetail: React.FC = () => {
       .finally(() => setLikeLoading(false));
     // Comments
     setCommentsLoading(true);
-    fetch(`/api/components/${id}/comments`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments`, {
       headers: { Authorization: `Bearer ${token}` },
       credentials: "include",
     })
@@ -200,7 +200,7 @@ const ComponentDetail: React.FC = () => {
   // Check if already favourited
   useEffect(() => {
     if (!id || !user) return;
-    fetch(`/api/favourites`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/favourites`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -236,7 +236,7 @@ const ComponentDetail: React.FC = () => {
     setSavingFavourite(true);
     try {
       if (!isFavourited) {
-        const res = await fetch("/api/favourites", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/favourites`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -256,7 +256,7 @@ const ComponentDetail: React.FC = () => {
           variant: "default",
         });
       } else {
-        const res = await fetch(`/api/favourites/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/favourites/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -699,7 +699,7 @@ const ComponentDetail: React.FC = () => {
                     setLikeLoading(true);
                     try {
                       const method = likedByMe ? "DELETE" : "POST";
-                      const url = `/api/components/${id}/like`;
+                      const url = `${import.meta.env.VITE_API_URL}/api/components/${id}/like`;
                       const payload = undefined; // No body sent
                       console.log("[Like] Request:", { method, url, payload });
                       const res = await fetch(url, {
@@ -802,7 +802,7 @@ const ComponentDetail: React.FC = () => {
                   setCommentsLoading(true);
                   try {
                     console.log("[Comment] Posting comment for component", id, "text:", commentText);
-                    const res = await fetch(`/api/components/${id}/comments`, {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments`, {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
@@ -946,7 +946,7 @@ const ComponentDetail: React.FC = () => {
                               if (!replyText.trim()) return;
                               setCommentsLoading(true);
                               try {
-                                const res = await fetch(`/api/components/${id}/comments/${comment._id}/reply`, {
+                                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments/${comment._id}/reply`, {
                                   method: "POST",
                                   headers: {
                                     "Content-Type": "application/json",
@@ -1065,7 +1065,7 @@ const ComponentDetail: React.FC = () => {
                 if (!deletingCommentId) return;
                 setCommentsLoading(true);
                 try {
-                  const res = await fetch(`/api/components/${id}/comments/${deletingCommentId}`, {
+                  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments/${deletingCommentId}`, {
                     method: "DELETE",
                     headers: {
                       Authorization: `Bearer ${token}`,

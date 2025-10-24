@@ -593,7 +593,7 @@ export const CommunityUserProfile = ({
     console.log("[CommunityUserProfile] Fetching user and components for userId:", userId);
 
     Promise.all([
-      fetch(`/api/users/${userId}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`)
         .then((res) => {
           console.log("[CommunityUserProfile] /api/users response status:", res.status);
           return res.json();
@@ -602,7 +602,7 @@ export const CommunityUserProfile = ({
           console.error("[CommunityUserProfile] Error fetching user info:", err);
           return null;
         }),
-      fetch(`/api/components?createdBy=${userId}`)
+      fetch(`${import.meta.env.VITE_API_URL}/api/components?createdBy=${userId}`)
         .then((res) => {
           console.log("[CommunityUserProfile] /api/components response status:", res.status);
           return res.json();

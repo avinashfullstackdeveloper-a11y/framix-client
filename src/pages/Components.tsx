@@ -39,7 +39,7 @@ const Components = () => {
 
   const fetchComponents = () => {
     setLoading(true);
-    fetch("/api/components", { credentials: "include" })
+    fetch(`${import.meta.env.VITE_API_URL}/api/components`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
@@ -53,7 +53,7 @@ const Components = () => {
     if (!window.confirm("Are you sure you want to delete this component?"))
       return;
     try {
-      const res = await fetch(`/api/components/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

@@ -33,7 +33,7 @@ const CommunityList = () => {
     const fetchComponents = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/components", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
           credentials: "include",
         });
 
@@ -1029,8 +1029,8 @@ const CommunityUserProfileRoute = () => {
     setLoading(true);
     // Fetch user info and their components
     Promise.all([
-      fetch(`/api/users/${userId}`).then((res) => res.json()),
-      fetch(`/api/components?createdBy=${userId}`).then((res) => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`).then((res) => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/components?createdBy=${userId}`).then((res) => res.json()),
     ])
       .then(([userInfo, userComponents]) => {
         setUser({
