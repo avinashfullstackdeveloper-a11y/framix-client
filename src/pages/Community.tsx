@@ -33,9 +33,12 @@ const CommunityList = () => {
     const fetchComponents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/components`,
+          {
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch components");
@@ -408,12 +411,38 @@ const CommunityList = () => {
       // Multi-language (full HTML doc)
       if (
         component.language &&
-        component.language.toLowerCase() === "multi" &&
-        component.code
+        component.language.toLowerCase() === "multi"
       ) {
+        // Build srcDoc from separate fields if code field is missing
+        const srcDoc = component.code || `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  overflow: hidden;
+                }
+                ${component.cssCode || ""}
+              </style>
+            </head>
+            <body>
+              ${component.htmlCode || ""}
+            </body>
+          </html>
+        `;
+        
         return (
           <iframe
-            srcDoc={component.code}
+            srcDoc={srcDoc}
             className="absolute inset-0 w-full h-full"
             style={{
               background: "transparent",
@@ -1029,8 +1058,12 @@ const CommunityUserProfileRoute = () => {
     setLoading(true);
     // Fetch user info and their components
     Promise.all([
-      fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`).then((res) => res.json()),
-      fetch(`${import.meta.env.VITE_API_URL}/api/components?createdBy=${userId}`).then((res) => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`).then((res) =>
+        res.json()
+      ),
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/components?createdBy=${userId}`
+      ).then((res) => res.json()),
     ])
       .then(([userInfo, userComponents]) => {
         setUser({

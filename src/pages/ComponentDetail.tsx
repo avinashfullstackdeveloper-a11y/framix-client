@@ -132,20 +132,32 @@ const ComponentDetail: React.FC = () => {
         if (tech === "css") {
           let htmlValue = "";
           let cssValue = "";
-          if (data.htmlCode !== undefined) htmlValue = data.htmlCode;
-          else if (data.html !== undefined) htmlValue = data.html;
-          if (data.cssCode !== undefined) cssValue = data.cssCode;
-          else if (data.css !== undefined) cssValue = data.css;
-          if (
-            !htmlValue &&
-            data.code &&
-            (data.language === "html" ||
-              data.language === "multi" ||
-              data.language === "css")
-          )
-            htmlValue = data.code;
-          if (!cssValue && data.code && data.language === "css")
-            cssValue = data.code;
+          
+          // Priority 1: Check for separate html/css fields (new format from admin upload)
+          if (data.html !== undefined && data.html !== null) {
+            htmlValue = data.html;
+          }
+          if (data.css !== undefined && data.css !== null) {
+            cssValue = data.css;
+          }
+          
+          // Priority 2: Check for legacy htmlCode/cssCode fields
+          if (!htmlValue && data.htmlCode !== undefined) {
+            htmlValue = data.htmlCode;
+          }
+          if (!cssValue && data.cssCode !== undefined) {
+            cssValue = data.cssCode;
+          }
+          
+          // Priority 3: Fallback to combined 'code' field only if no separate fields exist
+          if (!htmlValue && !cssValue && data.code) {
+            if (data.language === "html" || data.language === "multi") {
+              htmlValue = data.code;
+            } else if (data.language === "css") {
+              cssValue = data.code;
+            }
+          }
+          
           setHtmlCode(htmlValue);
           setCssCode(cssValue);
           setPreviewHtmlCode(htmlValue);

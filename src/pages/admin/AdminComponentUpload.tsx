@@ -30,14 +30,14 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
   const [form, setForm] = useState({
     type: "" as ComponentType | "",
     language: "html",
-    html: "",
-    css: "",
+    htmlCode: "",
+    cssCode: "",
     react: "",
     tailwind: "",
   });
   const [activeTab, setActiveTab] = useState<
-    "html" | "css" | "react" | "tailwind"
-  >("html");
+    "htmlCode" | "cssCode" | "react" | "tailwind"
+  >("htmlCode");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -58,16 +58,23 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleTabChange = (tab: "html" | "css" | "react" | "tailwind") => {
+  const handleTabChange = (tab: "htmlCode" | "cssCode" | "react" | "tailwind") => {
     setActiveTab(tab);
-    setForm((prev) => ({ ...prev, language: tab }));
+    // Map tab to language for backend
+    const languageMap: Record<string, string> = {
+      htmlCode: "html",
+      cssCode: "css",
+      react: "react",
+      tailwind: "tailwind"
+    };
+    setForm((prev) => ({ ...prev, language: languageMap[tab] || tab }));
   };
 
   const validateAndCleanCode = () => {
     const warnings: string[] = [];
 
     // Check for viewport units that might cause issues
-    if (form.css.includes("100vw") || form.css.includes("100vh")) {
+    if (form.cssCode.includes("100vw") || form.cssCode.includes("100vh")) {
       warnings.push(
         "Using 100vw/100vh may cause preview issues. Consider using fixed dimensions or percentages."
       );
@@ -75,9 +82,9 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
 
     // Check if HTML contains full document structure
     if (
-      form.html.includes("<html>") ||
-      form.html.includes("<head>") ||
-      form.html.includes("<body>")
+      form.htmlCode.includes("<html>") ||
+      form.htmlCode.includes("<head>") ||
+      form.htmlCode.includes("<body>")
     ) {
       warnings.push(
         "Remove <html>, <head>, and <body> tags. Only provide the component HTML."
@@ -85,54 +92,6 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     }
 
     return warnings;
-  };
-
-  const formatCode = () => {
-    // Determine if multiple code fields are filled
-    const codeFields = [form.html, form.css, form.react, form.tailwind].filter(
-      Boolean
-    );
-    const multiLang = codeFields.length > 1;
-
-    if (multiLang) {
-      // Build a properly formatted HTML document
-      return `<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body, html {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: transparent;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      ${form.css || ""}
-      ${form.tailwind || ""}
-    </style>
-  </head>
-  <body>
-    ${form.html}
-    ${
-      form.react
-        ? `<script type="text/babel">\n${form.react}\n    </script>`
-        : ""
-    }
-  </body>
-</html>`;
-    }
-
-    // Single language - return as-is
-    return form.html || form.css || form.react || form.tailwind;
   };
 
   const { toast } = useToast();
@@ -144,17 +103,26 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     setSuccess(false);
 
     try {
+      // Validate required fields
+      if (!form.type) {
+        throw new Error("Please select a component type");
+      }
+
       // Validate that at least HTML is provided if multi-language
       const codeFields = [
-        form.html,
-        form.css,
+        form.htmlCode,
+        form.cssCode,
         form.react,
         form.tailwind,
       ].filter(Boolean);
       const multiLang = codeFields.length > 1;
 
-      if (multiLang && !form.html) {
+      if (multiLang && !form.htmlCode) {
         throw new Error("HTML is required when using multiple languages");
+      }
+
+      if (codeFields.length === 0) {
+        throw new Error("Please provide at least one code field");
       }
 
       // Run validation checks
@@ -171,14 +139,11 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
         }
       }
 
-      const formattedCode = formatCode();
-
       const jsonBody = {
         type: form.type,
         language: multiLang ? "multi" : form.language,
-        code: formattedCode,
-        html: form.html,
-        css: form.css,
+        htmlCode: form.htmlCode,
+        cssCode: form.cssCode,
         react: form.react,
         tailwind: form.tailwind,
       };
@@ -196,8 +161,8 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
       setForm({
         type: "",
         language: "html",
-        html: "",
-        css: "",
+        htmlCode: "",
+        cssCode: "",
         react: "",
         tailwind: "",
       });
@@ -236,12 +201,12 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
     setForm({
       type: "",
       language: "html",
-      html: "",
-      css: "",
+      htmlCode: "",
+      cssCode: "",
       react: "",
       tailwind: "",
     });
-    setActiveTab("html");
+    setActiveTab("htmlCode");
     setError(null);
     setSuccess(false);
   };
@@ -379,11 +344,11 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
             </h3>
             <ul className="text-xs text-[#767676] space-y-1">
               <li>
-                • <span className="text-white">HTML:</span> Required if using
+                • <span className="text-white">HTML Code:</span> Required if using
                 CSS/React/Tailwind. Provide only component markup
               </li>
               <li>
-                • <span className="text-white">CSS:</span> Avoid viewport units
+                • <span className="text-white">CSS Code:</span> Avoid viewport units
                 (100vw, 100vh) - components are scaled
               </li>
               <li>
@@ -420,7 +385,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
 
             {/* Tabs */}
             <div className="flex gap-1 p-1 bg-black rounded-lg border border-[#3A3A3A]">
-              {(["html", "css", "react", "tailwind"] as const).map((tab) => (
+              {(["htmlCode", "cssCode", "react", "tailwind"] as const).map((tab) => (
                 <button
                   key={tab}
                   type="button"
@@ -431,8 +396,8 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                       : "text-[#767676] hover:text-white hover:bg-[#3A3A3A]"
                   }`}
                 >
-                  {getTabIcon(tab)}
-                  {tab.toUpperCase()}
+                  {getTabIcon(tab === "htmlCode" ? "html" : tab === "cssCode" ? "css" : tab)}
+                  {tab === "htmlCode" ? "HTML" : tab === "cssCode" ? "CSS" : tab.toUpperCase()}
                 </button>
               ))}
             </div>
@@ -445,28 +410,28 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                 value={form[activeTab]}
                 onChange={handleChange}
                 rows={8}
-                required={activeTab === "html"}
-                placeholder={`Enter your ${activeTab.toUpperCase()} code here...`}
+                required={activeTab === "htmlCode"}
+                placeholder={`Enter your ${activeTab === "htmlCode" ? "HTML" : activeTab === "cssCode" ? "CSS" : activeTab.toUpperCase()} code here...`}
                 className="font-mono text-xs bg-black border border-[#3A3A3A] text-white placeholder:text-[#767676] focus:border-[#FF9AC9] resize-none transition-all duration-300"
               />
               <div className="absolute top-2 right-2">
                 <span className="px-2 py-0.5 bg-[#3A3A3A] text-[#767676] text-[10px] rounded-md font-medium">
-                  {activeTab.toUpperCase()}
+                  {activeTab === "htmlCode" ? "HTML" : activeTab === "cssCode" ? "CSS" : activeTab.toUpperCase()}
                 </span>
               </div>
             </div>
 
             {/* Code Stats */}
             <div className="flex gap-4 text-xs text-[#767676]">
-              <span>HTML: {form.html.length} chars</span>
-              <span>CSS: {form.css.length} chars</span>
+              <span>HTML: {form.htmlCode.length} chars</span>
+              <span>CSS: {form.cssCode.length} chars</span>
               <span>React: {form.react.length} chars</span>
               <span>Tailwind: {form.tailwind.length} chars</span>
             </div>
 
             {/* Live Preview */}
             {showPreview &&
-              (form.html || form.css || form.react || form.tailwind) && (
+              (form.htmlCode || form.cssCode || form.react || form.tailwind) && (
                 <div className="border border-[#3A3A3A] rounded-lg overflow-hidden">
                   <div className="bg-black px-3 py-1.5 text-xs font-medium text-white border-b border-[#3A3A3A]">
                     Live Preview
@@ -475,7 +440,33 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                     <div className="w-full h-full flex items-center justify-center">
                       <iframe
                         title="Live Preview"
-                        srcDoc={formatCode()}
+                        srcDoc={`
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <meta charset="UTF-8">
+                              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                              <style>
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body, html {
+                                  width: 100%;
+                                  height: 100%;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                  background: transparent;
+                                  overflow: hidden;
+                                }
+                                ${form.cssCode || ""}
+                                ${form.tailwind || ""}
+                              </style>
+                            </head>
+                            <body>
+                              ${form.htmlCode}
+                              ${form.react ? `<script type="text/babel">\n${form.react}\n</script>` : ""}
+                            </body>
+                          </html>
+                        `}
                         className="w-full h-full border-0"
                         style={{
                           background: "transparent",
