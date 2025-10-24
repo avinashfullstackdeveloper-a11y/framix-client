@@ -158,13 +158,16 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
     <button
       onClick={onClick}
       className={`
-        flex min-h-[120px] w-[120px] flex-col items-center justify-center h-[120px] mx-auto rounded-[14px] border-solid border-2 transition-all duration-200 hover:scale-105
+        flex flex-col items-center justify-center mx-auto rounded-[14px] border-solid border-2 transition-all duration-200 hover:scale-105
+        w-full h-auto max-w-[120px] max-h-[120px] min-h-[96px] min-w-[96px]
+        sm:min-h-[120px] sm:min-w-[120px] sm:max-w-[120px] sm:max-h-[120px]
         ${
           isSelected
             ? "bg-[rgba(57,20,37,1)] border-[rgba(255,71,156,1)]"
             : "bg-[rgba(26,26,26,1)] border-[rgba(42,42,42,1)] hover:border-[rgba(255,71,156,0.5)]"
         }
       `}
+      style={{ aspectRatio: "1 / 1" }}
     >
       <div className="mb-3">{icon}</div>
       <div className="flex flex-col items-stretch text-base text-[rgba(209,213,220,1)] font-semibold justify-center py-px">
@@ -185,17 +188,17 @@ const TechnologySelector: React.FC<TechnologySelectorProps> = ({
   onTechnologyChange,
 }) => {
   return (
-    <section className="flex min-h-[47px] w-full items-center gap-8 text-base font-semibold justify-center flex-wrap mt-12 max-md:max-w-full max-md:mt-10">
+    <section className="flex min-h-[47px] w-full items-center gap-4 sm:gap-8 text-base font-semibold justify-center flex-wrap mt-12 max-md:max-w-full max-md:mt-10">
       <div className="self-stretch flex flex-col items-stretch text-white whitespace-nowrap justify-center w-20 my-auto py-0.5">
         <h3 className="z-10 max-md:-mr-2">Technology</h3>
       </div>
 
-      <div className="self-stretch flex min-w-60 min-h-[47px] items-stretch gap-3 w-[285px] my-auto">
-        <div className="flex min-w-60 items-stretch gap-3 justify-center h-full">
+      <div className="self-stretch flex min-h-[47px] items-stretch gap-2 sm:gap-3 w-full sm:w-[285px] my-auto">
+        <div className="flex items-stretch gap-2 sm:gap-3 justify-center h-full w-full">
           <button
             onClick={() => onTechnologyChange("css")}
             className={`
-              flex items-center gap-2 whitespace-nowrap justify-center h-full px-5 py-[9px] rounded-[10px] border-solid border-2 transition-all duration-200
+              flex items-center gap-2 whitespace-nowrap justify-center h-full px-4 sm:px-5 py-[9px] rounded-[10px] border-solid border-2 transition-all duration-200 w-full sm:w-auto
               ${
                 selectedTechnology === "css"
                   ? "bg-[rgba(57,20,37,1)] text-white border-[rgba(255,71,156,1)]"
@@ -210,7 +213,7 @@ const TechnologySelector: React.FC<TechnologySelectorProps> = ({
           <button
             onClick={() => onTechnologyChange("tailwind")}
             className={`
-              flex items-center gap-2 justify-center h-full px-3.5 py-[9px] rounded-[10px] border-solid border-2 transition-all duration-200
+              flex items-center gap-2 justify-center h-full px-4 sm:px-3.5 py-[9px] rounded-[10px] border-solid border-2 transition-all duration-200 w-full sm:w-auto
               ${
                 selectedTechnology === "tailwind"
                   ? "bg-[rgba(57,20,37,1)] text-white border-[rgba(255,71,156,1)]"
@@ -316,9 +319,9 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
       >
         <form
           onSubmit={handleSubmit}
-          className="bg-[rgba(26,26,26,1)] flex w-full flex-col items-stretch pt-6 pb-12 rounded-2xl"
+          className="bg-[rgba(26,26,26,1)] flex w-full flex-col items-stretch pt-6 pb-12 rounded-2xl max-h-[90vh] overflow-y-auto sm:pt-6 sm:pb-12 hide-scrollbar"
         >
-          <header className="flex w-full items-center justify-between px-6">
+          <header className="flex w-full items-center justify-between px-4 sm:px-6">
             <h1 className="text-white text-lg font-semibold">
               What are you making?
             </h1>
@@ -332,14 +335,14 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
             </button>
           </header>
 
-          <main className="flex w-full flex-col items-stretch mt-10 px-8 max-md:max-w-full max-md:mt-6 max-md:px-3">
-            {/* First row of components */}
+          <main className="flex w-full flex-col items-stretch mt-8 sm:mt-10 px-3 sm:px-8 max-md:max-w-full">
+            {/* Component grid */}
             <section className="max-md:max-w-full">
-              <div className="gap-4 flex max-md:flex-col max-md:items-stretch">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {components.slice(0, 4).map((component) => (
                   <div
                     key={component.id}
-                    className="w-1/4 max-md:w-full max-md:ml-0"
+                    className="w-full"
                   >
                     <ComponentCard
                       title={component.title}
@@ -352,13 +355,12 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
               </div>
             </section>
 
-            {/* Second row of components */}
             <section className="mt-4 max-md:max-w-full">
-              <div className="gap-4 flex max-md:flex-col max-md:items-stretch">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {components.slice(4, 8).map((component) => (
                   <div
                     key={component.id}
-                    className="w-1/4 max-md:w-full max-md:ml-0"
+                    className="w-full"
                   >
                     <ComponentCard
                       title={component.title}
@@ -371,10 +373,9 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
               </div>
             </section>
 
-            {/* Third row of components */}
-            <section className="flex items-stretch gap-4 mt-4 justify-center">
+            <section className="mt-4 flex flex-col sm:flex-row items-stretch gap-4 justify-center">
               {components.slice(8).map((component) => (
-                <div key={component.id}>
+                <div key={component.id} className="w-full sm:w-auto">
                   <ComponentCard
                     title={component.title}
                     icon={component.icon}
@@ -391,7 +392,7 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
             />
             <button
               type="submit"
-              className="bg-[rgba(255,71,156,1)] self-stretch flex items-center gap-2.5 text-white whitespace-nowrap justify-center h-full px-6 py-2 rounded-[10px] max-md:px-5 hover:bg-[rgba(255,71,156,0.9)] transition-colors duration-200 mt-8"
+              className="bg-[rgba(255,71,156,1)] self-stretch flex items-center gap-2.5 text-white whitespace-nowrap justify-center h-full px-4 sm:px-6 py-2 rounded-[10px] max-md:px-5 hover:bg-[rgba(255,71,156,0.9)] transition-colors duration-200 mt-8"
             >
               <span className="self-stretch my-auto">Continue</span>
             </button>
@@ -403,3 +404,4 @@ export const ComponentSelectorPopup: React.FC<ComponentSelectorPopupProps> = ({
 };
 
 export default ComponentSelectorPopup;
+
