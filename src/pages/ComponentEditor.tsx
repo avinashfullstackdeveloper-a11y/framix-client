@@ -831,7 +831,7 @@ const ComponentEditor: React.FC = () => {
       };
 
       // Submit to backend
-      const response = await fetch("/api/submissions", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submissions`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

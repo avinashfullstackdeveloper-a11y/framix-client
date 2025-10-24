@@ -3,7 +3,11 @@ export async function apiRequest<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
-  const res = await fetch(url, {
+  const apiUrl =
+    url.startsWith("/api")
+      ? `${import.meta.env.VITE_API_URL}${url}`
+      : url;
+  const res = await fetch(apiUrl, {
     credentials: "include",
     ...options,
     headers: {
