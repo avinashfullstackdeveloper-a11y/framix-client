@@ -17,9 +17,9 @@ import AdminComponentUpload from "./pages/admin/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
 import Favourite from "./pages/Favourite";
 import Community from "./pages/Community";
-import Templates from "./pages/Template";
+// import Templates from "./pages/Template";
 import UploadTemplate from "./pages/UploadTemplate";
-import TemplateDetail from "./pages/TemplateDetail";
+// import TemplateDetail from "./pages/TemplateDetail";
 import ReportBug from "./pages/ReportBug";
 import { CommunityUserProfile } from "./components/CommunityUserProfile";
 import ComponentEditor from "./pages/ComponentEditor";
@@ -47,8 +47,8 @@ const App: React.FC = () => {
                 <AdminComponentUpload />
               </ProtectedRoute>
             } />
-            <Route path="/templates" element={<Templates />} />
-            <Route path="/templates/:id" element={<TemplateDetail />} />
+            {/* <Route path="/templates" element={<Templates />} /> */}
+            {/* <Route path="/templates/:id" element={<TemplateDetail />} /> */}
             <Route path="/upload-template" element={<UploadTemplate />} />
             <Route path="/community" element={<Community />} />
             {/* Community user profile route */}
