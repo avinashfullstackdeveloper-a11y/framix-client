@@ -43,8 +43,6 @@ const AdminQueue: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token") || "";
-
   // Check if user is admin
   useEffect(() => {
     if (user && (user as any).role !== "admin") {
@@ -65,10 +63,7 @@ const AdminQueue: React.FC = () => {
         ? "/api/submissions/all"
         : `/api/submissions/all?status=${filter}`;
 
-      const response = await fetch(endpoint, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}${endpoint}`, {
         credentials: "include",
       });
 
@@ -97,11 +92,10 @@ const AdminQueue: React.FC = () => {
   const handleApprove = async (submissionId: string) => {
     try {
       setProcessing(true);
-      const response = await fetch(`/api/submissions/${submissionId}/approve`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/submissions/${submissionId}/approve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
         body: JSON.stringify({ reviewNotes }),
@@ -136,11 +130,10 @@ const AdminQueue: React.FC = () => {
   const handleReject = async (submissionId: string) => {
     try {
       setProcessing(true);
-      const response = await fetch(`/api/submissions/${submissionId}/reject`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/submissions/${submissionId}/reject`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
         body: JSON.stringify({ reviewNotes }),
