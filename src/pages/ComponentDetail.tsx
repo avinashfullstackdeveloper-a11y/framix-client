@@ -605,9 +605,11 @@ const ComponentDetail: React.FC = () => {
                     size="sm"
                     onClick={() => {
                       let codeToCopy = "";
-                      if (activeTab === "html") codeToCopy = htmlCode;
-                      else if (activeTab === "css") codeToCopy = cssCode;
-                      else if (activeTab === "tailwind") codeToCopy = tailwindCode;
+                      if (technology === "css") {
+                        codeToCopy = activeTab === "html" ? htmlCode : cssCode;
+                      } else if (technology === "tailwind") {
+                        codeToCopy = tailwindCode;
+                      }
                       navigator.clipboard.writeText(codeToCopy);
                       toast({
                         title: "Copied!",
