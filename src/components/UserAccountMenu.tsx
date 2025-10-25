@@ -18,9 +18,10 @@ interface UserAccountMenuProps {
     name?: string;
     username?: string;
   };
+  onNavigate?: () => void;
 }
 
-export function UserAccountMenu({ user }: UserAccountMenuProps) {
+export function UserAccountMenu({ user, onNavigate }: UserAccountMenuProps) {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -47,12 +48,12 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-10 w-10 rounded-full bg-gradient-to-r from-[#E84288] to-[#9B4DCA] hover:opacity-90"
+          className="relative h-10 w-10 rounded-full bg-gradient-to-r from-[#E84288] to-[#9B4DCA] hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200 border border-[#E84288]/20"
         >
           <span className="text-white font-semibold">{initials}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-neutral-800" align="end">
+      <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-neutral-800" align="start">
         <DropdownMenuLabel className="text-white">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{displayName}</p>
@@ -61,35 +62,50 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-neutral-800" />
         <DropdownMenuItem
-          onClick={() => navigate("/settings/personal")}
+          onClick={() => {
+            onNavigate?.();
+            navigate("/settings/personal");
+          }}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <User className="mr-2 h-4 w-4" />
           <span>Your Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => navigate("/settings/favourite")}
+          onClick={() => {
+            onNavigate?.();
+            navigate("/settings/favourite");
+          }}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <Heart className="mr-2 h-4 w-4" />
           <span>Favourite</span>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => navigate("/notifications")}
+          onClick={() => {
+            onNavigate?.();
+            navigate("/notifications");
+          }}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <Bell className="mr-2 h-4 w-4" />
           <span>Notifications</span>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => navigate("/feedback")}
+          onClick={() => {
+            onNavigate?.();
+            navigate("/feedback");
+          }}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <Heart className="mr-2 h-4 w-4" />
           <span>Give Feedback</span>
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => navigate("/report-bug")}
+          onClick={() => {
+            onNavigate?.();
+            navigate("/report-bug");
+          }}
           className="text-neutral-300 focus:text-white focus:bg-neutral-800 cursor-pointer"
         >
           <Shield className="mr-2 h-4 w-4" />
@@ -97,7 +113,10 @@ export function UserAccountMenu({ user }: UserAccountMenuProps) {
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-neutral-800" />
         <DropdownMenuItem
-          onClick={handleSignOut}
+          onClick={() => {
+            onNavigate?.();
+            handleSignOut();
+          }}
           className="text-red-400 focus:text-red-300 focus:bg-neutral-800 cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" />
