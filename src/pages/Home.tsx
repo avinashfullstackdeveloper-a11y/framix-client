@@ -122,9 +122,22 @@ const LearnMoreButton = ({ onClick, className = "" }) => {
 };
 
 const LandingPage = () => {
-  const [activeTrustedCard, setActiveTrustedCard] = useState(0);
+  const [cardOrder, setCardOrder] = useState([0, 1, 2]); // Track the order of cards [left, center, right]
   const [activePortfolioCard, setActivePortfolioCard] = useState(0);
   const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(0);
+
+  // Handle card click - swap clicked card with center card
+  const handleCardClick = (cardIndex) => {
+    const clickedPosition = cardOrder.indexOf(cardIndex);
+    const centerPosition = 1;
+
+    // If clicked card is not in center, swap it with center card
+    if (clickedPosition !== centerPosition) {
+      const newOrder = [...cardOrder];
+      [newOrder[clickedPosition], newOrder[centerPosition]] = [newOrder[centerPosition], newOrder[clickedPosition]];
+      setCardOrder(newOrder);
+    }
+  };
 
   useEffect(() => {
     const portfolioInterval = setInterval(() => {
@@ -311,44 +324,42 @@ const LandingPage = () => {
             </div>
             {/* Pyramid Cards Layout */}
             <motion.div
-              className="flex justify-center items-end mx-auto relative max-w-[1062px] h-[349px] max-md:flex-col max-md:h-auto max-md:gap-5"
+              className="flex justify-center items-end mx-auto gap-0 max-w-[1062px] shadow-[0_0_16px_0_rgba(255,148,198,0.40)] max-md:flex-col max-md:gap-5 max-md:shadow-none"
               variants={itemVariants}
             >
-              {trustedWayCardData.map((card, index) => {
-                const isActive = index === activeTrustedCard;
+              {cardOrder.map((cardIndex, position) => {
+                const card = trustedWayCardData[cardIndex];
+                const isActive = position === 1; // Center position is active
                 const isPrimary = isActive;
-                const position = index - activeTrustedCard;
+                const isLeft = position === 0;
+                const isRight = position === 2;
 
                 return (
                   <motion.div
-                    key={index}
+                    key={cardIndex}
                     className={`shrink-0 cursor-pointer transition-all duration-500 ease-in-out ${
                       isActive
-                        ? "w-[410px] h-[349px] z-[2] relative max-md:w-full max-md:max-w-[500px]"
-                        : "w-[326px] h-[248px] z-[1] absolute max-md:w-full max-md:max-w-[500px] max-md:relative max-md:h-auto"
-                    }`}
-                    style={{
-                      left: !isActive && position < 0 ? "0" : "auto",
-                      right: !isActive && position > 0 ? "0" : "auto",
-                      top: !isActive ? "101px" : "auto",
-                    }}
-                    onClick={() => setActiveTrustedCard(index)}
+                        ? "w-[410px] h-[349px] z-[2]"
+                        : "w-[326px] h-[248px] z-[1]"
+                    } max-md:w-full max-md:max-w-[500px] max-md:h-auto`}
+                    onClick={() => handleCardClick(cardIndex)}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: position * 0.1 }}
+                    layout
                   >
                     <Card
                       className={`h-full p-8 flex flex-col justify-between ${
                         isPrimary
-                          ? "bg-white border-2 border-black text-black rounded-[20px_20px_0_0] max-md:rounded-[20px]"
-                          : "bg-[#FFF2F8] border border-[#FF94C6] text-black max-md:rounded-[20px]"
+                          ? "bg-white border-2 border-black text-black rounded-[20px_20px_0_0]"
+                          : "bg-[#FFF2F8] text-black border-0"
                       } ${
-                        position < 0
-                          ? "rounded-[20px_0_0_20px] max-md:rounded-[20px]"
-                          : position > 0
-                          ? "rounded-[0_20px_20px_0] max-md:rounded-[20px]"
+                        isLeft
+                          ? "rounded-[20px_0_0_20px] border-l border-b border-[#FF94C6]"
+                          : isRight
+                          ? "rounded-[0_20px_20px_0] border-r border-b border-[#FF94C6]"
                           : ""
-                      }`}
+                      } max-md:rounded-[20px] max-md:border max-md:border-[#FF94C6]`}
                     >
                       <CardContent className="p-0 flex flex-col justify-between h-full">
                         <div>
@@ -357,7 +368,7 @@ const LandingPage = () => {
                               isPrimary ? "text-[#FF94C6]" : "text-black"
                             }`}
                           >
-                            0{index + 1}.
+                            0{cardIndex + 1}.
                           </div>
                           <h3
                             className={`text-2xl font-bold mb-4 ${
@@ -367,8 +378,9 @@ const LandingPage = () => {
                             {card.title}
                           </h3>
                           {isActive && (
-                            <AnimatePresence>
+                            <AnimatePresence mode="wait">
                               <motion.div
+                                key={`desc-${cardIndex}`}
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
@@ -382,8 +394,9 @@ const LandingPage = () => {
                           )}
                         </div>
                         {isActive && (
-                          <AnimatePresence>
+                          <AnimatePresence mode="wait">
                             <motion.div
+                              key={`btn-${cardIndex}`}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
