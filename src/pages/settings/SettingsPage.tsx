@@ -1,11 +1,16 @@
 // SettingsPage.tsx
 import React, { useState } from "react";
-import PersonalInformation from "./PersonalInformation";
+import PersonalInformation from "./PersonalInformation.tsx";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { AccountSection } from "./AccountSection";
+import { AccountSection } from "./AccountSection.tsx";
 
-const Sidebar = ({ activeSection, onSectionChange }) => {
+interface SidebarProps {
+  activeSection: string;
+  onSectionChange: (section: string) => void;
+}
+
+const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   const sections = [
     {
       id: "profile",
