@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -719,26 +718,52 @@ const LandingPage = () => {
                     ship projects faster.
                   </p>
                 </div>
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <CheckCircle2 className="w-8 h-8 text-[#FF94C666]" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-4">
+                    <img
+                      src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/b3e01f76687760bdd63bc89d58c852773dafd9b6?placeholderIfAbsent=true"
+                      alt="Production-ready UI blocks icon"
+                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                    />
                     <div>
-                      <h3 className="font-semibold">
-                        We provide production-ready UI blocks
-                      </h3>
-                      <p className="text-gray-500 text-sm">
-                        that save hours of design & coding.
+                      <p className="text-sm text-gray-400">
+                        We provide production-ready UI blocks that save hours of design & coding.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <CheckCircle2 className="w-8 h-8 text-[#FF94C666]" />
+                  <div className="flex items-start gap-4">
+                    <img
+                      src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/baa5ef204155c19dc1745995b471723badd394b1?placeholderIfAbsent=true"
+                      alt="Tech stack integration icon"
+                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                    />
                     <div>
-                      <h3 className="font-semibold">
-                        Easily connect Framix components
-                      </h3>
-                      <p className="text-gray-500 text-sm">
-                        with your tech stack.
+                      <p className="text-sm text-gray-400">
+                        Easily connect Framix components with your tech stack.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <img
+                      src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/c1a1cab1584735dfde7a9e9d3b6104f3f90dac06?placeholderIfAbsent=true"
+                      alt="Design optimization icon"
+                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                    />
+                    <div>
+                      <p className="text-sm text-gray-400">
+                        Optimize your design-to-development process with plug-and-play templates.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <img
+                      src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/faece15b6a9adcb25dea2bf417827b9850409be3?placeholderIfAbsent=true"
+                      alt="Scalable systems icon"
+                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                    />
+                    <div>
+                      <p className="text-sm text-gray-400">
+                        Build scalable design systems and SaaS platforms.
                       </p>
                     </div>
                   </div>
