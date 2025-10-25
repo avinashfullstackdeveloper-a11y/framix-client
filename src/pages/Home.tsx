@@ -687,14 +687,38 @@ const LandingPage = () => {
           <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div variants={itemVariants}>
-                <h2 className="text-4xl font-bold mb-6">
-                  What's new we provide for you?
+                <h2 className="text-4xl font-bold mb-6 leading-tight">
+                  <span
+                    className="block"
+                    style={{
+                      background: "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    What's{" "}
+                    <span
+                      className="text-[#FF94C9]"
+                      style={{
+                        WebkitTextFillColor: "#FF94C9",
+                        background: "none",
+                        WebkitBackgroundClip: "initial",
+                      }}
+                    >
+                      new
+                    </span>{" "}
+                    we provide for you?
+                  </span>
                 </h2>
-                <p className="text-gray-400 mb-8">
-                  Framix delivers a growing ecosystem of powerful UI components,
-                  templates, and tools designed to help designers and developers
-                  ship projects faster.
-                </p>
+                <div className="flex items-start mb-8">
+                  <div className="w-1 h-full rounded bg-[#FF94C9] mr-4" style={{ minHeight: "2.5rem" }}></div>
+                  <p className="text-gray-400">
+                    Framix delivers a growing ecosystem of powerful UI components,
+                    templates, and tools designed to help designers and developers
+                    ship projects faster.
+                  </p>
+                </div>
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
                     <CheckCircle2 className="w-8 h-8 text-[#FF94C666]" />
