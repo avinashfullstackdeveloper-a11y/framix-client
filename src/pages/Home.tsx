@@ -389,12 +389,10 @@ const LandingPage = () => {
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-400 mb-8">
-                  Framix empowers designers and developers with a growing
-                  ecosystem of modern UI components and templates. Whether
-                  you're building SaaS dashboards, mobile apps, or websites,
-                  Framix ensures your workflow stays fast, reliable, and
-                  accessible from anywhere.
+                <p className="text-gray-400 mb-4">
+                  Framix empowers designers and developers with a growing ecosystem of modern UI components and templates. Whether you’re building SaaS dashboards, mobile apps, or websites, Framix ensures your workflow stays fast, reliable, and accessible from anywhere.
+                  </p><p className="text-gray-400 mb-8">
+                  With industry-standard practices and seamless scalability, Framix helps teams deliver high-performing projects confidently.
                 </p>
                 <Button className="bg-white text-black font-semibold px-10 py-3 rounded-full hover:bg-gray-200 shadow-lg" style={{ borderRadius: "999px", minWidth: "200px" }}>
                   Start Designing
