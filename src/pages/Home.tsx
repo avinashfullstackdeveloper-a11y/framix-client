@@ -228,7 +228,7 @@ const LandingPage = () => {
                   Your trusted way to design, build, and scale.
                 </h2>
               </motion.div>
-              <motion.div className="relative h-64" variants={itemVariants}>
+              <motion.div className="relative h-64 overflow-hidden" variants={itemVariants}>
                 {trustedWayCardData.map((card, index) => (
                   <Card
                     key={index}
@@ -464,7 +464,7 @@ const LandingPage = () => {
                 </div>
               </motion.div>
               <motion.div
-                className="relative h-96 w-full"
+                className="relative h-96 w-full overflow-hidden"
                 variants={itemVariants}
               >
                 <AnimatePresence>
@@ -511,7 +511,7 @@ const LandingPage = () => {
 
         {/* Voices of Our Creators Section */}
         <motion.section
-          className="py-24"
+          className="py-24 overflow-hidden"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
@@ -535,7 +535,8 @@ const LandingPage = () => {
             <div className="flex flex-col gap-6">
               {/* First Scrolling Row (Right to Left) */}
               <div className="relative overflow-hidden w-full">
-                <motion.div
+                <div className="absolute inset-0 overflow-hidden">
+                  <motion.div
                   className="flex"
                   animate={{ x: ["0%", "-100%"] }}
                   transition={{
@@ -554,12 +555,14 @@ const LandingPage = () => {
                       </div>
                     )
                   )}
-                </motion.div>
+                  </motion.div>
+                </div>
               </div>
 
               {/* Second Scrolling Row (Left to Right) */}
               <div className="relative overflow-hidden w-full">
-                <motion.div
+                <div className="absolute inset-0 overflow-hidden">
+                  <motion.div
                   className="flex"
                   animate={{ x: ["-100%", "0%"] }}
                   transition={{
@@ -578,7 +581,8 @@ const LandingPage = () => {
                       </div>
                     )
                   )}
-                </motion.div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
