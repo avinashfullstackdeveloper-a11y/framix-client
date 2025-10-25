@@ -80,7 +80,7 @@ const Components = () => {
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          <span className="text-primary">Components</span> Showcase
+          <span className="text-[#FF9AC9]">Components</span> Showcase
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
           Explore polished, scalable components — from simple buttons to full

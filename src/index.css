@@ -1,3 +1,14 @@
+/* Neon effect for hero section (reduced white glow) */
+.neon-hero-text {
+  text-shadow:
+    0 0 1px #fff,
+    0 0 2px #fff;
+}
+.neon-hero-glow {
+  text-shadow:
+    0 0 1.5px #fff,
+    0 0 3px #fff;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,6 +80,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Manrope', system-ui, sans-serif;
   }
 }
 

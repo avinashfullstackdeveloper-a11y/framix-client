@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import "../index.css"; // Ensure global styles are loaded
 
 const trustedWayCardData = [
   {
@@ -169,14 +170,16 @@ const LandingPage = () => {
               className="text-center lg:text-left z-10"
               variants={itemVariants}
             >
-              <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight flex flex-col">
-                <span>Accelerate products with</span>
-                <span>
+              <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight flex flex-col neon-hero">
+                <span className="neon-hero-text">Accelerate products with</span>
+                <span className="neon-hero-text">
                   ready-made{" "}
-                  <span className="text-[#FF94C666]">components</span>
+                  <span className="text-[#FF9AC9] neon-hero-glow">
+                    components
+                  </span>
                 </span>
               </h1>
-              <p className="text-xl text-gray-400 mb-8 leading-relaxed">
+              <p className="text-xl text-white mb-8 leading-relaxed">
                 Instantly copy responsive HTML, CSS, and React code. Build
                 modern interface faster, without starting from scratch.
               </p>
@@ -596,5 +599,16 @@ const LandingPage = () => {
     </div>
   );
 };
+
+
+/* Neon effect for hero section */
+<style jsx>{`
+  .neon-hero-text {
+    text-shadow: 0 0 8px #ff9ac9cc, 0 0 16px #ff9ac9aa, 0 0 32px #ff9ac966;
+  }
+  .neon-hero-glow {
+    text-shadow: 0 0 12px #ff9ac9, 0 0 24px #ff9ac9bb, 0 0 40px #ff9ac988;
+  }
+`}</style>;
 
 export default LandingPage;
