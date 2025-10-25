@@ -88,16 +88,45 @@ const testimonialsData = [
   },
 ];
 
+// LearnMore Button Component
+const LearnMoreButton = ({ onClick, className = "" }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`inline-flex justify-center items-center gap-2 transition-all duration-200 hover:gap-3 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-50 ${className}`}
+      aria-label="Learn more about this feature"
+    >
+      <span className="text-black text-xl font-bold leading-[18px] tracking-[-0.2px] max-sm:text-lg">
+        Learn more
+      </span>
+      <div className="transition-transform duration-200 hover:translate-x-1">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M18.9424 10L13.1384 15.8054L12.1944 14.8627L16.3904 10.6667H1.33305V9.33337H16.3904L12.1944 5.1387L13.1384 4.1947L18.9424 10Z"
+            fill="black"
+          />
+        </svg>
+      </div>
+    </button>
+  );
+};
+
 const LandingPage = () => {
   const [activeTrustedCard, setActiveTrustedCard] = useState(0);
   const [activePortfolioCard, setActivePortfolioCard] = useState(0);
   const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(0);
 
   useEffect(() => {
-    const trustedInterval = setInterval(() => {
-      setActiveTrustedCard((prev) => (prev + 1) % trustedWayCardData.length);
-    }, 3000);
-
     const portfolioInterval = setInterval(() => {
       setActivePortfolioCard((prev) => (prev + 1) % portfolioCardData.length);
     }, 3000);
@@ -107,7 +136,6 @@ const LandingPage = () => {
     }, 4000);
 
     return () => {
-      clearInterval(trustedInterval);
       clearInterval(portfolioInterval);
       clearInterval(whatsNewInterval);
     };
@@ -281,53 +309,100 @@ const LandingPage = () => {
                 </p>
               </motion.div>
             </div>
-            {/* Cards row below heading/paragraph */}
+            {/* Pyramid Cards Layout */}
             <motion.div
-              className="relative h-64 overflow-visible w-full"
+              className="flex justify-center items-end mx-auto relative max-w-[1062px] h-[349px] max-md:flex-col max-md:h-auto max-md:gap-5"
               variants={itemVariants}
             >
-              {trustedWayCardData.map((card, index) => (
-                <Card
-                  key={index}
-                  className={`absolute w-full h-full p-6 border-0 text-white transition-all duration-500 ease-in-out ${
-                    index === activeTrustedCard
-                      ? "z-10 scale-105 bg-gradient-to-br from-[#FF94C666]/90 to-purple-600/90"
-                      : "z-0 scale-100 bg-[#1c1c1c] opacity-50"
-                  }`}
-                  style={{
-                    transform: `translateX(${
-                      (index - activeTrustedCard) * 10
-                    }%) ${index !== activeTrustedCard ? "scale(0.95)" : ""}`,
-                    zIndex:
-                      trustedWayCardData.length -
-                      Math.abs(index - activeTrustedCard),
-                  }}
-                >
-                  <CardContent className="p-0">
-                    <div className="text-lg font-bold">0{index + 1}.</div>
-                    <h3 className="text-xl font-semibold my-2">{card.title}</h3>
-                    {index === activeTrustedCard && (
-                      <AnimatePresence>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                        >
-                          <p className="text-sm text-gray-200">
-                            {card.description}
-                          </p>
-                          <a
-                            href="#"
-                            className="text-sm font-semibold mt-4 inline-block"
+              {trustedWayCardData.map((card, index) => {
+                const isActive = index === activeTrustedCard;
+                const isPrimary = isActive;
+                const position = index - activeTrustedCard;
+
+                return (
+                  <motion.div
+                    key={index}
+                    className={`shrink-0 cursor-pointer transition-all duration-500 ease-in-out ${
+                      isActive
+                        ? "w-[410px] h-[349px] z-[2] relative max-md:w-full max-md:max-w-[500px]"
+                        : "w-[326px] h-[248px] z-[1] absolute max-md:w-full max-md:max-w-[500px] max-md:relative max-md:h-auto"
+                    }`}
+                    style={{
+                      left: !isActive && position < 0 ? "0" : "auto",
+                      right: !isActive && position > 0 ? "0" : "auto",
+                      top: !isActive ? "101px" : "auto",
+                    }}
+                    onClick={() => setActiveTrustedCard(index)}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card
+                      className={`h-full p-8 flex flex-col justify-between ${
+                        isPrimary
+                          ? "bg-white border-2 border-black text-black rounded-[20px_20px_0_0] max-md:rounded-[20px]"
+                          : "bg-[#FFF2F8] border border-[#FF94C6] text-black max-md:rounded-[20px]"
+                      } ${
+                        position < 0
+                          ? "rounded-[20px_0_0_20px] max-md:rounded-[20px]"
+                          : position > 0
+                          ? "rounded-[0_20px_20px_0] max-md:rounded-[20px]"
+                          : ""
+                      }`}
+                    >
+                      <CardContent className="p-0 flex flex-col justify-between h-full">
+                        <div>
+                          <div
+                            className={`text-sm font-bold mb-2 ${
+                              isPrimary ? "text-[#FF94C6]" : "text-black"
+                            }`}
                           >
-                            Learn more →
-                          </a>
-                        </motion.div>
-                      </AnimatePresence>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+                            0{index + 1}.
+                          </div>
+                          <h3
+                            className={`text-2xl font-bold mb-4 ${
+                              isPrimary ? "text-black" : "text-[#333]"
+                            }`}
+                          >
+                            {card.title}
+                          </h3>
+                          {isActive && (
+                            <AnimatePresence>
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <p className="text-[#666] text-base mb-6">
+                                  {card.description}
+                                </p>
+                              </motion.div>
+                            </AnimatePresence>
+                          )}
+                        </div>
+                        {isActive && (
+                          <AnimatePresence>
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ delay: 0.2 }}
+                            >
+                              <LearnMoreButton
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  console.log(`Learn more: ${card.title}`);
+                                }}
+                              />
+                            </motion.div>
+                          </AnimatePresence>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </motion.section>
