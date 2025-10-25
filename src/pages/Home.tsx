@@ -507,26 +507,95 @@ const LandingPage = () => {
                 className="h-96 overflow-hidden relative"
                 variants={itemVariants}
               >
-                <motion.div
-                  className="grid grid-cols-4 gap-4"
-                  animate={{ y: ["0%", "-50%"] }}
-                  transition={{
-                    ease: "linear",
-                    duration: 30,
-                    repeat: Infinity,
-                  }}
-                >
-                  {[...trustedPlatformImages, ...trustedPlatformImages].map(
-                    (src, i) => (
-                      <img
-                        key={i}
-                        src={src}
-                        alt={`Component preview ${i + 1}`}
-                        className="h-32 w-full object-cover rounded-lg"
-                      />
-                    )
-                  )}
-                </motion.div>
+                <div className="grid grid-cols-4 gap-4 h-full">
+                  {/* Column 1 - Moving Up */}
+                  <motion.div
+                    className="flex flex-col gap-4"
+                    animate={{ y: ["0%", "-50%"] }}
+                    transition={{
+                      ease: "linear",
+                      duration: 30,
+                      repeat: Infinity,
+                    }}
+                  >
+                    {[...trustedPlatformImages.slice(0, 5), ...trustedPlatformImages.slice(0, 5)].map(
+                      (src, i) => (
+                        <img
+                          key={i}
+                          src={src}
+                          alt={`Component preview ${i + 1}`}
+                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                        />
+                      )
+                    )}
+                  </motion.div>
+
+                  {/* Column 2 - Moving Down */}
+                  <motion.div
+                    className="flex flex-col gap-4"
+                    animate={{ y: ["-50%", "0%"] }}
+                    transition={{
+                      ease: "linear",
+                      duration: 30,
+                      repeat: Infinity,
+                    }}
+                  >
+                    {[...trustedPlatformImages.slice(5, 10), ...trustedPlatformImages.slice(5, 10)].map(
+                      (src, i) => (
+                        <img
+                          key={i}
+                          src={src}
+                          alt={`Component preview ${i + 6}`}
+                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                        />
+                      )
+                    )}
+                  </motion.div>
+
+                  {/* Column 3 - Moving Up */}
+                  <motion.div
+                    className="flex flex-col gap-4"
+                    animate={{ y: ["0%", "-50%"] }}
+                    transition={{
+                      ease: "linear",
+                      duration: 30,
+                      repeat: Infinity,
+                    }}
+                  >
+                    {[...trustedPlatformImages.slice(10, 15), ...trustedPlatformImages.slice(10, 15)].map(
+                      (src, i) => (
+                        <img
+                          key={i}
+                          src={src}
+                          alt={`Component preview ${i + 11}`}
+                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                        />
+                      )
+                    )}
+                  </motion.div>
+
+                  {/* Column 4 - Moving Down */}
+                  <motion.div
+                    className="flex flex-col gap-4"
+                    animate={{ y: ["-50%", "0%"] }}
+                    transition={{
+                      ease: "linear",
+                      duration: 30,
+                      repeat: Infinity,
+                    }}
+                  >
+                    {[...trustedPlatformImages.slice(15, 20), ...trustedPlatformImages.slice(15, 20)].map(
+                      (src, i) => (
+                        <img
+                          key={i}
+                          src={src}
+                          alt={`Component preview ${i + 16}`}
+                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                        />
+                      )
+                    )}
+                  </motion.div>
+                </div>
               </motion.div>
             </div>
           </div>
