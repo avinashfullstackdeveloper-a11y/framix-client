@@ -123,7 +123,8 @@ const LearnMoreButton = ({ onClick, className = "" }) => {
 const LandingPage = () => {
   const [cardOrder, setCardOrder] = useState([0, 1, 2]); // Track the order of cards [left, center, right]
   const [activePortfolioCard, setActivePortfolioCard] = useState(0);
-  const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(0);
+  const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(1);
+  const [videoCardOrder, setVideoCardOrder] = useState([0, 1, 2]); // Track video card order [left, center, right]
 
   // Handle card click - swap clicked card with center card
   const handleCardClick = (cardIndex) => {
@@ -133,8 +134,28 @@ const LandingPage = () => {
     // If clicked card is not in center, swap it with center card
     if (clickedPosition !== centerPosition) {
       const newOrder = [...cardOrder];
-      [newOrder[clickedPosition], newOrder[centerPosition]] = [newOrder[centerPosition], newOrder[clickedPosition]];
+      [newOrder[clickedPosition], newOrder[centerPosition]] = [
+        newOrder[centerPosition],
+        newOrder[clickedPosition],
+      ];
       setCardOrder(newOrder);
+    }
+  };
+
+  // Handle video card click - swap clicked card with center card
+  const handleVideoCardClick = (cardIndex) => {
+    const clickedPosition = videoCardOrder.indexOf(cardIndex);
+    const centerPosition = 1;
+
+    // If clicked card is not in center, swap it with center card
+    if (clickedPosition !== centerPosition) {
+      const newOrder = [...videoCardOrder];
+      [newOrder[clickedPosition], newOrder[centerPosition]] = [
+        newOrder[centerPosition],
+        newOrder[clickedPosition],
+      ];
+      setVideoCardOrder(newOrder);
+      setActiveWhatsNewCard(cardIndex);
     }
   };
 
@@ -143,13 +164,8 @@ const LandingPage = () => {
       setActivePortfolioCard((prev) => (prev + 1) % portfolioCardData.length);
     }, 3000);
 
-    const whatsNewInterval = setInterval(() => {
-      setActiveWhatsNewCard((prev) => (prev + 1) % whatsNewVideos.length);
-    }, 4000);
-
     return () => {
       clearInterval(portfolioInterval);
-      clearInterval(whatsNewInterval);
     };
   }, []);
 
@@ -277,7 +293,8 @@ const LandingPage = () => {
                   <span
                     className="block"
                     style={{
-                      background: "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                      background:
+                        "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -299,7 +316,8 @@ const LandingPage = () => {
                   <span
                     className="block"
                     style={{
-                      background: "linear-gradient(90deg, #e5e7eb 0%, #a3a3a3 60%, #6b7280 100%)",
+                      background:
+                        "linear-gradient(90deg, #e5e7eb 0%, #a3a3a3 60%, #6b7280 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -328,108 +346,124 @@ const LandingPage = () => {
                 variants={itemVariants}
               >
                 {cardOrder.map((cardIndex, position) => {
-                const card = trustedWayCardData[cardIndex];
-                const isActive = position === 1; // Center position is active
-                const isPrimary = isActive;
-                const isLeft = position === 0;
-                const isRight = position === 2;
+                  const card = trustedWayCardData[cardIndex];
+                  const isActive = position === 1; // Center position is active
+                  const isPrimary = isActive;
+                  const isLeft = position === 0;
+                  const isRight = position === 2;
 
-                return (
-                  <motion.div
-                    key={cardIndex}
-                    layoutId={`card-${cardIndex}`}
-                    className={`shrink-0 cursor-pointer ${
-                      isActive
-                        ? "w-[410px] h-[349px] z-[2] max-md:w-[280px] max-md:h-[300px] max-sm:w-[220px] max-sm:h-[280px]"
-                        : "w-[326px] h-[248px] z-[1] max-md:w-[200px] max-md:h-[200px] max-sm:w-[140px] max-sm:h-[180px]"
-                    }`}
-                    onClick={() => handleCardClick(cardIndex)}
-                    initial={false}
-                    animate={{
-                      width: isActive
-                        ? window.innerWidth < 640 ? 220 : window.innerWidth < 768 ? 280 : 410
-                        : window.innerWidth < 640 ? 140 : window.innerWidth < 768 ? 200 : 326,
-                      height: isActive
-                        ? window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 300 : 349
-                        : window.innerWidth < 640 ? 180 : window.innerWidth < 768 ? 200 : 248,
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 30,
-                    }}
-                    layout
-                  >
-                    <Card
-                      className={`h-full p-8 max-md:p-5 max-sm:p-3 flex flex-col justify-between transition-all duration-500 ease-in-out ${
-                        isPrimary
-                          ? "bg-[#FF94C9] border-2 border-[#FF94C9] text-black rounded-[20px_20px_0_0] max-md:rounded-[15px_15px_0_0]"
-                          : "bg-[#A67388] text-white border-0 opacity-70"
-                      } ${
-                        isLeft
-                          ? "rounded-[20px_0_0_20px] max-md:rounded-[15px_0_0_15px] border-l border-b border-[#8B5F70]"
-                          : isRight
-                          ? "rounded-[0_20px_20px_0] max-md:rounded-[0_15px_15px_0] border-r border-b border-[#8B5F70]"
-                          : ""
+                  return (
+                    <motion.div
+                      key={cardIndex}
+                      layoutId={`card-${cardIndex}`}
+                      className={`shrink-0 cursor-pointer ${
+                        isActive
+                          ? "w-[410px] h-[349px] z-[2] max-md:w-[280px] max-md:h-[300px] max-sm:w-[220px] max-sm:h-[280px]"
+                          : "w-[326px] h-[248px] z-[1] max-md:w-[200px] max-md:h-[200px] max-sm:w-[140px] max-sm:h-[180px]"
                       }`}
+                      onClick={() => handleCardClick(cardIndex)}
+                      initial={false}
+                      animate={{
+                        width: isActive
+                          ? window.innerWidth < 640
+                            ? 220
+                            : window.innerWidth < 768
+                            ? 280
+                            : 410
+                          : window.innerWidth < 640
+                          ? 140
+                          : window.innerWidth < 768
+                          ? 200
+                          : 326,
+                        height: isActive
+                          ? window.innerWidth < 640
+                            ? 280
+                            : window.innerWidth < 768
+                            ? 300
+                            : 349
+                          : window.innerWidth < 640
+                          ? 180
+                          : window.innerWidth < 768
+                          ? 200
+                          : 248,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                      layout
                     >
-                      <CardContent className="p-0 flex flex-col justify-between h-full">
-                        <div>
-                          <div
-                            className={`text-sm max-md:text-xs font-bold mb-2 transition-colors duration-500 ${
-                              isPrimary ? "text-black" : "text-white"
-                            }`}
-                          >
-                            0{cardIndex + 1}.
+                      <Card
+                        className={`h-full p-8 max-md:p-5 max-sm:p-3 flex flex-col justify-between transition-all duration-500 ease-in-out ${
+                          isPrimary
+                            ? "bg-[#FF94C9] border-2 border-[#FF94C9] text-black rounded-[20px_20px_0_0] max-md:rounded-[15px_15px_0_0]"
+                            : "bg-[#A67388] text-white border-0 opacity-70"
+                        } ${
+                          isLeft
+                            ? "rounded-[20px_0_0_20px] max-md:rounded-[15px_0_0_15px] border-l border-b border-[#8B5F70]"
+                            : isRight
+                            ? "rounded-[0_20px_20px_0] max-md:rounded-[0_15px_15px_0] border-r border-b border-[#8B5F70]"
+                            : ""
+                        }`}
+                      >
+                        <CardContent className="p-0 flex flex-col justify-between h-full">
+                          <div>
+                            <div
+                              className={`text-sm max-md:text-xs font-bold mb-2 transition-colors duration-500 ${
+                                isPrimary ? "text-black" : "text-white"
+                              }`}
+                            >
+                              0{cardIndex + 1}.
+                            </div>
+                            <h3
+                              className={`text-2xl max-md:text-lg max-sm:text-base font-bold mb-4 max-md:mb-2 transition-colors duration-500 ${
+                                isPrimary ? "text-black" : "text-white"
+                              }`}
+                            >
+                              {card.title}
+                            </h3>
+                            {isActive && (
+                              <AnimatePresence mode="wait">
+                                <motion.div
+                                  key={`desc-${cardIndex}`}
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <p className="text-black/80 text-base max-md:text-sm max-sm:text-xs mb-6 max-md:mb-3">
+                                    {card.description}
+                                  </p>
+                                </motion.div>
+                              </AnimatePresence>
+                            )}
                           </div>
-                          <h3
-                            className={`text-2xl max-md:text-lg max-sm:text-base font-bold mb-4 max-md:mb-2 transition-colors duration-500 ${
-                              isPrimary ? "text-black" : "text-white"
-                            }`}
-                          >
-                            {card.title}
-                          </h3>
                           {isActive && (
                             <AnimatePresence mode="wait">
                               <motion.div
-                                key={`desc-${cardIndex}`}
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.3 }}
+                                key={`btn-${cardIndex}`}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ delay: 0.2 }}
                               >
-                                <p className="text-black/80 text-base max-md:text-sm max-sm:text-xs mb-6 max-md:mb-3">
-                                  {card.description}
-                                </p>
+                                <div className="bg-[#FF94C9] rounded-md inline-block px-1 max-md:text-sm max-sm:text-xs">
+                                  <LearnMoreButton
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      console.log(`Learn more: ${card.title}`);
+                                    }}
+                                    className="max-md:text-sm max-sm:text-xs"
+                                  />
+                                </div>
                               </motion.div>
                             </AnimatePresence>
                           )}
-                        </div>
-                        {isActive && (
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={`btn-${cardIndex}`}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ delay: 0.2 }}
-                            >
-                              <div className="bg-[#FF94C9] rounded-md inline-block px-1 max-md:text-sm max-sm:text-xs">
-                                <LearnMoreButton
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    console.log(`Learn more: ${card.title}`);
-                                  }}
-                                  className="max-md:text-sm max-sm:text-xs"
-                                />
-                              </div>
-                            </motion.div>
-                          </AnimatePresence>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
                 })}
               </motion.div>
             </LayoutGroup>
@@ -451,7 +485,8 @@ const LandingPage = () => {
                   <span
                     className="block"
                     style={{
-                      background: "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                      background:
+                        "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -472,7 +507,8 @@ const LandingPage = () => {
                   <span
                     className="block"
                     style={{
-                      background: "linear-gradient(90deg, #e5e7eb 0%, #a3a3a3 60%, #6b7280 100%)",
+                      background:
+                        "linear-gradient(90deg, #e5e7eb 0%, #a3a3a3 60%, #6b7280 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -494,11 +530,21 @@ const LandingPage = () => {
                   ))}
                 </div>
                 <p className="text-gray-400 mb-4">
-                  Framix empowers designers and developers with a growing ecosystem of modern UI components and templates. Whether you’re building SaaS dashboards, mobile apps, or websites, Framix ensures your workflow stays fast, reliable, and accessible from anywhere.
-                  </p><p className="text-gray-400 mb-8">
-                  With industry-standard practices and seamless scalability, Framix helps teams deliver high-performing projects confidently.
+                  Framix empowers designers and developers with a growing
+                  ecosystem of modern UI components and templates. Whether
+                  you’re building SaaS dashboards, mobile apps, or websites,
+                  Framix ensures your workflow stays fast, reliable, and
+                  accessible from anywhere.
                 </p>
-                <Button className="bg-white text-black font-semibold px-10 py-3 rounded-full hover:bg-gray-200 shadow-lg" style={{ borderRadius: "999px", minWidth: "200px" }}>
+                <p className="text-gray-400 mb-8">
+                  With industry-standard practices and seamless scalability,
+                  Framix helps teams deliver high-performing projects
+                  confidently.
+                </p>
+                <Button
+                  className="bg-white text-black font-semibold px-10 py-3 rounded-full hover:bg-gray-200 shadow-lg"
+                  style={{ borderRadius: "999px", minWidth: "200px" }}
+                >
                   Start Designing
                 </Button>
               </motion.div>
@@ -517,16 +563,17 @@ const LandingPage = () => {
                       repeat: Infinity,
                     }}
                   >
-                    {[...trustedPlatformImages.slice(0, 5), ...trustedPlatformImages.slice(0, 5)].map(
-                      (src, i) => (
-                        <img
-                          key={i}
-                          src={src}
-                          alt={`Component preview ${i + 1}`}
-                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
-                        />
-                      )
-                    )}
+                    {[
+                      ...trustedPlatformImages.slice(0, 5),
+                      ...trustedPlatformImages.slice(0, 5),
+                    ].map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt={`Component preview ${i + 1}`}
+                        className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                      />
+                    ))}
                   </motion.div>
 
                   {/* Column 2 - Moving Down */}
@@ -539,16 +586,17 @@ const LandingPage = () => {
                       repeat: Infinity,
                     }}
                   >
-                    {[...trustedPlatformImages.slice(5, 10), ...trustedPlatformImages.slice(5, 10)].map(
-                      (src, i) => (
-                        <img
-                          key={i}
-                          src={src}
-                          alt={`Component preview ${i + 6}`}
-                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
-                        />
-                      )
-                    )}
+                    {[
+                      ...trustedPlatformImages.slice(5, 10),
+                      ...trustedPlatformImages.slice(5, 10),
+                    ].map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt={`Component preview ${i + 6}`}
+                        className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                      />
+                    ))}
                   </motion.div>
 
                   {/* Column 3 - Moving Up */}
@@ -561,16 +609,17 @@ const LandingPage = () => {
                       repeat: Infinity,
                     }}
                   >
-                    {[...trustedPlatformImages.slice(10, 15), ...trustedPlatformImages.slice(10, 15)].map(
-                      (src, i) => (
-                        <img
-                          key={i}
-                          src={src}
-                          alt={`Component preview ${i + 11}`}
-                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
-                        />
-                      )
-                    )}
+                    {[
+                      ...trustedPlatformImages.slice(10, 15),
+                      ...trustedPlatformImages.slice(10, 15),
+                    ].map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt={`Component preview ${i + 11}`}
+                        className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                      />
+                    ))}
                   </motion.div>
 
                   {/* Column 4 - Moving Down */}
@@ -583,16 +632,17 @@ const LandingPage = () => {
                       repeat: Infinity,
                     }}
                   >
-                    {[...trustedPlatformImages.slice(15, 20), ...trustedPlatformImages.slice(15, 20)].map(
-                      (src, i) => (
-                        <img
-                          key={i}
-                          src={src}
-                          alt={`Component preview ${i + 16}`}
-                          className="h-32 w-full object-cover rounded-lg flex-shrink-0"
-                        />
-                      )
-                    )}
+                    {[
+                      ...trustedPlatformImages.slice(15, 20),
+                      ...trustedPlatformImages.slice(15, 20),
+                    ].map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt={`Component preview ${i + 16}`}
+                        className="h-32 w-full object-cover rounded-lg flex-shrink-0"
+                      />
+                    ))}
                   </motion.div>
                 </div>
               </motion.div>
@@ -690,7 +740,8 @@ const LandingPage = () => {
                   <span
                     className="block"
                     style={{
-                      background: "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                      background:
+                        "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -711,11 +762,14 @@ const LandingPage = () => {
                   </span>
                 </h2>
                 <div className="flex items-start mb-8">
-                  <div className="w-1 h-full rounded bg-[#FF94C9] mr-4" style={{ minHeight: "2.5rem" }}></div>
+                  <div
+                    className="w-1 h-full rounded bg-[#FF94C9] mr-4"
+                    style={{ minHeight: "2.5rem" }}
+                  ></div>
                   <p className="text-gray-400">
-                    Framix delivers a growing ecosystem of powerful UI components,
-                    templates, and tools designed to help designers and developers
-                    ship projects faster.
+                    Framix delivers a growing ecosystem of powerful UI
+                    components, templates, and tools designed to help designers
+                    and developers ship projects faster.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -727,7 +781,8 @@ const LandingPage = () => {
                     />
                     <div>
                       <p className="text-sm text-gray-400">
-                        We provide production-ready UI blocks that save hours of design & coding.
+                        We provide production-ready UI blocks that save hours of
+                        design & coding.
                       </p>
                     </div>
                   </div>
@@ -751,7 +806,8 @@ const LandingPage = () => {
                     />
                     <div>
                       <p className="text-sm text-gray-400">
-                        Optimize your design-to-development process with plug-and-play templates.
+                        Optimize your design-to-development process with
+                        plug-and-play templates.
                       </p>
                     </div>
                   </div>
@@ -770,46 +826,59 @@ const LandingPage = () => {
                 </div>
               </motion.div>
               <motion.div
-                className="relative h-96 w-full overflow-hidden"
+                className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
                 variants={itemVariants}
               >
-                <AnimatePresence>
-                  {whatsNewVideos.map((videoSrc, index) => (
+                {videoCardOrder.map((videoIndex, position) => {
+                  const isActive = position === 1; // Center position is active
+                  const isLeft = position === 0;
+                  const isRight = position === 2;
+
+                  return (
                     <motion.div
-                      key={videoSrc}
-                      className="absolute w-full h-full"
-                      initial={{
-                        opacity: 0,
-                        y: 50,
-                        scale: 0.9,
-                        rotate: (index - activeWhatsNewCard) * 5,
-                      }}
+                      key={videoIndex}
+                      layoutId={`video-card-${videoIndex}`}
+                      onClick={() => handleVideoCardClick(videoIndex)}
+                      className={`absolute cursor-pointer transition-all duration-500 ${
+                        isActive
+                          ? "w-[223px] h-[287px] left-1/2 -translate-x-1/2 top-[31px] z-[3] shadow-[0_4px_20px_rgba(0,0,0,0.1)] max-md:w-[200px] max-md:h-[260px] max-md:top-[20px] max-sm:w-40 max-sm:h-[200px] max-sm:top-[30px]"
+                          : isLeft
+                          ? "w-[223px] h-[287px] rotate-[-13.37deg] z-[1] left-0 top-[31px] opacity-70 max-md:w-[200px] max-md:h-[260px] max-md:top-[20px] max-sm:w-40 max-sm:h-[200px] max-sm:top-[30px]"
+                          : "w-[223px] h-[287px] rotate-[13.37deg] z-[2] right-0 top-[31px] opacity-70 max-md:w-[200px] max-md:h-[260px] max-md:top-[20px] max-sm:w-40 max-sm:h-[200px] max-sm:top-[30px]"
+                      }`}
+                      initial={false}
                       animate={{
-                        opacity: 1,
-                        y: (index - activeWhatsNewCard) * -20,
-                        scale: 1 - Math.abs(index - activeWhatsNewCard) * 0.05,
-                        rotate: (index - activeWhatsNewCard) * 5,
+                        rotate: isActive ? 0 : isLeft ? -13.37 : 13.37,
+                        opacity: isActive ? 1 : 0.7,
                       }}
-                      exit={{ opacity: 0, y: -50, scale: 0.9 }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
-                      style={{
-                        zIndex:
-                          whatsNewVideos.length -
-                          Math.abs(index - activeWhatsNewCard),
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
                       }}
+                      layout
                     >
-                      <Card className="w-full h-full bg-white text-gray-800 p-2 rounded-2xl shadow-2xl overflow-hidden">
+                      <div
+                        className={`h-full w-full ${
+                          isActive ? "bg-white" : "bg-[#BFBDBD]"
+                        } rounded-[16.715px] p-2 box-border`}
+                      >
                         <video
-                          src={videoSrc}
+                          src={whatsNewVideos[videoIndex]}
                           autoPlay
                           loop
                           muted
-                          className="w-full h-full object-cover rounded-xl"
-                        ></video>
-                      </Card>
+                          className="w-full h-full object-cover rounded-[12px]"
+                        />
+                      </div>
                     </motion.div>
-                  ))}
-                </AnimatePresence>
+                  );
+                })}
+
+                {/* FRAMIX badge */}
+                <div className="absolute -translate-x-1/2 text-white font-semibold text-sm z-[4] bg-[#FF94C9] px-4 py-2 rounded-[20px] left-1/2 -bottom-5 max-sm:text-xs max-sm:px-3 max-sm:py-1.5">
+                  <div>FRAMIX</div>
+                </div>
               </motion.div>
             </div>
           </div>
