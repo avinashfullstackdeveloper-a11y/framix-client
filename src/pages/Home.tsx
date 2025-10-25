@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import "../index.css"; // Ensure global styles are loaded
@@ -96,7 +96,7 @@ const LearnMoreButton = ({ onClick, className = "" }) => {
       className={`inline-flex justify-center items-center gap-2 transition-all duration-200 hover:gap-3 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-black focus:ring-opacity-50 ${className}`}
       aria-label="Learn more about this feature"
     >
-      <span className="text-black text-xl font-bold leading-[18px] tracking-[-0.2px] max-sm:text-lg">
+      <span className="text-black text-xl max-md:text-base max-sm:text-sm font-bold leading-[18px] tracking-[-0.2px]">
         Learn more
       </span>
       <div className="transition-transform duration-200 hover:translate-x-1">
@@ -106,7 +106,7 @@ const LearnMoreButton = ({ onClick, className = "" }) => {
           viewBox="0 0 20 20"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-5 h-5"
+          className="w-5 h-5 max-md:w-4 max-md:h-4 max-sm:w-3 max-sm:h-3"
           aria-hidden="true"
         >
           <path
@@ -261,13 +261,13 @@ const LandingPage = () => {
 
         {/* Your trusted way Section */}
         <motion.section
-          className="py-24"
+          className="py-24 max-md:py-16 max-sm:py-12"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           variants={containerVariants}
         >
-          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20 max-md:px-6 max-sm:px-4">
             {/* Responsive flex for heading and paragraph */}
             <div className="flex flex-col lg:flex-row gap-8 items-stretch mb-12">
               <motion.div
@@ -323,11 +323,12 @@ const LandingPage = () => {
               </motion.div>
             </div>
             {/* Pyramid Cards Layout */}
-            <motion.div
-              className="flex justify-center items-end mx-auto gap-0 max-w-[1062px] max-md:flex-col max-md:gap-5"
-              variants={itemVariants}
-            >
-              {cardOrder.map((cardIndex, position) => {
+            <LayoutGroup>
+              <motion.div
+                className="flex justify-center items-end mx-auto gap-0 max-w-[1062px] overflow-x-auto hide-scrollbar px-4 max-md:px-0"
+                variants={itemVariants}
+              >
+                {cardOrder.map((cardIndex, position) => {
                 const card = trustedWayCardData[cardIndex];
                 const isActive = position === 1; // Center position is active
                 const isPrimary = isActive;
@@ -337,42 +338,54 @@ const LandingPage = () => {
                 return (
                   <motion.div
                     key={cardIndex}
-                    className={`shrink-0 cursor-pointer transition-all duration-500 ease-in-out ${
+                    layoutId={`card-${cardIndex}`}
+                    className={`shrink-0 cursor-pointer ${
                       isActive
-                        ? "w-[410px] h-[349px] z-[2]"
-                        : "w-[326px] h-[248px] z-[1]"
-                    } max-md:w-full max-md:max-w-[500px] max-md:h-auto`}
+                        ? "w-[410px] h-[349px] z-[2] max-md:w-[280px] max-md:h-[300px] max-sm:w-[220px] max-sm:h-[280px]"
+                        : "w-[326px] h-[248px] z-[1] max-md:w-[200px] max-md:h-[200px] max-sm:w-[140px] max-sm:h-[180px]"
+                    }`}
                     onClick={() => handleCardClick(cardIndex)}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: position * 0.1 }}
+                    initial={false}
+                    animate={{
+                      width: isActive
+                        ? window.innerWidth < 640 ? 220 : window.innerWidth < 768 ? 280 : 410
+                        : window.innerWidth < 640 ? 140 : window.innerWidth < 768 ? 200 : 326,
+                      height: isActive
+                        ? window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 300 : 349
+                        : window.innerWidth < 640 ? 180 : window.innerWidth < 768 ? 200 : 248,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 30,
+                    }}
                     layout
                   >
                     <Card
-                      className={`h-full p-8 flex flex-col justify-between ${
+                      className={`h-full p-8 max-md:p-5 max-sm:p-3 flex flex-col justify-between transition-all duration-500 ease-in-out ${
                         isPrimary
-                          ? "bg-[#FF94C9] border-2 border-[#FF94C9] text-black rounded-[20px_20px_0_0]"
-                          : "bg-[#A67388] text-black border-0 opacity-70"
+                          ? "bg-[#FF94C9] border-2 border-[#FF94C9] text-black rounded-[20px_20px_0_0] max-md:rounded-[15px_15px_0_0]"
+                          : "bg-[#A67388] text-white border-0 opacity-70"
                       } ${
                         isLeft
-                          ? "rounded-[20px_0_0_20px] border-l border-b border-[#8B5F70]"
+                          ? "rounded-[20px_0_0_20px] max-md:rounded-[15px_0_0_15px] border-l border-b border-[#8B5F70]"
                           : isRight
-                          ? "rounded-[0_20px_20px_0] border-r border-b border-[#8B5F70]"
+                          ? "rounded-[0_20px_20px_0] max-md:rounded-[0_15px_15px_0] border-r border-b border-[#8B5F70]"
                           : ""
-                      } max-md:rounded-[20px] max-md:border max-md:border-[#8B5F70]`}
+                      }`}
                     >
                       <CardContent className="p-0 flex flex-col justify-between h-full">
                         <div>
                           <div
-                            className={`text-sm font-bold mb-2 ${
-                              isPrimary ? "text-black" : "text-black/80"
+                            className={`text-sm max-md:text-xs font-bold mb-2 transition-colors duration-500 ${
+                              isPrimary ? "text-black" : "text-white"
                             }`}
                           >
                             0{cardIndex + 1}.
                           </div>
                           <h3
-                            className={`text-2xl font-bold mb-4 ${
-                              isPrimary ? "text-black" : "text-black/70"
+                            className={`text-2xl max-md:text-lg max-sm:text-base font-bold mb-4 max-md:mb-2 transition-colors duration-500 ${
+                              isPrimary ? "text-black" : "text-white"
                             }`}
                           >
                             {card.title}
@@ -386,7 +399,7 @@ const LandingPage = () => {
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3 }}
                               >
-                                <p className="text-black/80 text-base mb-6">
+                                <p className="text-black/80 text-base max-md:text-sm max-sm:text-xs mb-6 max-md:mb-3">
                                   {card.description}
                                 </p>
                               </motion.div>
@@ -402,12 +415,13 @@ const LandingPage = () => {
                               exit={{ opacity: 0 }}
                               transition={{ delay: 0.2 }}
                             >
-                              <div className="bg-[#FF94C9] rounded-md inline-block px-1">
+                              <div className="bg-[#FF94C9] rounded-md inline-block px-1 max-md:text-sm max-sm:text-xs">
                                 <LearnMoreButton
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     console.log(`Learn more: ${card.title}`);
                                   }}
+                                  className="max-md:text-sm max-sm:text-xs"
                                 />
                               </div>
                             </motion.div>
@@ -417,8 +431,9 @@ const LandingPage = () => {
                     </Card>
                   </motion.div>
                 );
-              })}
-            </motion.div>
+                })}
+              </motion.div>
+            </LayoutGroup>
           </div>
         </motion.section>
 
