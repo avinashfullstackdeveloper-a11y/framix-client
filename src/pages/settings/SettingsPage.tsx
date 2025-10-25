@@ -30,17 +30,17 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   ];
 
   return (
-    <aside className="min-h-[600px] w-64 flex-shrink-0 bg-[#181818] whitespace-nowrap pr-0.5 border-r border-neutral-800">
-      <div className="w-full px-3 py-2">
-        <div className="w-full text-lg text-[rgba(242,242,242,1)] font-semibold tracking-[-0.45px] leading-loose px-4">
+    <aside className="max-md:w-full md:min-h-[600px] md:w-64 md:flex-shrink-0 bg-[#181818] whitespace-nowrap max-md:border-b md:border-r border-neutral-800 max-md:pr-0 md:pr-0.5">
+      <div className="w-full max-md:px-4 max-md:py-3 md:px-3 md:py-2">
+        <div className="w-full text-lg text-[rgba(242,242,242,1)] font-semibold tracking-[-0.45px] leading-loose max-md:hidden md:px-4">
           <div>Settings</div>
         </div>
-        <nav className="w-full text-sm text-[rgba(153,153,153,1)] font-medium leading-none mt-2">
+        <nav className="w-full text-sm text-[rgba(153,153,153,1)] font-medium leading-none max-md:mt-0 md:mt-2 max-md:flex max-md:gap-2 max-md:overflow-x-auto max-md:pb-1">
           {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => onSectionChange(section.id)}
-              className={`flex w-full items-center gap-2 mt-1 px-4 py-2 rounded-md transition-colors ${
+              className={`flex items-center gap-2 max-md:flex-shrink-0 max-md:px-4 max-md:py-2 md:w-full md:mt-1 md:px-4 md:py-2 rounded-md transition-colors ${
                 activeSection === section.id
                   ? "bg-[rgba(33,33,33,1)] text-[rgba(230,230,230,1)]"
                   : "hover:bg-[rgba(33,33,33,1)] hover:text-[rgba(230,230,230,1)]"
@@ -48,10 +48,10 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
             >
               <img
                 src={section.icon}
-                className="aspect-[1] object-contain w-4 self-stretch shrink-0 my-auto"
+                className="aspect-[1] object-contain w-4 flex-shrink-0"
                 alt={section.label}
               />
-              <div className="self-stretch my-auto">{section.label}</div>
+              <div className="whitespace-nowrap">{section.label}</div>
             </button>
           ))}
         </nav>
@@ -67,23 +67,23 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Go Back Button */}
-      <div className="px-8 pt-8">
+      <div className="max-md:px-4 max-md:pt-4 md:px-8 md:pt-8">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate(-1)}
           aria-label="Go Back"
-          className="bg-transparent text-white border-none font-bold text-lg hover:bg-transparent hover:scale-105 transition-transform p-2"
+          className="bg-transparent text-white border-none font-bold max-md:text-base md:text-lg hover:bg-transparent hover:scale-105 transition-transform p-2"
         >
           ← Go Back
         </Button>
       </div>
-      <div className="flex px-8 pb-8">
+      <div className="max-md:flex-col md:flex max-md:px-4 max-md:pb-4 md:px-8 md:pb-8">
         <Sidebar
           activeSection={activeSection}
           onSectionChange={setActiveSection}
         />
-        <main className="flex-1 pl-8 min-h-[600px]">
+        <main className="flex-1 max-md:mt-4 md:pl-8 md:min-h-[600px]">
           <div className="h-full">
             {activeSection === "profile" && (
               <section className="h-full">

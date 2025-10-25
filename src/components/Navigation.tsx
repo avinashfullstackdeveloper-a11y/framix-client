@@ -114,14 +114,14 @@ const Navigation = () => {
                   aria-expanded={mobileOpen}
                   aria-controls="mobile-menu"
                   onClick={() => setMobileOpen(true)}
-                  className="focus-visible:ring-2 focus-visible:ring-[#E84288] focus-visible:ring-offset-2"
+                  className="h-10 w-10 hover:bg-[#E84288]/10 transition-all duration-300 rounded-lg focus-visible:ring-2 focus-visible:ring-[#E84288] focus-visible:ring-offset-2"
                 >
-                  <Menu className="h-12 w-12" />
+                  <Menu className="h-6 w-6 text-[#E84288] transition-transform duration-300 hover:scale-110" />
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="p-0 pt-8 bg-[#111111] text-white focus:outline-none"
+                className="p-0 pt-8 bg-[#111111] border-l border-neutral-800 text-white focus:outline-none w-[280px] sm:w-[320px]"
                 id="mobile-menu"
                 tabIndex={-1}
                 aria-modal="true"
@@ -131,29 +131,48 @@ const Navigation = () => {
                 <DialogTitle asChild>
                   <VisuallyHidden>Navigation Menu</VisuallyHidden>
                 </DialogTitle>
-                <nav className="flex flex-col gap-6 px-8 py-4 text-lg font-medium" autoFocus>
+                
+                {/* Logo Section */}
+                <div className="px-8 pb-4">
+                  <Link
+                    to="/"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center"
+                  >
+                    <img src="/fremix.png" alt="Framix Logo" className="h-9 w-auto" />
+                  </Link>
+                </div>
+                
+                <nav className="flex flex-col gap-2 px-6 py-6 text-base font-medium" autoFocus>
                   {navLinks.map(link => (
                     <NavLink
                       key={link.to}
                       to={link.to}
                       onClick={() => setMobileOpen(false)}
                       tabIndex={0}
-                      className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E84288] rounded"
+                      className="py-3 px-4 rounded-lg hover:bg-neutral-800/50 active:bg-neutral-800 transition-all duration-200 min-h-[44px] flex items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E84288]"
                     >
                       {link.label}
                     </NavLink>
                   ))}
                 </nav>
-                <div className="px-8 pb-4">
+                
+                {/* Visual separator */}
+                <div className="mx-6 my-4 border-t border-neutral-800" />
+                
+                {/* Account section with improved spacing */}
+                <div className="px-6 pb-6">
                   {isLoading ? (
                     <div className="h-10 w-10 rounded-full bg-neutral-800 animate-pulse" />
                   ) : user ? (
-                    <UserAccountMenu user={user} />
+                    <div className="py-2">
+                      <UserAccountMenu user={user} onNavigate={() => setMobileOpen(false)} />
+                    </div>
                   ) : (
                     <Link to="/signin" tabIndex={0}>
                       <Button
                         variant="default"
-                        className="w-full bg-[#E84288] text-black font-semibold hover:bg-[#E84288]/90 rounded-lg focus-visible:ring-2 focus-visible:ring-[#E84288] focus-visible:ring-offset-2"
+                        className="w-full bg-[#E84288] text-white font-semibold hover:bg-[#E84288]/90 hover:shadow-lg hover:shadow-[#E84288]/20 rounded-lg transition-all duration-300 min-h-[44px] focus-visible:ring-2 focus-visible:ring-[#E84288] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
                         onClick={() => setMobileOpen(false)}
                       >
                         Explore Now
