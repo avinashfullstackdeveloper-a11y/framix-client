@@ -11,7 +11,7 @@ import Components from "./pages/Components";
 // import Pricing from "./pages/Pricing";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
-import SettingsPage from "./pages/SettingsPage";
+import SettingsPage from "./pages/settings/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import AdminComponentUpload from "./pages/admin/AdminComponentUpload";
 import ComponentDetail from "./pages/ComponentDetail";
