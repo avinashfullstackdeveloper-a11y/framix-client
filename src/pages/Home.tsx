@@ -826,54 +826,55 @@ const LandingPage = () => {
                 </div>
               </motion.div>
               <motion.div
-                className="relative w-[400px] h-[350px] mx-auto flex items-center justify-center max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
+                className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
                 variants={itemVariants}
               >
-                {videoCardOrder.map((videoIndex, position) => {
-                  const isActive = position === 1; // Center position is active
-                  const isLeft = position === 0;
-                  const isRight = position === 2;
+                {/* Left tilted card */}
+                <div
+                  className="absolute w-[223px] h-[287px] rotate-[-13.37deg] z-[1] left-0 top-0 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px] cursor-pointer"
+                  onClick={() => handleVideoCardClick(videoCardOrder[0])}
+                >
+                  <div className="w-full h-full bg-[#BFBDBD] rounded-[16.715px] p-2 box-border">
+                    <video
+                      src={whatsNewVideos[videoCardOrder[0]]}
+                      autoPlay
+                      loop
+                      muted
+                      className="w-full h-full object-cover rounded-[12px]"
+                    />
+                  </div>
+                </div>
 
-                  return (
-                    <motion.div
-                      key={videoIndex}
-                      layoutId={`video-card-${videoIndex}`}
-                      onClick={() => handleVideoCardClick(videoIndex)}
-                      className={`absolute cursor-pointer transition-all duration-500 ${
-                        isActive
-                          ? "w-[223px] h-[287px] left-1/2 -translate-x-1/2 z-[3] shadow-[0_4px_20px_rgba(0,0,0,0.1)] max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
-                          : isLeft
-                          ? "w-[223px] h-[287px] rotate-[-13.37deg] z-[1] left-0 opacity-70 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
-                          : "w-[223px] h-[287px] rotate-[13.37deg] z-[2] right-0 opacity-70 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
-                      }`}
-                      initial={false}
-                      animate={{
-                        rotate: isActive ? 0 : isLeft ? -13.37 : 13.37,
-                        opacity: isActive ? 1 : 0.7,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                      layout
-                    >
-                      <div
-                        className={`h-full w-full ${
-                          isActive ? "bg-white" : "bg-[#BFBDBD]"
-                        } rounded-[16.715px] p-2 box-border`}
-                      >
-                        <video
-                          src={whatsNewVideos[videoIndex]}
-                          autoPlay
-                          loop
-                          muted
-                          className="w-full h-full object-cover rounded-[12px]"
-                        />
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                {/* Right tilted card */}
+                <div
+                  className="absolute w-[223px] h-[287px] rotate-[13.37deg] z-[2] right-0 top-0 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px] cursor-pointer"
+                  onClick={() => handleVideoCardClick(videoCardOrder[2])}
+                >
+                  <div className="w-full h-full bg-[#BFBDBD] rounded-[16.715px] p-2 box-border">
+                    <video
+                      src={whatsNewVideos[videoCardOrder[2]]}
+                      autoPlay
+                      loop
+                      muted
+                      className="w-full h-full object-cover rounded-[12px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Center active card */}
+                <div
+                  className="absolute w-[223px] h-[287px] -translate-x-2/4 z-[3] shadow-[0_4px_20px_rgba(0,0,0,0.1)] left-2/4 top-0 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
+                >
+                  <div className="w-full h-full bg-white rounded-[16.715px] p-2 box-border">
+                    <video
+                      src={whatsNewVideos[videoCardOrder[1]]}
+                      autoPlay
+                      loop
+                      muted
+                      className="w-full h-full object-cover rounded-[12px]"
+                    />
+                  </div>
+                </div>
               </motion.div>
             </div>
           </div>
