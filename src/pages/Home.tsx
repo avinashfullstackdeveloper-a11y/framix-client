@@ -131,7 +131,7 @@ const LandingPage = () => {
       opacity: 1,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        // Remove 'ease' for compatibility with framer-motion types
       },
     },
   };
@@ -226,63 +226,109 @@ const LandingPage = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={containerVariants}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <motion.div className="lg:pr-12" variants={itemVariants}>
-                <h2 className="text-4xl font-bold mb-6">
-                  Your trusted way to design, build, and scale.
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
+            {/* Responsive flex for heading and paragraph */}
+            <div className="flex flex-col lg:flex-row gap-8 items-stretch mb-12">
+              <motion.div
+                className="lg:w-1/2 flex items-start justify-start"
+                variants={itemVariants}
+              >
+                <h2 className="text-4xl font-bold mb-6 lg:mb-0 text-left w-full leading-tight">
+                  <span
+                    className="block"
+                    style={{
+                      background: "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    Your{" "}
+                    <span
+                      className="text-[#FF94C9]"
+                      style={{
+                        WebkitTextFillColor: "#FF94C9",
+                        background: "none",
+                        WebkitBackgroundClip: "initial",
+                      }}
+                    >
+                      trusted
+                    </span>{" "}
+                    way to
+                  </span>
+                  <span
+                    className="block"
+                    style={{
+                      background: "linear-gradient(90deg, #e5e7eb 0%, #a3a3a3 60%, #6b7280 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    design, build, and scale.
+                  </span>
                 </h2>
               </motion.div>
               <motion.div
-                className="relative h-64 overflow-hidden"
+                className="lg:w-1/2 flex items-end justify-start"
                 variants={itemVariants}
               >
-                {trustedWayCardData.map((card, index) => (
-                  <Card
-                    key={index}
-                    className={`absolute w-full h-full p-6 border-0 text-white transition-all duration-500 ease-in-out ${
-                      index === activeTrustedCard
-                        ? "z-10 scale-105 bg-gradient-to-br from-[#FF94C666]/90 to-purple-600/90"
-                        : "z-0 scale-100 bg-[#1c1c1c] opacity-50"
-                    }`}
-                    style={{
-                      transform: `translateX(${
-                        (index - activeTrustedCard) * 10
-                      }%) ${index !== activeTrustedCard ? "scale(0.95)" : ""}`,
-                      zIndex:
-                        trustedWayCardData.length -
-                        Math.abs(index - activeTrustedCard),
-                    }}
-                  >
-                    <CardContent className="p-0">
-                      <div className="text-lg font-bold">0{index + 1}.</div>
-                      <h3 className="text-xl font-semibold my-2">
-                        {card.title}
-                      </h3>
-                      {index === activeTrustedCard && (
-                        <AnimatePresence>
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                          >
-                            <p className="text-sm text-gray-200">
-                              {card.description}
-                            </p>
-                            <a
-                              href="#"
-                              className="text-sm font-semibold mt-4 inline-block"
-                            >
-                              Learn more →
-                            </a>
-                          </motion.div>
-                        </AnimatePresence>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
+                <p className="max-w-xl text-left w-full text-gray-400">
+                  Framix unites and empowers a growing ecosystem of designers
+                  and developers. With production-ready UI components, design
+                  systems, and templates, Framix enables teams to create
+                  exceptional digital products faster and smarter.
+                </p>
               </motion.div>
             </div>
+            {/* Cards row below heading/paragraph */}
+            <motion.div
+              className="relative h-64 overflow-visible w-full"
+              variants={itemVariants}
+            >
+              {trustedWayCardData.map((card, index) => (
+                <Card
+                  key={index}
+                  className={`absolute w-full h-full p-6 border-0 text-white transition-all duration-500 ease-in-out ${
+                    index === activeTrustedCard
+                      ? "z-10 scale-105 bg-gradient-to-br from-[#FF94C666]/90 to-purple-600/90"
+                      : "z-0 scale-100 bg-[#1c1c1c] opacity-50"
+                  }`}
+                  style={{
+                    transform: `translateX(${
+                      (index - activeTrustedCard) * 10
+                    }%) ${index !== activeTrustedCard ? "scale(0.95)" : ""}`,
+                    zIndex:
+                      trustedWayCardData.length -
+                      Math.abs(index - activeTrustedCard),
+                  }}
+                >
+                  <CardContent className="p-0">
+                    <div className="text-lg font-bold">0{index + 1}.</div>
+                    <h3 className="text-xl font-semibold my-2">{card.title}</h3>
+                    {index === activeTrustedCard && (
+                      <AnimatePresence>
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                        >
+                          <p className="text-sm text-gray-200">
+                            {card.description}
+                          </p>
+                          <a
+                            href="#"
+                            className="text-sm font-semibold mt-4 inline-block"
+                          >
+                            Learn more →
+                          </a>
+                        </motion.div>
+                      </AnimatePresence>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </motion.div>
           </div>
         </motion.section>
 
@@ -297,14 +343,45 @@ const LandingPage = () => {
           <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div variants={itemVariants}>
-                <h2 className="text-4xl font-bold mb-6">
-                  Trusted platform anytime & anywhere.
+                <h2 className="text-4xl font-bold mb-6 leading-tight">
+                  <span
+                    className="block"
+                    style={{
+                      background: "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    Trusted{" "}
+                    <span
+                      className="text-[#FF94C9]"
+                      style={{
+                        WebkitTextFillColor: "#FF94C9",
+                        background: "none",
+                        WebkitBackgroundClip: "initial",
+                      }}
+                    >
+                      platform
+                    </span>
+                  </span>
+                  <span
+                    className="block"
+                    style={{
+                      background: "linear-gradient(90deg, #e5e7eb 0%, #a3a3a3 60%, #6b7280 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    anytime & anywhere.
+                  </span>
                 </h2>
-                <div className="flex items-center gap-1 mb-4 text-[#FF94C666]">
+                <div className="flex items-center gap-1.5 mb-4 text-white">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-5 h-5 fill-current"
+                      className="w-10 h-10 fill-current"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                     >
@@ -319,7 +396,7 @@ const LandingPage = () => {
                   Framix ensures your workflow stays fast, reliable, and
                   accessible from anywhere.
                 </p>
-                <Button className="bg-white text-black font-semibold px-6 py-3 rounded-md hover:bg-gray-200">
+                <Button className="bg-white text-black font-semibold px-10 py-3 rounded-full hover:bg-gray-200 shadow-lg" style={{ borderRadius: "999px", minWidth: "200px" }}>
                   Start Designing
                 </Button>
               </motion.div>
@@ -600,15 +677,6 @@ const LandingPage = () => {
   );
 };
 
-
 /* Neon effect for hero section */
-<style jsx>{`
-  .neon-hero-text {
-    text-shadow: 0 0 8px #ff9ac9cc, 0 0 16px #ff9ac9aa, 0 0 32px #ff9ac966;
-  }
-  .neon-hero-glow {
-    text-shadow: 0 0 12px #ff9ac9, 0 0 24px #ff9ac9bb, 0 0 40px #ff9ac988;
-  }
-`}</style>;
 
 export default LandingPage;
