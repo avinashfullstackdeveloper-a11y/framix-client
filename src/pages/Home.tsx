@@ -351,28 +351,28 @@ const LandingPage = () => {
                     <Card
                       className={`h-full p-8 flex flex-col justify-between ${
                         isPrimary
-                          ? "bg-white border-2 border-black text-black rounded-[20px_20px_0_0]"
-                          : "bg-[#FFF2F8] text-black border-0"
+                          ? "bg-[#FF94C9] border-2 border-[#FF94C9] text-black rounded-[20px_20px_0_0]"
+                          : "bg-[#A67388] text-black border-0 opacity-70"
                       } ${
                         isLeft
-                          ? "rounded-[20px_0_0_20px] border-l border-b border-[#FF94C6]"
+                          ? "rounded-[20px_0_0_20px] border-l border-b border-[#8B5F70]"
                           : isRight
-                          ? "rounded-[0_20px_20px_0] border-r border-b border-[#FF94C6]"
+                          ? "rounded-[0_20px_20px_0] border-r border-b border-[#8B5F70]"
                           : ""
-                      } max-md:rounded-[20px] max-md:border max-md:border-[#FF94C6]`}
+                      } max-md:rounded-[20px] max-md:border max-md:border-[#8B5F70]`}
                     >
                       <CardContent className="p-0 flex flex-col justify-between h-full">
                         <div>
                           <div
                             className={`text-sm font-bold mb-2 ${
-                              isPrimary ? "text-[#FF94C6]" : "text-black"
+                              isPrimary ? "text-black" : "text-black/80"
                             }`}
                           >
                             0{cardIndex + 1}.
                           </div>
                           <h3
                             className={`text-2xl font-bold mb-4 ${
-                              isPrimary ? "text-black" : "text-[#333]"
+                              isPrimary ? "text-black" : "text-black/70"
                             }`}
                           >
                             {card.title}
@@ -386,7 +386,7 @@ const LandingPage = () => {
                                 exit={{ opacity: 0, height: 0 }}
                                 transition={{ duration: 0.3 }}
                               >
-                                <p className="text-[#666] text-base mb-6">
+                                <p className="text-black/80 text-base mb-6">
                                   {card.description}
                                 </p>
                               </motion.div>
@@ -402,12 +402,14 @@ const LandingPage = () => {
                               exit={{ opacity: 0 }}
                               transition={{ delay: 0.2 }}
                             >
-                              <LearnMoreButton
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  console.log(`Learn more: ${card.title}`);
-                                }}
-                              />
+                              <div className="bg-[#FF94C9] rounded-md inline-block px-1">
+                                <LearnMoreButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log(`Learn more: ${card.title}`);
+                                  }}
+                                />
+                              </div>
                             </motion.div>
                           </AnimatePresence>
                         )}
