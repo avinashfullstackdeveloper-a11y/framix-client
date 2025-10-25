@@ -826,7 +826,7 @@ const LandingPage = () => {
                 </div>
               </motion.div>
               <motion.div
-                className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
+                className="relative w-[400px] h-[350px] mx-auto flex items-center justify-center max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
                 variants={itemVariants}
               >
                 {videoCardOrder.map((videoIndex, position) => {
@@ -841,10 +841,10 @@ const LandingPage = () => {
                       onClick={() => handleVideoCardClick(videoIndex)}
                       className={`absolute cursor-pointer transition-all duration-500 ${
                         isActive
-                          ? "w-[223px] h-[287px] left-1/2 -translate-x-1/2 top-[31px] z-[3] shadow-[0_4px_20px_rgba(0,0,0,0.1)] max-md:w-[200px] max-md:h-[260px] max-md:top-[20px] max-sm:w-40 max-sm:h-[200px] max-sm:top-[30px]"
+                          ? "w-[223px] h-[287px] left-1/2 -translate-x-1/2 z-[3] shadow-[0_4px_20px_rgba(0,0,0,0.1)] max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
                           : isLeft
-                          ? "w-[223px] h-[287px] rotate-[-13.37deg] z-[1] left-0 top-[31px] opacity-70 max-md:w-[200px] max-md:h-[260px] max-md:top-[20px] max-sm:w-40 max-sm:h-[200px] max-sm:top-[30px]"
-                          : "w-[223px] h-[287px] rotate-[13.37deg] z-[2] right-0 top-[31px] opacity-70 max-md:w-[200px] max-md:h-[260px] max-md:top-[20px] max-sm:w-40 max-sm:h-[200px] max-sm:top-[30px]"
+                          ? "w-[223px] h-[287px] rotate-[-13.37deg] z-[1] left-0 opacity-70 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
+                          : "w-[223px] h-[287px] rotate-[13.37deg] z-[2] right-0 opacity-70 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
                       }`}
                       initial={false}
                       animate={{
@@ -874,11 +874,6 @@ const LandingPage = () => {
                     </motion.div>
                   );
                 })}
-
-                {/* FRAMIX badge */}
-                <div className="absolute -translate-x-1/2 text-white font-semibold text-sm z-[4] bg-[#FF94C9] px-4 py-2 rounded-[20px] left-1/2 -bottom-5 max-sm:text-xs max-sm:px-3 max-sm:py-1.5">
-                  <div>FRAMIX</div>
-                </div>
               </motion.div>
             </div>
           </div>
