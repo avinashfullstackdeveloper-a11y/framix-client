@@ -324,7 +324,7 @@ const LandingPage = () => {
             </div>
             {/* Pyramid Cards Layout */}
             <motion.div
-              className="flex justify-center items-end mx-auto gap-0 max-w-[1062px] shadow-[0_0_16px_0_rgba(255,148,198,0.40)] max-md:flex-col max-md:gap-5 max-md:shadow-none"
+              className="flex justify-center items-end mx-auto gap-0 max-w-[1062px] max-md:flex-col max-md:gap-5"
               variants={itemVariants}
             >
               {cardOrder.map((cardIndex, position) => {
