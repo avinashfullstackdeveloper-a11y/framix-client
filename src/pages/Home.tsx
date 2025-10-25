@@ -164,19 +164,21 @@ const LandingPage = () => {
           initial="hidden"
           animate="visible"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
               className="text-center lg:text-left z-10"
               variants={itemVariants}
             >
-              <h1 className="text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                Accelerate products with{" "}
-                <span className="text-[#FF94C666]">ready-made components</span>
+              <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight flex flex-col">
+                <span>Accelerate products with</span>
+                <span>
+                  ready-made{" "}
+                  <span className="text-[#FF94C666]">components</span>
+                </span>
               </h1>
               <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-                Build modern interfaces faster without starting from scratch.
-                Ready-to-ship components and templates to help you build
-                beautiful products faster.
+                Instantly copy responsive HTML, CSS, and React code. Build
+                modern interface faster, without starting from scratch.
               </p>
               <div className="flex gap-4 justify-center lg:justify-start">
                 <Button className="bg-white text-black font-semibold px-6 py-3 rounded-md hover:bg-gray-200">
@@ -193,7 +195,7 @@ const LandingPage = () => {
               </div>
             </motion.div>
             <motion.div
-              className="relative flex justify-center items-center h-full min-h-[300px]"
+              className="relative flex justify-end items-center h-full min-h-[300px] lg:pl-16"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
@@ -203,11 +205,11 @@ const LandingPage = () => {
                 stiffness: 100,
               }}
             >
-              <div className="absolute w-80 h-80 bg-[#FF94C666]/20 rounded-full blur-3xl"></div>
+              <div className="absolute right-0 w-80 h-80 bg-[#FF94C666]/20 rounded-full blur-3xl"></div>
               <img
                 src="/phone.png"
                 alt="App Preview"
-                className="w-[300px] md:w-[400px] relative z-10"
+                className="w-[260px] md:w-[370px] lg:w-[420px] relative z-10 lg:mr-[-40px]"
               />
             </motion.div>
           </div>
@@ -228,7 +230,10 @@ const LandingPage = () => {
                   Your trusted way to design, build, and scale.
                 </h2>
               </motion.div>
-              <motion.div className="relative h-64 overflow-hidden" variants={itemVariants}>
+              <motion.div
+                className="relative h-64 overflow-hidden"
+                variants={itemVariants}
+              >
                 {trustedWayCardData.map((card, index) => (
                   <Card
                     key={index}
@@ -286,7 +291,7 @@ const LandingPage = () => {
           viewport={{ once: true, amount: 0.3 }}
           variants={containerVariants}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div variants={itemVariants}>
                 <h2 className="text-4xl font-bold mb-6">
@@ -352,7 +357,7 @@ const LandingPage = () => {
           viewport={{ once: true, amount: 0.2 }}
           variants={containerVariants}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20 text-center">
             <motion.h2
               variants={itemVariants}
               className="text-4xl font-bold mb-4"
@@ -427,7 +432,7 @@ const LandingPage = () => {
           viewport={{ once: true, amount: 0.2 }}
           variants={containerVariants}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div variants={itemVariants}>
                 <h2 className="text-4xl font-bold mb-6">
@@ -517,7 +522,7 @@ const LandingPage = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={containerVariants}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20 text-center">
             <motion.h2
               variants={itemVariants}
               className="text-4xl font-bold mb-4"
@@ -537,24 +542,24 @@ const LandingPage = () => {
               <div className="relative overflow-hidden w-full">
                 <div className="absolute inset-0 overflow-hidden">
                   <motion.div
-                  className="flex"
-                  animate={{ x: ["0%", "-100%"] }}
-                  transition={{
-                    ease: "linear",
-                    duration: 40,
-                    repeat: Infinity,
-                  }}
-                >
-                  {[...testimonialsData, ...testimonialsData].map(
-                    (testimonial, index) => (
-                      <div
-                        key={index}
-                        className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-3"
-                      >
-                        <TestimonialCard testimonial={testimonial} />
-                      </div>
-                    )
-                  )}
+                    className="flex"
+                    animate={{ x: ["0%", "-100%"] }}
+                    transition={{
+                      ease: "linear",
+                      duration: 40,
+                      repeat: Infinity,
+                    }}
+                  >
+                    {[...testimonialsData, ...testimonialsData].map(
+                      (testimonial, index) => (
+                        <div
+                          key={index}
+                          className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-3"
+                        >
+                          <TestimonialCard testimonial={testimonial} />
+                        </div>
+                      )
+                    )}
                   </motion.div>
                 </div>
               </div>
@@ -563,24 +568,24 @@ const LandingPage = () => {
               <div className="relative overflow-hidden w-full">
                 <div className="absolute inset-0 overflow-hidden">
                   <motion.div
-                  className="flex"
-                  animate={{ x: ["-100%", "0%"] }}
-                  transition={{
-                    ease: "linear",
-                    duration: 40,
-                    repeat: Infinity,
-                  }}
-                >
-                  {[...testimonialsData, ...testimonialsData].map(
-                    (testimonial, index) => (
-                      <div
-                        key={index}
-                        className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-3"
-                      >
-                        <TestimonialCard testimonial={testimonial} />
-                      </div>
-                    )
-                  )}
+                    className="flex"
+                    animate={{ x: ["-100%", "0%"] }}
+                    transition={{
+                      ease: "linear",
+                      duration: 40,
+                      repeat: Infinity,
+                    }}
+                  >
+                    {[...testimonialsData, ...testimonialsData].map(
+                      (testimonial, index) => (
+                        <div
+                          key={index}
+                          className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-3"
+                        >
+                          <TestimonialCard testimonial={testimonial} />
+                        </div>
+                      )
+                    )}
                   </motion.div>
                 </div>
               </div>
