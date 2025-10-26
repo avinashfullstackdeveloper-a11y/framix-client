@@ -25,7 +25,7 @@ const Footer = () => {
           {/* Top section with navigation links */}
           <div className="flex flex-row justify-between sm:grid sm:grid-cols-3 gap-8 mb-24">
             {/* Company Links */}
-            <div className="flex flex-col">
+            <div className="flex flex-col sm:ml-32">
               <h3 className="text-base font-semibold text-white mb-5">
                 Company
               </h3>
@@ -98,7 +98,7 @@ const Footer = () => {
             </div>
 
             {/* Products Links */}
-            <div>
+            <div className="sm:ml-32">
               <h3 className="text-base font-semibold text-white mb-5">
                 Products
               </h3>
@@ -139,7 +139,7 @@ const Footer = () => {
             </div>
 
             {/* Resources Links - hidden on mobile, visible on desktop */}
-            <div className="hidden sm:block">
+            <div className="hidden sm:block sm:ml-32">
               <h3 className="text-base font-semibold text-white mb-5">
                 Resources
               </h3>
@@ -181,9 +181,13 @@ const Footer = () => {
           </div>
 
           {/* Bottom section with the main logo */}
-          <div className="flex items-center space-x-6">
-            <FramixIcon />
-            <span className="text-8xl font-bold tracking-tighter">Framix</span>
+          <div className="w-full flex flex-row items-center justify-center">
+            <div className="w-full flex flex-row items-center justify-center">
+              <FramixIcon />
+              <span className="text-[10vw] font-bold tracking-tighter ml-8">
+                Framix
+              </span>
+            </div>
           </div>
         </div>
       </div>
