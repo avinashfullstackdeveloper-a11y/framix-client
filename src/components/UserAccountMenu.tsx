@@ -48,9 +48,9 @@ export function UserAccountMenu({ user, onNavigate }: UserAccountMenuProps) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-10 w-10 rounded-full bg-gradient-to-r from-[#E84288] to-[#9B4DCA] hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200 border border-[#E84288]/20"
+          className="relative h-10 w-10 rounded-full bg-white text-black hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200 border border-neutral-300"
         >
-          <span className="text-white font-semibold">{initials}</span>
+          <span className="text-black font-semibold">{initials}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-neutral-800" align="start">
