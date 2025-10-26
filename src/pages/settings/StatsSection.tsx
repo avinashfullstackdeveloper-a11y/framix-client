@@ -43,10 +43,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ className = '' }) => {
         setError(null);
         const data = await getUserStats();
         
-        // DEBUG: Log the received data
-        console.log('[DEBUG StatsSection] Received stats data:', data);
-        console.log('[DEBUG StatsSection] totalViews value:', data.totalViews, 'Type:', typeof data.totalViews);
-        
         // Format numbers with commas for thousands
         const formatNumber = (num: number): string => {
           return num.toLocaleString('en-US');
