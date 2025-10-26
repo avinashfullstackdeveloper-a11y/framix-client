@@ -13,6 +13,7 @@ const CommunityList = () => {
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   // OPTIMIZATION: Lazy load fallback data only when needed (API fails)
   const [fallbackData, setFallbackData] = useState<{ featured: any[], all: any[] } | null>(null);
 
@@ -105,6 +106,26 @@ const CommunityList = () => {
       return true;
     });
   }, [components, fallbackData, selectedCategory, searchQuery]);
+
+  // Reset to page 1 when filters or search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
+
+  // Pagination calculations
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedComponents = filteredComponents.slice(startIndex, endIndex);
+
+  // Scroll to All Components section when page changes
+  const allComponentsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (currentPage > 1 && allComponentsRef.current) {
+      allComponentsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
 
   // OPTIMIZATION: Memoize featured components slice
   const featuredComponentsList = useMemo(() => {
@@ -862,7 +883,7 @@ const CommunityList = () => {
           </div>
         </div>
       </div>
-      <div className="mb-16">
+      <div className="mb-16" ref={allComponentsRef}>
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">All Components</h2>
           <p className="text-muted-foreground">
@@ -871,7 +892,7 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredComponents.map((component, index) => {
+          {paginatedComponents.map((component, index) => {
               return (
                 <Link
                   to={`/components/${component.type || "component"}/${
@@ -952,6 +973,39 @@ const CommunityList = () => {
               );
             })}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-8">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                currentPage === 1
+                  ? 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
+                  : 'bg-gradient-primary text-primary-foreground hover:opacity-90'
+              }`}
+            >
+              Previous
+            </button>
+            
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                currentPage === totalPages
+                  ? 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
+                  : 'bg-gradient-primary text-primary-foreground hover:opacity-90'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* CTA Section */}
