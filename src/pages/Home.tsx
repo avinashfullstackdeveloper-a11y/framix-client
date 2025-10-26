@@ -25,19 +25,122 @@ const trustedWayCardData = [
 
 const portfolioCardData = [
   {
-    icon: "#",
+    icon: (
+      <div className="relative w-[86px] h-[86px]">
+        <svg
+          width="86"
+          height="86"
+          viewBox="0 0 86 86"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="43"
+            cy="43"
+            r="41"
+            stroke="#141414"
+            strokeWidth="4"
+          />
+        </svg>
+        <svg
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          width="38"
+          height="38"
+          viewBox="0 0 38 38"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11.622 22.5556L12.357 15.4444H5V11.8889H12.7262L13.645 3H17.1643L16.2455 11.8889H23.2262L24.145 3H27.6642L26.7455 11.8889H33V15.4444H26.378L25.643 22.5556H33V26.1111H25.2738L24.355 35H20.8357L21.7545 26.1111H14.7738L13.855 35H10.3357L11.2545 26.1111H5V22.5556H11.622ZM15.1413 22.5556H22.1237L22.8587 15.4444H15.8763L15.1413 22.5556Z"
+            fill="#141414"
+          />
+        </svg>
+      </div>
+    ),
     title: "Ready-made components",
     description:
       "With industry-standard practices and seamless scalability, Framix helps teams deliver high-performing projects confidently.",
   },
   {
-    icon: "🎛️",
+    icon: (
+      <div className="relative w-[86px] h-[86px]">
+        <svg
+          width="86"
+          height="86"
+          viewBox="0 0 86 86"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="43"
+            cy="43"
+            r="41"
+            stroke="#141414"
+            strokeWidth="4"
+          />
+        </svg>
+        <svg
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          width="38"
+          height="38"
+          viewBox="0 0 38 38"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6.33333 17.4167H15.8333C16.2533 17.4167 16.656 17.2499 16.9529 16.9529C17.2499 16.656 17.4167 16.2533 17.4167 15.8333V6.33333C17.4167 5.91341 17.2499 5.51068 16.9529 5.21375C16.656 4.91681 16.2533 4.75 15.8333 4.75H6.33333C5.91341 4.75 5.51068 4.91681 5.21375 5.21375C4.91681 5.51068 4.75 5.91341 4.75 6.33333V15.8333C4.75 16.2533 4.91681 16.656 5.21375 16.9529C5.51068 17.2499 5.91341 17.4167 6.33333 17.4167ZM7.91667 7.91667H14.25V14.25H7.91667V7.91667ZM31.6667 4.75H22.1667C21.7467 4.75 21.344 4.91681 21.0471 5.21375C20.7501 5.51068 20.5833 5.91341 20.5833 6.33333V15.8333C20.5833 16.2533 20.7501 16.656 21.0471 16.9529C21.344 17.2499 21.7467 17.4167 22.1667 17.4167H31.6667C32.0866 17.4167 32.4893 17.2499 32.7863 16.9529C33.0832 16.656 33.25 16.2533 33.25 15.8333V6.33333C33.25 5.91341 33.0832 5.51068 32.7863 5.21375C32.4893 4.91681 32.0866 4.75 31.6667 4.75ZM30.0833 14.25H23.75V7.91667H30.0833V14.25ZM15.8333 33.25C16.2533 33.25 16.656 33.0832 16.9529 32.7863C17.2499 32.4893 17.4167 32.0866 17.4167 31.6667V22.1667C17.4167 21.7467 17.2499 21.344 16.9529 21.0471C16.656 20.7501 16.2533 20.5833 15.8333 20.5833H6.33333C5.91341 20.5833 5.51068 20.7501 5.21375 21.0471C4.91681 21.344 4.75 21.7467 4.75 22.1667V31.6667C4.75 32.0866 4.91681 32.4893 5.21375 32.7863C5.51068 33.0832 5.91341 33.25 6.33333 33.25H15.8333ZM7.91667 23.75H14.25V30.0833H7.91667V23.75ZM28.5 22.1667H25.3333V25.3333H22.1667V28.5H25.3333V31.6667H28.5V28.5H31.6667V25.3333H28.5V22.1667Z"
+            fill="#141414"
+          />
+        </svg>
+      </div>
+    ),
     title: "Customize with ease",
     description:
       "Tailor every detail to your brand with pixel-perfect control and modern design standards.",
   },
   {
-    icon: "🚀",
+    icon: (
+      <div className="relative w-[86px] h-[86px]">
+        <svg
+          width="86"
+          height="86"
+          viewBox="0 0 86 86"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="43"
+            cy="43"
+            r="41"
+            stroke="#141414"
+            strokeWidth="4"
+          />
+        </svg>
+        <svg
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          width="38"
+          height="38"
+          viewBox="0 0 38 38"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.12467 26.125C4.74967 28.12 3.95801 34.0417 3.95801 34.0417C3.95801 34.0417 9.87967 33.25 11.8747 30.875C12.9988 29.545 12.983 27.5025 11.7322 26.2675C11.1167 25.6801 10.3061 25.3407 9.4557 25.3144C8.60534 25.2881 7.77523 25.5767 7.12467 26.125ZM18.9997 23.75L14.2497 19C15.0922 16.8141 16.1532 14.7188 17.4163 12.7458C19.2612 9.79605 21.8301 7.36731 24.8786 5.69063C27.9271 4.01395 31.3539 3.14507 34.833 3.16665C34.833 7.47332 33.598 15.0417 25.333 20.5833C23.3328 21.8475 21.2111 22.9083 18.9997 23.75Z"
+            stroke="#141414"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M14.2497 19H6.33301C6.33301 19 7.20384 14.2025 9.49967 12.6667C12.0647 10.9567 17.4163 12.6667 17.4163 12.6667M18.9997 23.75V31.6667C18.9997 31.6667 23.7972 30.7958 25.333 28.5C27.043 25.935 25.333 20.5833 25.333 20.5833"
+            stroke="#141414"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+    ),
     title: "Launch faster",
     description:
       "Deploy beautiful, functional designs in record time without reinventing the wheel.",
@@ -122,7 +225,7 @@ const LearnMoreButton = ({ onClick, className = "" }) => {
 
 const LandingPage = () => {
   const [cardOrder, setCardOrder] = useState([0, 1, 2]); // Track the order of cards [left, center, right]
-  const [activePortfolioCard, setActivePortfolioCard] = useState(0);
+  const [activePortfolioCard, setActivePortfolioCard] = useState(-1);
   const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(1);
   const [videoCardOrder, setVideoCardOrder] = useState([0, 1, 2]); // Track video card order [left, center, right]
 
@@ -159,15 +262,6 @@ const LandingPage = () => {
     }
   };
 
-  useEffect(() => {
-    const portfolioInterval = setInterval(() => {
-      setActivePortfolioCard((prev) => (prev + 1) % portfolioCardData.length);
-    }, 3000);
-
-    return () => {
-      clearInterval(portfolioInterval);
-    };
-  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -673,7 +767,7 @@ const LandingPage = () => {
               high-quality projects – all powered by flexible UI components.
             </motion.p>
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 justify-items-center"
               variants={containerVariants}
             >
               {portfolioCardData.map((card, index) => (
@@ -681,37 +775,41 @@ const LandingPage = () => {
                   key={index}
                   variants={itemVariants}
                   onMouseEnter={() => setActivePortfolioCard(index)}
+                  onMouseLeave={() => setActivePortfolioCard(-1)}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex w-full max-w-[350px]"
                 >
                   <Card
-                    className={`bg-[#1c1c1c] border-gray-800 p-8 text-center flex flex-col justify-start items-center h-full transition-all duration-300 ease-in-out ${
-                      activePortfolioCard === index ? "bg-[#FF94C666]/90" : ""
+                    className={`border-0 flex flex-col items-center justify-center p-6 sm:p-8 lg:p-12 rounded-[20px] w-full h-[450px] transition-all duration-300 ease-in-out ${
+                      activePortfolioCard === index
+                        ? "bg-gradient-to-br from-[#FF94C9] via-[#FF94C9] to-[#FF94C9]"
+                        : "bg-gradient-to-bl from-white via-gray-700 to-black"
                     }`}
                   >
-                    <CardContent className="p-0">
-                      <div
-                        className={`w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6 transition-all duration-300 ${
-                          activePortfolioCard === index ? "bg-white/20" : ""
-                        }`}
-                      >
-                        <span className="text-4xl text-[#FF94C666]">
-                          {card.icon}
-                        </span>
+                    <CardContent className="p-0 flex flex-col items-center justify-center h-full">
+                      <div className={`flex items-center justify-center w-[106px] h-[106px] rounded-full p-[10px] mb-4 transition-all duration-300 ${
+                        activePortfolioCard === index ? "bg-white" : "bg-[#FF94C9]"
+                      }`}>
+                        {card.icon}
                       </div>
-                      <h3 className="text-2xl font-semibold mb-3">
+                      <h2 className="text-white text-center font-bold text-xl leading-6 tracking-[-0.8px] mb-4">
                         {card.title}
-                      </h3>
+                      </h2>
+                      <p className={`text-center font-light text-base leading-5 tracking-[-0.16px] max-w-[265px] mb-6 transition-colors duration-300 ${
+                        activePortfolioCard === index ? "text-black" : "text-gray-400"
+                      }`}>
+                        {card.description}
+                      </p>
                       <AnimatePresence>
                         {activePortfolioCard === index && (
                           <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.2 }}
                           >
-                            <p className="text-gray-200 mt-4">
-                              {card.description}
-                            </p>
-                            <Button className="bg-black text-white mt-6">
+                            <Button className="bg-black text-white hover:bg-gray-900 px-8 py-2 rounded-full font-semibold">
                               Learn More
                             </Button>
                           </motion.div>
