@@ -27,3 +27,34 @@ export async function apiRequest<T>(
   }
   return res.json();
 }
+
+interface UserStats {
+  totalPosts: number;
+  totalFavorites: number;
+  totalViews: number;
+}
+
+interface UserStatsResponse {
+  success: boolean;
+  stats: UserStats;
+}
+
+export async function getUserStats(): Promise<UserStats> {
+  const response = await apiRequest<UserStatsResponse>("/api/user/stats");
+  return response.stats;
+}
+
+interface ChartDataPoint {
+  date: string;
+  count: number;
+}
+
+interface UserStatsChartResponse {
+  success: boolean;
+  data: ChartDataPoint[];
+}
+
+export async function getUserStatsChart(): Promise<ChartDataPoint[]> {
+  const response = await apiRequest<UserStatsChartResponse>("/api/user/stats/chart");
+  return response.data;
+}
