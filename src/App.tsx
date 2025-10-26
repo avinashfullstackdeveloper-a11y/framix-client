@@ -24,7 +24,7 @@ import ReportBug from "./pages/ReportBug";
 import { CommunityUserProfile } from "./components/CommunityUserProfile";
 import ComponentEditor from "./pages/ComponentEditor";
 import AdminRoutes from "./pages/admin/AdminRoutes";
-import NotificationsPage from "./pages/NotificationsPage";
+// import NotificationsPage from "./pages/NotificationsPage";
 
 import FeedbackForm from "./pages/Feedback";
 
@@ -53,7 +53,7 @@ const App: React.FC = () => {
             <Route path="/community" element={<Community />} />
             {/* Community user profile route */}
             <Route path="/community/:username" element={<CommunityUserProfile />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
+            {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
             {/* <Route path="/blogs" element={<Blogs />} /> */}
             {/* <Route path="/pricing" element={<Pricing />} /> */}
             <Route path="/signin" element={<SignIn />} />

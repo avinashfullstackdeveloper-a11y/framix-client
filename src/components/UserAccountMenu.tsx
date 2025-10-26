@@ -81,7 +81,7 @@ export function UserAccountMenu({ user, onNavigate }: UserAccountMenuProps) {
           <Heart className="mr-2 h-4 w-4" />
           <span>Favourite</span>
         </DropdownMenuItem>
-        <DropdownMenuItem
+        {/* <DropdownMenuItem
           onClick={() => {
             onNavigate?.();
             navigate("/notifications");
@@ -90,7 +90,7 @@ export function UserAccountMenu({ user, onNavigate }: UserAccountMenuProps) {
         >
           <Bell className="mr-2 h-4 w-4" />
           <span>Notifications</span>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         <DropdownMenuItem
           onClick={() => {
             onNavigate?.();
