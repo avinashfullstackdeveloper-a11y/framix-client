@@ -280,7 +280,7 @@ const LandingPage = () => {
       <main>
         {/* Hero Section */}
         <motion.section
-          className="relative pt-20 pb-20 lg:pt-24 lg:pb-32 overflow-hidden"
+          className="relative pt-20 pb-12 lg:pt-24 lg:pb-16 overflow-hidden"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -340,7 +340,7 @@ const LandingPage = () => {
 
         {/* Your trusted way Section */}
         <motion.section
-          className="py-24 max-md:py-16 max-sm:py-12"
+          className="py-12 max-md:py-8 max-sm:py-6"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
