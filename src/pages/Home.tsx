@@ -233,7 +233,6 @@ const LandingPage = () => {
     }
   };
 
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -773,7 +772,7 @@ const LandingPage = () => {
                     whileHover={{ scale: 1.05 }}
                     transition={{
                       duration: 0.4,
-                      ease: [0.4, 0, 0.2, 1]
+                      ease: [0.4, 0, 0.2, 1],
                     }}
                     className="flex w-full max-w-[350px]"
                   >
@@ -785,19 +784,28 @@ const LandingPage = () => {
                       }`}
                     >
                       <CardContent className="p-0 flex flex-col items-center justify-center flex-grow transition-all duration-500">
-                        <div className={`flex items-center justify-center w-[106px] h-[106px] rounded-full p-[10px] mb-4 transition-all duration-500 ${
-                          isHovered ? "bg-[#141414]" : "bg-[#FF94C9]"
-                        }`}>
-                          <PortfolioIcon type={card.iconType} isHovered={isHovered} />
+                        <div
+                          className={`flex items-center justify-center w-[106px] h-[106px] rounded-full p-[10px] mb-4 transition-all duration-500 ${
+                            isHovered ? "bg-[#141414]" : "bg-[#FF94C9]"
+                          }`}
+                        >
+                          <PortfolioIcon
+                            type={card.iconType}
+                            isHovered={isHovered}
+                          />
                         </div>
-                        <h2 className={`text-center font-bold text-xl leading-6 tracking-[-0.8px] mb-4 transition-colors duration-500 ${
-                          isHovered ? "text-black" : "text-white"
-                        }`}>
+                        <h2
+                          className={`text-center font-bold text-xl leading-6 tracking-[-0.8px] mb-4 transition-colors duration-500 ${
+                            isHovered ? "text-black" : "text-white"
+                          }`}
+                        >
                           {card.title}
                         </h2>
-                        <p className={`text-center font-light text-base leading-5 tracking-[-0.16px] max-w-[265px] transition-colors duration-500 ${
-                          isHovered ? "text-black" : "text-gray-400"
-                        }`}>
+                        <p
+                          className={`text-center font-light text-base leading-5 tracking-[-0.16px] max-w-[265px] transition-colors duration-500 ${
+                            isHovered ? "text-black" : "text-gray-400"
+                          }`}
+                        >
                           {card.description}
                         </p>
                       </CardContent>
@@ -941,10 +949,10 @@ const LandingPage = () => {
                         className="absolute cursor-pointer"
                         initial={false}
                         animate={{
-                          left: isLeft ? '0px' : isCenter ? '50%' : 'auto',
-                          right: isRight ? '0px' : 'auto',
+                          left: isLeft ? "0px" : isCenter ? "50%" : "auto",
+                          right: isRight ? "0px" : "auto",
                           rotate: isLeft ? -13.37 : isCenter ? 0 : 13.37,
-                          x: isCenter ? '-50%' : '0%',
+                          x: isCenter ? "-50%" : "0%",
                           zIndex: isLeft ? 1 : isCenter ? 3 : 2,
                           scale: isCenter ? 1 : 0.95,
                         }}
@@ -956,13 +964,29 @@ const LandingPage = () => {
                         }}
                         onClick={() => handleVideoCardClick(videoIndex)}
                         style={{
-                          width: window.innerWidth < 640 ? '160px' : window.innerWidth < 768 ? '200px' : '223px',
-                          height: window.innerWidth < 640 ? '200px' : window.innerWidth < 768 ? '260px' : '287px',
+                          width:
+                            window.innerWidth < 640
+                              ? "160px"
+                              : window.innerWidth < 768
+                              ? "200px"
+                              : "223px",
+                          height:
+                            window.innerWidth < 640
+                              ? "200px"
+                              : window.innerWidth < 768
+                              ? "260px"
+                              : "287px",
                         }}
                       >
-                        <div className={`w-full h-full rounded-[16.715px] p-2 box-border transition-all duration-300 ${
-                          isCenter ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)]' : isLeft ? 'bg-[#BFBDBD]' : 'bg-transparent'
-                        }`}>
+                        <div
+                          className={`w-full h-full rounded-[16.715px] p-2 box-border transition-all duration-300 ${
+                            isCenter
+                              ? "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
+                              : isLeft
+                              ? "bg-[#BFBDBD]"
+                              : "bg-transparent"
+                          }`}
+                        >
                           <video
                             src={whatsNewVideos[videoIndex]}
                             autoPlay
@@ -1003,13 +1027,13 @@ const LandingPage = () => {
               in us
             </motion.p>
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col -space-y-8">
               {/* First Scrolling Row (Right to Left) */}
-              <div className="relative overflow-hidden w-full">
-                <div className="absolute inset-0 overflow-hidden">
+              <div className="relative overflow-hidden w-full h-72">
+                <div className="flex gap-3">
                   <motion.div
-                    className="flex"
-                    animate={{ x: ["0%", "-100%"] }}
+                    className="flex gap-3"
+                    animate={{ x: ["0%", "-50%"] }}
                     transition={{
                       ease: "linear",
                       duration: 40,
@@ -1018,10 +1042,7 @@ const LandingPage = () => {
                   >
                     {[...testimonialsData, ...testimonialsData].map(
                       (testimonial, index) => (
-                        <div
-                          key={index}
-                          className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-3"
-                        >
+                        <div key={index} className="flex-shrink-0 w-[320px]">
                           <TestimonialCard testimonial={testimonial} />
                         </div>
                       )
@@ -1031,11 +1052,11 @@ const LandingPage = () => {
               </div>
 
               {/* Second Scrolling Row (Left to Right) */}
-              <div className="relative overflow-hidden w-full">
-                <div className="absolute inset-0 overflow-hidden">
+              <div className="relative overflow-hidden w-full h-72">
+                <div className="flex gap-3">
                   <motion.div
-                    className="flex"
-                    animate={{ x: ["-100%", "0%"] }}
+                    className="flex gap-3"
+                    animate={{ x: ["-50%", "0%"] }}
                     transition={{
                       ease: "linear",
                       duration: 40,
@@ -1044,10 +1065,7 @@ const LandingPage = () => {
                   >
                     {[...testimonialsData, ...testimonialsData].map(
                       (testimonial, index) => (
-                        <div
-                          key={index}
-                          className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 p-3"
-                        >
+                        <div key={index} className="flex-shrink-0 w-[320px]">
                           <TestimonialCard testimonial={testimonial} />
                         </div>
                       )
