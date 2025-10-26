@@ -43,6 +43,10 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ className = '' }) => {
         setError(null);
         const data = await getUserStats();
         
+        // DEBUG: Log the received data
+        console.log('[DEBUG StatsSection] Received stats data:', data);
+        console.log('[DEBUG StatsSection] totalViews value:', data.totalViews, 'Type:', typeof data.totalViews);
+        
         // Format numbers with commas for thousands
         const formatNumber = (num: number): string => {
           return num.toLocaleString('en-US');
@@ -62,7 +66,22 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ className = '' }) => {
       }
     };
 
+    // Fetch on mount
     fetchStats();
+
+    // Add visibility change listener to refetch when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchStats();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup listener
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   return (
@@ -142,7 +161,22 @@ export const Chart: React.FC<ChartProps> = ({ className = '' }) => {
       }
     };
 
+    // Fetch on mount
     fetchChartData();
+
+    // Add visibility change listener to refetch when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchChartData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup listener
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   // Format date for x-axis (show fewer labels for readability)
