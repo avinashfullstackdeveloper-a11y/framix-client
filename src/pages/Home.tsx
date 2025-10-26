@@ -769,23 +769,20 @@ const LandingPage = () => {
                     variants={itemVariants}
                     onMouseEnter={() => setActivePortfolioCard(index)}
                     onMouseLeave={() => setActivePortfolioCard(-1)}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{
-                      duration: 0.4,
-                      ease: [0.4, 0, 0.2, 1],
-                    }}
                     className="flex w-full max-w-[350px]"
                   >
                     <Card
-                      className={`border-0 flex flex-col items-center justify-between p-6 sm:p-8 lg:p-12 rounded-[20px] w-full h-[450px] transition-all duration-500 ease-in-out ${
+                      className={`border-0 flex flex-col items-center justify-between p-6 sm:p-8 lg:p-12 rounded-[20px] w-full h-[450px] transition-all duration-300 ease-out transform origin-center will-change-transform ${
+                        isHovered ? "scale-105" : "scale-100"
+                      } ${
                         isHovered
                           ? "bg-gradient-to-br from-[#FF94C9] via-[#FF94C9] to-[#FF94C9]"
                           : "bg-gradient-to-bl from-gray-500 via-gray-700 to-black"
                       }`}
                     >
-                      <CardContent className="p-0 flex flex-col items-center justify-center flex-grow transition-all duration-500">
+                      <CardContent className="p-0 flex flex-col items-center justify-center flex-grow">
                         <div
-                          className={`flex items-center justify-center w-[106px] h-[106px] rounded-full p-[10px] mb-4 transition-all duration-500 ${
+                          className={`flex items-center justify-center w-[106px] h-[106px] rounded-full p-[10px] mb-4 transition-colors duration-300 ${
                             isHovered ? "bg-[#141414]" : "bg-[#FF94C9]"
                           }`}
                         >
@@ -795,14 +792,14 @@ const LandingPage = () => {
                           />
                         </div>
                         <h2
-                          className={`text-center font-bold text-xl leading-6 tracking-[-0.8px] mb-4 transition-colors duration-500 ${
+                          className={`text-center font-bold text-xl leading-6 tracking-[-0.8px] mb-4 transition-colors duration-300 ${
                             isHovered ? "text-black" : "text-white"
                           }`}
                         >
                           {card.title}
                         </h2>
                         <p
-                          className={`text-center font-light text-base leading-5 tracking-[-0.16px] max-w-[265px] transition-colors duration-500 ${
+                          className={`text-center font-light text-base leading-5 tracking-[-0.16px] max-w-[265px] transition-colors duration-300 ${
                             isHovered ? "text-black" : "text-gray-400"
                           }`}
                         >
