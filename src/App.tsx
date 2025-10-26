@@ -51,7 +51,8 @@ const App: React.FC = () => {
             {/* <Route path="/templates/:id" element={<TemplateDetail />} /> */}
             <Route path="/upload-template" element={<UploadTemplate />} />
             <Route path="/community" element={<Community />} />
-            {/* Community user profile route */}
+            {/* Community user profile routes */}
+            <Route path="/community/user/:userId" element={<CommunityUserProfile />} />
             <Route path="/community/:username" element={<CommunityUserProfile />} />
             {/* <Route path="/notifications" element={<NotificationsPage />} /> */}
             {/* <Route path="/blogs" element={<Blogs />} /> */}

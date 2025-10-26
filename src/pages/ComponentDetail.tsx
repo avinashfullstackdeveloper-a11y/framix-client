@@ -39,6 +39,7 @@ type ComponentData = {
   react?: string;
   tailwind?: string;
   createdBy?: {
+    _id?: string;
     name?: string;
     email?: string;
   };
@@ -491,28 +492,51 @@ const ComponentDetail: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Creator Profile Card at Top */}
         {component.createdBy && (
-          <Card className="max-w-md mx-auto mb-8 mt-0">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold">
+          <Card
+            className="max-w-2xl mx-auto mb-8 mt-0 hover:shadow-xl hover:border-primary/50 transition-all duration-300 cursor-pointer group"
+            onClick={() => {
+              if (component.createdBy?._id) {
+                navigate(`/community/user/${component.createdBy._id}`);
+              }
+            }}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
                   {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
                 </div>
-                <div className="text-left">
-                  <div className="font-semibold text-base">
-                    {component.createdBy.name || "Anonymous"}
+                <div className="flex-1 text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="font-bold text-lg group-hover:text-primary transition-colors">
+                      {component.createdBy.name || "Anonymous"}
+                    </div>
+                    {component.creatorStatus && (
+                      <Badge variant="secondary" className="text-xs">
+                        {component.creatorStatus === "original" && "✓ Original Creator"}
+                        {component.creatorStatus === "found" && "Found & Shared"}
+                        {component.creatorStatus === "modified" && "Found & Modified"}
+                      </Badge>
+                    )}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {component.createdBy.email || ""}
                   </div>
-                  {component.creatorStatus && (
-                    <div className="text-xs text-primary mt-1">
-                      {component.creatorStatus === "original" &&
-                        "✓ Original Creator"}
-                      {component.creatorStatus === "found" && "Found & Shared"}
-                      {component.creatorStatus === "modified" &&
-                        "Found & Modified"}
-                    </div>
-                  )}
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground group-hover:text-primary transition-colors">
+                  <span className="text-sm font-medium hidden sm:inline">View Profile</span>
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
                 </div>
               </div>
             </CardContent>
