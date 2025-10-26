@@ -726,9 +726,30 @@ const LandingPage = () => {
           <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20 text-center">
             <motion.h2
               variants={itemVariants}
-              className="text-4xl font-bold mb-4"
+              className="text-4xl font-bold mb-4 leading-tight"
             >
-              Build your design portfolio
+              <span
+                style={{
+                  background:
+                    "linear-gradient(90deg, #fff 0%, #a3a3a3 80%, #6b7280 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Build your{" "}
+                <span
+                  className="text-[#FF94C9]"
+                  style={{
+                    WebkitTextFillColor: "#FF94C9",
+                    background: "none",
+                    WebkitBackgroundClip: "initial",
+                  }}
+                >
+                  design
+                </span>{" "}
+                portfolio
+              </span>
             </motion.h2>
             <motion.p
               variants={itemVariants}
