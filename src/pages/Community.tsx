@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { CommunityUserProfile } from "@/components/CommunityUserProfile";
@@ -13,6 +13,8 @@ const CommunityList = () => {
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [popupOpen, setPopupOpen] = useState(false);
+  // OPTIMIZATION: Lazy load fallback data only when needed (API fails)
+  const [fallbackData, setFallbackData] = useState<{ featured: any[], all: any[] } | null>(null);
 
   // Types from ComponentSelectorPopup
   const componentTypes = [
@@ -28,7 +30,7 @@ const CommunityList = () => {
     "tooltip",
   ];
 
-  // Fetch approved components from API
+  // OPTIMIZATION: Fetch approved components from API
   useEffect(() => {
     const fetchComponents = async () => {
       try {
@@ -48,6 +50,13 @@ const CommunityList = () => {
         setComponents(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching components:", error);
+        // OPTIMIZATION: Only load fallback data when API fails
+        import("@/data/fallbackComponents").then((module) => {
+          setFallbackData({
+            featured: module.featuredComponents,
+            all: module.allComponents,
+          });
+        });
         setComponents([]);
       } finally {
         setLoading(false);
@@ -57,151 +66,52 @@ const CommunityList = () => {
     fetchComponents();
   }, []);
 
-  // Get all unique categories from both API and fallback data
-  const getAllCategories = () => {
-    const apiCategories = components
-      .map((c) => c.category || c.type)
-      .filter(Boolean);
-    const fallbackCategories = [
-      ...featuredComponents.map((c) => c.category || c.type),
-      ...allComponents.map((c) => c.category || c.type),
-    ].filter(Boolean);
-    return [
-      "All",
-      ...Array.from(new Set([...apiCategories, ...fallbackCategories])),
-    ];
-  };
+  // OPTIMIZATION: Memoize filtered components to prevent recalculation on every render
+  const filteredComponents = useMemo(() => {
+    const sourceComponents = components.length > 0
+      ? [...components]
+      : fallbackData
+      ? [...fallbackData.featured, ...fallbackData.all]
+      : [];
 
-  // Sample data for components (fallback)
-  const featuredComponents = [
-    {
-      title: "Animated Navigation",
-      description: "Smooth hover animations with gradient backgrounds",
-      author: {
-        name: "Alex Chen",
-        username: "@alexchen",
-        initials: "AC",
-      },
-      likes: 245,
-      comments: 32,
-      category: "Navigation",
-      preview: "/assets/videos/comp1.mp4",
-    },
-    {
-      title: "Data Dashboard",
-      description: "Interactive charts and real-time metrics display",
-      author: {
-        name: "Sarah Kim",
-        username: "@sarahk",
-        initials: "SK",
-      },
-      likes: 189,
-      comments: 21,
-      category: "Dashboard",
-      preview: "/assets/videos/comp2.mp4",
-    },
-    {
-      title: "E-commerce Card",
-      description: "Product card with image gallery and quick actions",
-      author: {
-        name: "Mike Rodriguez",
-        username: "@miker",
-        initials: "MR",
-      },
-      likes: 156,
-      comments: 18,
-      category: "E-commerce",
-      preview: "/assets/videos/comp3.mp4",
-    },
-    {
-      title: "Contact Form",
-      description: "Modern form with validation and success states",
-      author: {
-        name: "Jessica Wang",
-        username: "@jessw",
-        initials: "JW",
-      },
-      likes: 132,
-      comments: 15,
-      category: "Forms",
-      preview: "/assets/videos/comp4.mp4",
-    },
-  ];
+    return sourceComponents.filter((component) => {
+      // Type/category filter
+      if (selectedCategory !== "All") {
+        const type = (
+          component.type ||
+          component.category ||
+          ""
+        ).toLowerCase();
+        if (type !== selectedCategory.toLowerCase()) return false;
+      }
+      // Search filter
+      if (searchQuery.trim() !== "") {
+        const q = searchQuery.toLowerCase();
+        return (
+          (component.title &&
+            component.title.toLowerCase().includes(q)) ||
+          (component.description &&
+            component.description.toLowerCase().includes(q)) ||
+          (component.category &&
+            component.category.toLowerCase().includes(q)) ||
+          (component.type &&
+            component.type.toLowerCase().includes(q)) ||
+          (component.author?.name &&
+            component.author.name.toLowerCase().includes(q)) ||
+          (component.createdBy?.name &&
+            component.createdBy.name.toLowerCase().includes(q))
+        );
+      }
+      return true;
+    });
+  }, [components, fallbackData, selectedCategory, searchQuery]);
 
-  const allComponents = [
-    {
-      title: "Pricing Table",
-      description: "Three-tier pricing with toggle animation",
-      author: {
-        name: "David Park",
-        username: "@davidp",
-        initials: "DP",
-      },
-      likes: 98,
-      comments: 12,
-      category: "Pricing",
-    },
-    {
-      title: "User Profile",
-      description: "Compact profile card with social links",
-      author: {
-        name: "Lisa Thompson",
-        username: "@lisat",
-        initials: "LT",
-      },
-      likes: 87,
-      comments: 8,
-      category: "Profile",
-    },
-    {
-      title: "Notification System",
-      description: "Toast notifications with different states",
-      author: {
-        name: "Ryan Smith",
-        username: "@ryans",
-        initials: "RS",
-      },
-      likes: 76,
-      comments: 11,
-      category: "UI",
-    },
-    {
-      title: "Loading Animation",
-      description: "Elegant skeleton loading for content",
-      author: {
-        name: "Emma Davis",
-        username: "@emmad",
-        initials: "ED",
-      },
-      likes: 143,
-      comments: 9,
-      category: "Animation",
-    },
-    {
-      title: "Search Interface",
-      description: "Advanced search with filters and suggestions",
-      author: {
-        name: "Kevin Brown",
-        username: "@kevinb",
-        initials: "KB",
-      },
-      likes: 112,
-      comments: 14,
-      category: "Search",
-    },
-    {
-      title: "Calendar Widget",
-      description: "Interactive calendar with event markers",
-      author: {
-        name: "Maria Garcia",
-        username: "@mariag",
-        initials: "MG",
-      },
-      likes: 94,
-      comments: 7,
-      category: "Widget",
-    },
-  ];
+  // OPTIMIZATION: Memoize featured components slice
+  const featuredComponentsList = useMemo(() => {
+    return components.length > 0
+      ? components.slice(0, 4)
+      : fallbackData?.featured || [];
+  }, [components, fallbackData]);
 
   // Avatar Component
   const Avatar = ({
@@ -299,9 +209,42 @@ const CommunityList = () => {
     );
   };
 
-  // LivePreview Component
+  // OPTIMIZATION: LivePreview Component with lazy loading via Intersection Observer
+  // This prevents rendering iframes (and loading external CDNs) until they're visible
   const LivePreview = ({ component }: { component: any }) => {
-    const renderPreview = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // OPTIMIZATION: Intersection Observer to detect when component enters viewport
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              // Once visible, stop observing to prevent unnecessary checks
+              observer.disconnect();
+            }
+          });
+        },
+        {
+          rootMargin: "50px", // Start loading 50px before entering viewport
+          threshold: 0.1,
+        }
+      );
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
+
+      return () => observer.disconnect();
+    }, []);
+
+    // OPTIMIZATION: Memoize srcDoc generation to prevent recreation on every render
+    const srcDocContent = useMemo(() => {
+      if (!isVisible) return null;
+
+      const renderPreview = () => {
       // If code is a full HTML document, use it directly
       if (
         typeof component.code === "string" &&
@@ -598,7 +541,22 @@ const CommunityList = () => {
       );
     };
 
-    return renderPreview();
+      return renderPreview();
+    }, [isVisible, component]);
+
+    // OPTIMIZATION: Return placeholder until component is visible
+    if (!isVisible) {
+      return (
+        <div
+          ref={containerRef}
+          className="absolute inset-0 w-full h-full flex items-center justify-center bg-secondary/20"
+        >
+          <div className="text-muted-foreground text-sm">Loading preview...</div>
+        </div>
+      );
+    }
+
+    return srcDocContent;
   };
 
   return (
@@ -655,10 +613,7 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(components.length > 0
-            ? components.slice(0, 4)
-            : featuredComponents
-          ).map((component, index) => {
+          {featuredComponentsList.map((component, index) => {
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -916,41 +871,7 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(components.length > 0
-            ? [...components]
-            : [...featuredComponents, ...allComponents]
-          )
-            .filter((component) => {
-              // Type/category filter
-              if (selectedCategory !== "All") {
-                const type = (
-                  component.type ||
-                  component.category ||
-                  ""
-                ).toLowerCase();
-                if (type !== selectedCategory.toLowerCase()) return false;
-              }
-              // Search filter
-              if (searchQuery.trim() !== "") {
-                const q = searchQuery.toLowerCase();
-                return (
-                  (component.title &&
-                    component.title.toLowerCase().includes(q)) ||
-                  (component.description &&
-                    component.description.toLowerCase().includes(q)) ||
-                  (component.category &&
-                    component.category.toLowerCase().includes(q)) ||
-                  (component.type &&
-                    component.type.toLowerCase().includes(q)) ||
-                  (component.author?.name &&
-                    component.author.name.toLowerCase().includes(q)) ||
-                  (component.createdBy?.name &&
-                    component.createdBy.name.toLowerCase().includes(q))
-                );
-              }
-              return true;
-            })
-            .map((component, index) => {
+          {filteredComponents.map((component, index) => {
               return (
                 <Link
                   to={`/components/${component.type || "component"}/${
