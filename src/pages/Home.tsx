@@ -933,7 +933,7 @@ const LandingPage = () => {
                 </div>
               </motion.div>
               <motion.div
-                className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
+                className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-full max-sm:h-60 max-sm:px-4"
                 variants={itemVariants}
               >
                 <AnimatePresence mode="sync">
@@ -949,12 +949,30 @@ const LandingPage = () => {
                         className="absolute cursor-pointer"
                         initial={false}
                         animate={{
-                          left: isLeft ? "0px" : isCenter ? "50%" : "auto",
-                          right: isRight ? "0px" : "auto",
-                          rotate: isLeft ? -13.37 : isCenter ? 0 : 13.37,
+                          left: isLeft
+                            ? window.innerWidth < 640
+                              ? "0px"
+                              : "0px"
+                            : isCenter
+                            ? "50%"
+                            : "auto",
+                          right: isRight
+                            ? window.innerWidth < 640
+                              ? "0px"
+                              : "0px"
+                            : "auto",
+                          rotate: isLeft
+                            ? window.innerWidth < 640
+                              ? -10
+                              : -13.37
+                            : isCenter
+                            ? 0
+                            : window.innerWidth < 640
+                            ? 10
+                            : 13.37,
                           x: isCenter ? "-50%" : "0%",
                           zIndex: isLeft ? 1 : isCenter ? 3 : 2,
-                          scale: isCenter ? 1 : 0.95,
+                          scale: isCenter ? 1 : 0.9,
                         }}
                         transition={{
                           type: "spring",
@@ -966,25 +984,23 @@ const LandingPage = () => {
                         style={{
                           width:
                             window.innerWidth < 640
-                              ? "160px"
+                              ? "140px"
                               : window.innerWidth < 768
                               ? "200px"
                               : "223px",
                           height:
                             window.innerWidth < 640
-                              ? "200px"
+                              ? "180px"
                               : window.innerWidth < 768
                               ? "260px"
                               : "287px",
                         }}
                       >
                         <div
-                          className={`w-full h-full rounded-[16.715px] p-2 box-border transition-all duration-300 ${
+                          className={`w-full h-full rounded-[16.715px] max-sm:rounded-[12px] p-2 max-sm:p-1.5 box-border transition-all duration-300 ${
                             isCenter
                               ? "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
-                              : isLeft
-                              ? "bg-[#BFBDBD]"
-                              : "bg-transparent"
+                              : "bg-[#BFBDBD]"
                           }`}
                         >
                           <video
@@ -992,7 +1008,7 @@ const LandingPage = () => {
                             autoPlay
                             loop
                             muted
-                            className="w-full h-full object-cover rounded-[12px]"
+                            className="w-full h-full object-cover rounded-[12px] max-sm:rounded-[8px]"
                           />
                         </div>
                       </motion.div>
