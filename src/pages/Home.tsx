@@ -928,52 +928,53 @@ const LandingPage = () => {
                 className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-[280px] max-sm:h-60"
                 variants={itemVariants}
               >
-                {/* Left tilted card */}
-                <div
-                  className="absolute w-[223px] h-[287px] rotate-[-13.37deg] z-[1] left-0 top-0 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px] cursor-pointer"
-                  onClick={() => handleVideoCardClick(videoCardOrder[0])}
-                >
-                  <div className="w-full h-full bg-[#BFBDBD] rounded-[16.715px] p-2 box-border">
-                    <video
-                      src={whatsNewVideos[videoCardOrder[0]]}
-                      autoPlay
-                      loop
-                      muted
-                      className="w-full h-full object-cover rounded-[12px]"
-                    />
-                  </div>
-                </div>
+                <AnimatePresence mode="sync">
+                  {videoCardOrder.map((videoIndex, position) => {
+                    const isLeft = position === 0;
+                    const isCenter = position === 1;
+                    const isRight = position === 2;
 
-                {/* Right tilted card */}
-                <div
-                  className="absolute w-[223px] h-[287px] rotate-[13.37deg] z-[2] right-0 top-0 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px] cursor-pointer"
-                  onClick={() => handleVideoCardClick(videoCardOrder[2])}
-                >
-                  <div className="w-full h-full bg-[#BFBDBD] rounded-[16.715px] p-2 box-border">
-                    <video
-                      src={whatsNewVideos[videoCardOrder[2]]}
-                      autoPlay
-                      loop
-                      muted
-                      className="w-full h-full object-cover rounded-[12px]"
-                    />
-                  </div>
-                </div>
-
-                {/* Center active card */}
-                <div
-                  className="absolute w-[223px] h-[287px] -translate-x-2/4 z-[3] shadow-[0_4px_20px_rgba(0,0,0,0.1)] left-2/4 top-0 max-md:w-[200px] max-md:h-[260px] max-sm:w-40 max-sm:h-[200px]"
-                >
-                  <div className="w-full h-full bg-white rounded-[16.715px] p-2 box-border">
-                    <video
-                      src={whatsNewVideos[videoCardOrder[1]]}
-                      autoPlay
-                      loop
-                      muted
-                      className="w-full h-full object-cover rounded-[12px]"
-                    />
-                  </div>
-                </div>
+                    return (
+                      <motion.div
+                        key={videoIndex}
+                        layoutId={`video-card-${videoIndex}`}
+                        className="absolute cursor-pointer"
+                        initial={false}
+                        animate={{
+                          left: isLeft ? '0px' : isCenter ? '50%' : 'auto',
+                          right: isRight ? '0px' : 'auto',
+                          rotate: isLeft ? -13.37 : isCenter ? 0 : 13.37,
+                          x: isCenter ? '-50%' : '0%',
+                          zIndex: isLeft ? 1 : isCenter ? 3 : 2,
+                          scale: isCenter ? 1 : 0.95,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                          mass: 0.8,
+                        }}
+                        onClick={() => handleVideoCardClick(videoIndex)}
+                        style={{
+                          width: window.innerWidth < 640 ? '160px' : window.innerWidth < 768 ? '200px' : '223px',
+                          height: window.innerWidth < 640 ? '200px' : window.innerWidth < 768 ? '260px' : '287px',
+                        }}
+                      >
+                        <div className={`w-full h-full rounded-[16.715px] p-2 box-border transition-all duration-300 ${
+                          isCenter ? 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.1)]' : isLeft ? 'bg-[#BFBDBD]' : 'bg-transparent'
+                        }`}>
+                          <video
+                            src={whatsNewVideos[videoIndex]}
+                            autoPlay
+                            loop
+                            muted
+                            className="w-full h-full object-cover rounded-[12px]"
+                          />
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               </motion.div>
             </div>
           </div>
