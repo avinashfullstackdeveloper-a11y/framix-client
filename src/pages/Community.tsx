@@ -152,9 +152,9 @@ const CommunityList = () => {
 
     return (
       <div
-        className={`flex items-center justify-center bg-gradient-primary rounded-full ${sizeClasses[size]} ${className}`}
+        className={`flex items-center justify-center bg-white rounded-full ${sizeClasses[size]} ${className}`}
       >
-        <span className="text-primary-foreground font-medium">{initials}</span>
+        <span className="text-black font-medium">{initials}</span>
       </div>
     );
   };
@@ -586,9 +586,11 @@ const CommunityList = () => {
       <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6">
           Discover
-          <span className="text-primary"> Incredible</span>
+          <span className="neon-hero neon-hero-text">
+            <span className="text-[#FF9AC9] neon-hero-glow"> Incredible</span>
+          </span>
           <br />
-          Components from Creators
+          <span>Components</span> from Creators
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
           Browse thousands of production-ready UI components built by talented
@@ -597,7 +599,7 @@ const CommunityList = () => {
         <div className="flex gap-4 justify-center max-sm:flex-col max-sm:items-center">
           <Link
             to="/components"
-            className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity flex items-center justify-center"
+            className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center"
           >
             Browse components
           </Link>
@@ -627,9 +629,9 @@ const CommunityList = () => {
       {/* Featured Components Section */}
       <div className="mb-16">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Featured Components</h2>
+          <h2 className="text-3xl font-bold mb-2">Latest Components</h2>
           <p className="text-muted-foreground">
-            Hand-picked components from top creators
+            Fresh uploads from our community
           </p>
         </div>
 
