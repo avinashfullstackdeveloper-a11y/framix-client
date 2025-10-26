@@ -47,7 +47,7 @@ type ComponentData = {
 
 // Helper function to determine if color is light or dark
 const isLightColor = (hexColor: string): boolean => {
-  const hex = hexColor.replace('#', '');
+  const hex = hexColor.replace("#", "");
   const r = parseInt(hex.substr(0, 2), 16);
   const g = parseInt(hex.substr(2, 2), 16);
   const b = parseInt(hex.substr(4, 2), 16);
@@ -57,16 +57,16 @@ const isLightColor = (hexColor: string): boolean => {
 
 // Preset colors for the palette
 const presetColors = [
-  { name: 'White', value: '#ffffff' },
-  { name: 'Light Gray', value: '#f9fafb' },
-  { name: 'Dark Gray', value: '#1f2937' },
-  { name: 'Black', value: '#0a0a0a' },
-  { name: 'Light Blue', value: '#dbeafe' },
-  { name: 'Blue', value: '#1e40af' },
-  { name: 'Light Purple', value: '#f3e8ff' },
-  { name: 'Purple', value: '#6b21a8' },
-  { name: 'Light Green', value: '#d1fae5' },
-  { name: 'Green', value: '#065f46' },
+  { name: "White", value: "#ffffff" },
+  { name: "Light Gray", value: "#f9fafb" },
+  { name: "Dark Gray", value: "#1f2937" },
+  { name: "Black", value: "#0a0a0a" },
+  { name: "Light Blue", value: "#dbeafe" },
+  { name: "Blue", value: "#1e40af" },
+  { name: "Light Purple", value: "#f3e8ff" },
+  { name: "Purple", value: "#6b21a8" },
+  { name: "Light Green", value: "#d1fae5" },
+  { name: "Green", value: "#065f46" },
 ];
 
 const ComponentDetail: React.FC = () => {
@@ -81,7 +81,7 @@ const ComponentDetail: React.FC = () => {
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
+  const [backgroundColor, setBackgroundColor] = useState<string>("#ffffff");
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Favourites state
@@ -91,19 +91,28 @@ const ComponentDetail: React.FC = () => {
   // Likes/comments state
   const [likesCount, setLikesCount] = useState(0);
   const [likedByMe, setLikedByMe] = useState(false);
-  const [comments, setComments] = useState<{
-    _id: string;
-    text: string;
-    user?: {name?: string; _id?: string};
-    replies?: {_id: string; text: string; user?: {name?: string; _id?: string}; timestamp?: string}[];
-    timestamp?: string;
-  }[]>([]);
+  const [comments, setComments] = useState<
+    {
+      _id: string;
+      text: string;
+      user?: { name?: string; _id?: string };
+      replies?: {
+        _id: string;
+        text: string;
+        user?: { name?: string; _id?: string };
+        timestamp?: string;
+      }[];
+      timestamp?: string;
+    }[]
+  >([]);
   const [commentText, setCommentText] = useState("");
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+    null
+  );
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -133,7 +142,7 @@ const ComponentDetail: React.FC = () => {
         if (tech === "css") {
           let htmlValue = "";
           let cssValue = "";
-          
+
           // Priority 1: Check for separate html/css fields (new format from admin upload)
           if (data.html !== undefined && data.html !== null) {
             htmlValue = data.html;
@@ -141,7 +150,7 @@ const ComponentDetail: React.FC = () => {
           if (data.css !== undefined && data.css !== null) {
             cssValue = data.css;
           }
-          
+
           // Priority 2: Check for legacy htmlCode/cssCode fields
           if (!htmlValue && data.htmlCode !== undefined) {
             htmlValue = data.htmlCode;
@@ -149,7 +158,7 @@ const ComponentDetail: React.FC = () => {
           if (!cssValue && data.cssCode !== undefined) {
             cssValue = data.cssCode;
           }
-          
+
           // Priority 3: Fallback to combined 'code' field only if no separate fields exist
           if (!htmlValue && !cssValue && data.code) {
             if (data.language === "html" || data.language === "multi") {
@@ -158,7 +167,7 @@ const ComponentDetail: React.FC = () => {
               cssValue = data.code;
             }
           }
-          
+
           setHtmlCode(htmlValue);
           setCssCode(cssValue);
           setPreviewHtmlCode(htmlValue);
@@ -180,12 +189,12 @@ const ComponentDetail: React.FC = () => {
 
   // Track component view on mount (with ref to prevent double-counting in StrictMode)
   const hasTrackedView = useRef(false);
-  
+
   useEffect(() => {
     if (id && !hasTrackedView.current) {
       hasTrackedView.current = true;
-      trackComponentView(id).catch(err =>
-        console.error('Failed to track view:', err)
+      trackComponentView(id).catch((err) =>
+        console.error("Failed to track view:", err)
       );
     }
   }, [id]);
@@ -215,7 +224,13 @@ const ComponentDetail: React.FC = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log("[Comments] Fetched comments:", data);
-        setComments(Array.isArray(data.comments) ? data.comments : (Array.isArray(data) ? data : []));
+        setComments(
+          Array.isArray(data.comments)
+            ? data.comments
+            : Array.isArray(data)
+            ? data
+            : []
+        );
       })
       .catch((err) => {
         console.error("[Comments] Error fetching:", err);
@@ -262,15 +277,18 @@ const ComponentDetail: React.FC = () => {
     setSavingFavourite(true);
     try {
       if (!isFavourited) {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/favourites`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: "include",
-          body: JSON.stringify({ component: id }),
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/favourites`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+            body: JSON.stringify({ component: id }),
+          }
+        );
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
           throw new Error(errorData.message || "Failed to save favourite");
@@ -282,13 +300,16 @@ const ComponentDetail: React.FC = () => {
           variant: "default",
         });
       } else {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/favourites/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/favourites/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
+        );
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
           throw new Error(errorData.message || "Failed to remove favourite");
@@ -322,7 +343,7 @@ const ComponentDetail: React.FC = () => {
 
   // Preview logic with custom background color
   const renderPreview = () => {
-    const textColor = isLightColor(backgroundColor) ? '#1f2937' : '#f3f4f6';
+    const textColor = isLightColor(backgroundColor) ? "#1f2937" : "#f3f4f6";
 
     if (technology === "css") {
       if (!htmlCode && !cssCode) {
@@ -468,6 +489,36 @@ const ComponentDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Creator Profile Card at Top */}
+        {component.createdBy && (
+          <Card className="max-w-md mx-auto mb-8 mt-0">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold">
+                  {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+                <div className="text-left">
+                  <div className="font-semibold text-base">
+                    {component.createdBy.name || "Anonymous"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {component.createdBy.email || ""}
+                  </div>
+                  {component.creatorStatus && (
+                    <div className="text-xs text-primary mt-1">
+                      {component.creatorStatus === "original" &&
+                        "✓ Original Creator"}
+                      {component.creatorStatus === "found" && "Found & Shared"}
+                      {component.creatorStatus === "modified" &&
+                        "Found & Modified"}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Button
@@ -475,8 +526,18 @@ const ComponentDetail: React.FC = () => {
             onClick={() => navigate(-1)}
             className="flex items-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back
           </Button>
@@ -497,33 +558,8 @@ const ComponentDetail: React.FC = () => {
             </p>
           )}
 
-          {/* Creator Information */}
-          {component.createdBy && (
-            <Card className="max-w-md mx-auto mb-6">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold">
-                    {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold text-base">
-                      {component.createdBy.name || "Anonymous"}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {component.createdBy.email || ""}
-                    </div>
-                    {component.creatorStatus && (
-                      <div className="text-xs text-primary mt-1">
-                        {component.creatorStatus === "original" && "✓ Original Creator"}
-                        {component.creatorStatus === "found" && "Found & Shared"}
-                        {component.creatorStatus === "modified" && "Found & Modified"}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Creator Information (moved above, now removed here) */}
+          {/* (was here) */}
 
           {component.tags && component.tags.length > 0 && (
             <div className="flex flex-wrap justify-center gap-2">
@@ -543,9 +579,16 @@ const ComponentDetail: React.FC = () => {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Preview</CardTitle>
-                <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
+                <Popover
+                  open={showColorPicker}
+                  onOpenChange={setShowColorPicker}
+                >
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
                       <div
                         className="w-4 h-4 rounded border"
                         style={{ backgroundColor }}
@@ -556,7 +599,9 @@ const ComponentDetail: React.FC = () => {
                   <PopoverContent className="w-64">
                     <div className="space-y-3">
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Preset Colors</label>
+                        <label className="text-sm font-medium mb-2 block">
+                          Preset Colors
+                        </label>
                         <div className="grid grid-cols-5 gap-2">
                           {presetColors.map((color) => (
                             <button
@@ -564,7 +609,10 @@ const ComponentDetail: React.FC = () => {
                               className="w-8 h-8 rounded border-2 hover:scale-110 transition-transform"
                               style={{
                                 backgroundColor: color.value,
-                                borderColor: backgroundColor === color.value ? 'hsl(var(--primary))' : 'hsl(var(--border))'
+                                borderColor:
+                                  backgroundColor === color.value
+                                    ? "hsl(var(--primary))"
+                                    : "hsl(var(--border))",
                               }}
                               onClick={() => {
                                 setBackgroundColor(color.value);
@@ -576,7 +624,9 @@ const ComponentDetail: React.FC = () => {
                         </div>
                       </div>
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Custom Color</label>
+                        <label className="text-sm font-medium mb-2 block">
+                          Custom Color
+                        </label>
                         <div className="flex gap-2">
                           <input
                             type="color"
@@ -599,7 +649,10 @@ const ComponentDetail: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-[500px] flex items-center justify-center" style={{ backgroundColor }}>
+              <div
+                className="h-[500px] flex items-center justify-center"
+                style={{ backgroundColor }}
+              >
                 {renderPreview()}
               </div>
             </CardContent>
@@ -645,7 +698,12 @@ const ComponentDetail: React.FC = () => {
             </CardHeader>
             <CardContent className="p-0">
               {technology === "css" && (
-                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "html" | "css")}>
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(value) =>
+                    setActiveTab(value as "html" | "css")
+                  }
+                >
                   <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
                     <TabsTrigger value="html">HTML</TabsTrigger>
                     <TabsTrigger value="css">CSS</TabsTrigger>
@@ -716,7 +774,9 @@ const ComponentDetail: React.FC = () => {
                       setLikeLoading(true);
                       try {
                         const method = likedByMe ? "DELETE" : "POST";
-                        const url = `${import.meta.env.VITE_API_URL}/api/components/${id}/like`;
+                        const url = `${
+                          import.meta.env.VITE_API_URL
+                        }/api/components/${id}/like`;
                         const res = await fetch(url, {
                           method,
                           headers: { Authorization: `Bearer ${token}` },
@@ -724,7 +784,9 @@ const ComponentDetail: React.FC = () => {
                         });
                         if (!res.ok) throw new Error("Failed to update like");
                         setLikedByMe(!likedByMe);
-                        setLikesCount((prev) => likedByMe ? prev - 1 : prev + 1);
+                        setLikesCount((prev) =>
+                          likedByMe ? prev - 1 : prev + 1
+                        );
                       } catch (err) {
                         console.error("[Like] Error:", err);
                         toast({
@@ -745,8 +807,18 @@ const ComponentDetail: React.FC = () => {
                         <path d="M10 18.35L8.55 17.03C3.4 12.36 0 9.28 0 5.5 0 2.42 2.42 0 5.5 0 7.24 0 8.91 0.81 10 2.09 11.09 0.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.5 20 9.28 16.6 12.36 11.45 17.04L10 18.35Z" />
                       </svg>
                     ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
                       </svg>
                     )}
                     {likeLoading ? "Processing" : likedByMe ? "Liked" : "Like"}
@@ -760,13 +832,25 @@ const ComponentDetail: React.FC = () => {
                 {/* Comments Count */}
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold">{comments.length}</div>
-                    <div className="text-xs text-muted-foreground">Comments</div>
+                    <div className="text-xs text-muted-foreground">
+                      Comments
+                    </div>
                   </div>
                 </div>
               </div>
@@ -785,16 +869,40 @@ const ComponentDetail: React.FC = () => {
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                      />
                     </svg>
                   )}
-                  {savingFavourite ? "Saving..." : isFavourited ? "Favourited" : "Add to Favourites"}
+                  {savingFavourite
+                    ? "Saving..."
+                    : isFavourited
+                    ? "Favourited"
+                    : "Add to Favourites"}
                 </Button>
-                
+
                 <Button variant="outline" className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                    />
                   </svg>
                   Export
                 </Button>
@@ -807,8 +915,18 @@ const ComponentDetail: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
               Discussion ({comments.length})
             </CardTitle>
@@ -832,25 +950,34 @@ const ComponentDetail: React.FC = () => {
                   className="min-h-[100px] resize-none"
                 />
                 <div className="flex justify-between items-center">
-                  <span className={`text-xs ${
-                    commentText.length > 500 ? 'text-destructive' : 'text-muted-foreground'
-                  }`}>
+                  <span
+                    className={`text-xs ${
+                      commentText.length > 500
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
+                  >
                     {commentText.length}/500
                   </span>
-                  <Button 
+                  <Button
                     onClick={async () => {
                       if (!commentText.trim()) return;
                       setCommentsLoading(true);
                       try {
-                        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments`, {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                          },
-                          credentials: "include",
-                          body: JSON.stringify({ text: commentText }),
-                        });
+                        const res = await fetch(
+                          `${
+                            import.meta.env.VITE_API_URL
+                          }/api/components/${id}/comments`,
+                          {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${token}`,
+                            },
+                            credentials: "include",
+                            body: JSON.stringify({ text: commentText }),
+                          }
+                        );
                         if (!res.ok) throw new Error("Failed to post comment");
                         const response = await res.json();
                         if (response.success && response.comments) {
@@ -868,7 +995,11 @@ const ComponentDetail: React.FC = () => {
                         setCommentsLoading(false);
                       }
                     }}
-                    disabled={commentsLoading || !commentText.trim() || commentText.length > 500}
+                    disabled={
+                      commentsLoading ||
+                      !commentText.trim() ||
+                      commentText.length > 500
+                    }
                   >
                     {commentsLoading ? (
                       <>
@@ -887,8 +1018,18 @@ const ComponentDetail: React.FC = () => {
             <div className="space-y-6">
               {comments.length === 0 ? (
                 <div className="text-center py-8">
-                  <svg className="w-12 h-12 text-muted-foreground mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  <svg
+                    className="w-12 h-12 text-muted-foreground mx-auto mb-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
                   </svg>
                   <p className="text-muted-foreground">No comments yet</p>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -897,11 +1038,14 @@ const ComponentDetail: React.FC = () => {
                 </div>
               ) : (
                 comments.map((comment) => (
-                  <div key={comment._id} className="flex gap-4 pb-6 border-b last:border-b-0 last:pb-0">
+                  <div
+                    key={comment._id}
+                    className="flex gap-4 pb-6 border-b last:border-b-0 last:pb-0"
+                  >
                     <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-sm flex-shrink-0">
                       {comment.user?.name?.charAt(0).toUpperCase() || "U"}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0 space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
@@ -925,7 +1069,7 @@ const ComponentDetail: React.FC = () => {
                           </Button>
                         )}
                       </div>
-                      
+
                       <p className="text-sm text-foreground leading-relaxed">
                         {comment.text}
                       </p>
@@ -943,8 +1087,18 @@ const ComponentDetail: React.FC = () => {
                             }
                           }}
                         >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                            />
                           </svg>
                           {replyingTo === comment._id ? "Cancel" : "Reply"}
                         </button>
@@ -982,16 +1136,26 @@ const ComponentDetail: React.FC = () => {
                                   if (!replyText.trim()) return;
                                   setCommentsLoading(true);
                                   try {
-                                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments/${comment._id}/reply`, {
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${token}`,
-                                      },
-                                      credentials: "include",
-                                      body: JSON.stringify({ text: replyText }),
-                                    });
-                                    if (!res.ok) throw new Error("Failed to post reply");
+                                    const res = await fetch(
+                                      `${
+                                        import.meta.env.VITE_API_URL
+                                      }/api/components/${id}/comments/${
+                                        comment._id
+                                      }/reply`,
+                                      {
+                                        method: "POST",
+                                        headers: {
+                                          "Content-Type": "application/json",
+                                          Authorization: `Bearer ${token}`,
+                                        },
+                                        credentials: "include",
+                                        body: JSON.stringify({
+                                          text: replyText,
+                                        }),
+                                      }
+                                    );
+                                    if (!res.ok)
+                                      throw new Error("Failed to post reply");
                                     const response = await res.json();
                                     if (response.success && response.comments) {
                                       setComments(response.comments);
@@ -1024,7 +1188,8 @@ const ComponentDetail: React.FC = () => {
                           {comment.replies.map((reply) => (
                             <div key={reply._id} className="flex gap-3">
                               <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-xs flex-shrink-0">
-                                {reply.user?.name?.charAt(0).toUpperCase() || "U"}
+                                {reply.user?.name?.charAt(0).toUpperCase() ||
+                                  "U"}
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -1033,7 +1198,9 @@ const ComponentDetail: React.FC = () => {
                                   </span>
                                   {reply.timestamp && (
                                     <span className="text-xs text-muted-foreground">
-                                      {new Date(reply.timestamp).toLocaleDateString()}
+                                      {new Date(
+                                        reply.timestamp
+                                      ).toLocaleDateString()}
                                     </span>
                                   )}
                                 </div>
@@ -1055,12 +1222,16 @@ const ComponentDetail: React.FC = () => {
       </div>
 
       {/* Delete Comment Confirmation Dialog */}
-      <AlertDialog open={!!deletingCommentId} onOpenChange={(open) => !open && setDeletingCommentId(null)}>
+      <AlertDialog
+        open={!!deletingCommentId}
+        onOpenChange={(open) => !open && setDeletingCommentId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Comment?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete your comment and all its replies. This action cannot be undone.
+              This will permanently delete your comment and all its replies.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1071,26 +1242,34 @@ const ComponentDetail: React.FC = () => {
                 if (!deletingCommentId) return;
                 setCommentsLoading(true);
                 try {
-                  const res = await fetch(`${import.meta.env.VITE_API_URL}/api/components/${id}/comments/${deletingCommentId}`, {
-                    method: "DELETE",
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                    credentials: "include",
-                  });
-                  
+                  const res = await fetch(
+                    `${
+                      import.meta.env.VITE_API_URL
+                    }/api/components/${id}/comments/${deletingCommentId}`,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      credentials: "include",
+                    }
+                  );
+
                   if (!res.ok) {
                     const errorData = await res.json().catch(() => ({}));
-                    throw new Error(errorData.error || "Failed to delete comment");
+                    throw new Error(
+                      errorData.error || "Failed to delete comment"
+                    );
                   }
-                  
+
                   const response = await res.json();
-                  
+
                   if (response.success && response.comments) {
                     setComments(response.comments);
                     toast({
                       title: "Comment deleted",
-                      description: "Your comment has been successfully deleted.",
+                      description:
+                        "Your comment has been successfully deleted.",
                       variant: "default",
                     });
                   }
@@ -1098,7 +1277,10 @@ const ComponentDetail: React.FC = () => {
                   console.error("[Delete Comment] Error:", err);
                   toast({
                     title: "Error",
-                    description: err instanceof Error ? err.message : "Could not delete comment.",
+                    description:
+                      err instanceof Error
+                        ? err.message
+                        : "Could not delete comment.",
                     variant: "destructive",
                   });
                 } finally {
