@@ -30,6 +30,7 @@ const Components = () => {
     htmlCode?: string;
     cssCode?: string;
     tailwind?: string;
+    views?: number;
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -562,8 +563,13 @@ const Components = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-white text-xs sm:text-[13px] font-light">
-                          {componentItem.stats || ""}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+                            stroke="white" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="12" cy="12" r="3" stroke="white" strokeOpacity="0.6" strokeWidth="1.5"/>
+                        </svg>
+                        <span className="text-white text-xs font-light">
+                          {componentItem.views || 0} views
                         </span>
                       </div>
                     </div>

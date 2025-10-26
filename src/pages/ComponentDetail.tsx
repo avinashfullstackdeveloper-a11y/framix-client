@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { trackComponentView } from "@/lib/api";
 import {
   Popover,
   PopoverContent,
@@ -176,6 +177,18 @@ const ComponentDetail: React.FC = () => {
       })
       .catch(() => setLoading(false));
   }, [id, token]);
+
+  // Track component view on mount (with ref to prevent double-counting in StrictMode)
+  const hasTrackedView = useRef(false);
+  
+  useEffect(() => {
+    if (id && !hasTrackedView.current) {
+      hasTrackedView.current = true;
+      trackComponentView(id).catch(err =>
+        console.error('Failed to track view:', err)
+      );
+    }
+  }, [id]);
 
   // Fetch likes and comments on mount
   useEffect(() => {

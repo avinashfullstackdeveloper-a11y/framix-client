@@ -57,4 +57,12 @@ interface UserStatsChartResponse {
 export async function getUserStatsChart(): Promise<ChartDataPoint[]> {
   const response = await apiRequest<UserStatsChartResponse>("/api/user/stats/chart");
   return response.data;
+
+}
+
+export async function trackComponentView(componentId: string): Promise<{ success: boolean; views: number }> {
+  return apiRequest<{ success: boolean; views: number }>(
+    `/api/components/${componentId}/view`,
+    { method: 'POST' }
+  );
 }

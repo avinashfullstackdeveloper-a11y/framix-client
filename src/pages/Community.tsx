@@ -232,9 +232,11 @@ const CommunityList = () => {
   const InteractionButtons = ({
     likes,
     comments,
+    views
   }: {
     likes: number;
     comments: number;
+    views?: number;
   }) => {
     return (
       <div className="flex items-center gap-3">
@@ -281,6 +283,18 @@ const CommunityList = () => {
             {comments}
           </span>
         </button>
+        {views !== undefined && (
+          <div className="flex items-center gap-1">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+                stroke="white" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="12" r="3" stroke="white" strokeOpacity="0.6" strokeWidth="1.5"/>
+            </svg>
+            <span className="text-muted-foreground text-xs font-normal">
+              {views}
+            </span>
+          </div>
+        )}
       </div>
     );
   };
@@ -720,6 +734,7 @@ const CommunityList = () => {
                               ? component.comments.length
                               : 0)
                           }
+                          views={component.views || 0}
                         />
                       </div>
                     </div>
@@ -964,6 +979,7 @@ const CommunityList = () => {
                               ? component.comments.length
                               : 0)
                           }
+                          views={component.views || 0}
                         />
                       </div>
 
