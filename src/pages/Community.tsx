@@ -312,11 +312,12 @@ const CommunityList = () => {
       if (
         (component.language &&
           (component.language.toLowerCase() === "tailwind" ||
-           component.language.toLowerCase() === "tailwindcss") &&
+            component.language.toLowerCase() === "tailwindcss") &&
           (component.code || component.tailwind)) ||
         (component.technology === "tailwind" && component.tailwindCode)
       ) {
-        const tailwindHtml = component.code || component.tailwind || component.tailwindCode || "";
+        const tailwindHtml =
+          component.code || component.tailwind || component.tailwindCode || "";
         const srcDoc = `
           <!DOCTYPE html>
           <html>
@@ -410,12 +411,11 @@ const CommunityList = () => {
       }
 
       // Multi-language (full HTML doc)
-      if (
-        component.language &&
-        component.language.toLowerCase() === "multi"
-      ) {
+      if (component.language && component.language.toLowerCase() === "multi") {
         // Build srcDoc from separate fields if code field is missing
-        const srcDoc = component.code || `
+        const srcDoc =
+          component.code ||
+          `
           <!DOCTYPE html>
           <html>
             <head>
@@ -440,7 +440,7 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        
+
         return (
           <iframe
             srcDoc={srcDoc}
@@ -654,7 +654,7 @@ const CommunityList = () => {
               >
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
-                    <div className="h-64 rounded-t-lg relative overflow-hidden bg-black">
+                    <div className="h-64 rounded-t-lg relative overflow-hidden" style={{ backgroundColor: "#9ca3af" }}>
                       <LivePreview component={component} />
                       <div className="absolute top-3 right-3 z-10">
                         <Badge
@@ -967,7 +967,7 @@ const CommunityList = () => {
                         />
                       </div>
 
-                      <div className="h-96 bg-black rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                      <div className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: "#9ca3af" }}>
                         <LivePreview component={component} />
                       </div>
 
