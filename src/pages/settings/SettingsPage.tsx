@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AccountSection } from "./AccountSection.tsx";
 
+import StatsSection from "./StatsSection.tsx";
+
 interface SidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
@@ -97,12 +99,7 @@ export default function SettingsPage() {
             )}
             {activeSection === "stats" && (
               <section className="h-full">
-                <div className="max-w-3xl mx-auto space-y-8 h-full flex flex-col justify-center">
-                  <h2 className="text-2xl font-semibold mb-4">Stats</h2>
-                  <p className="text-neutral-400">
-                    Stats section (dummy content)
-                  </p>
-                </div>
+                <StatsSection />
               </section>
             )}
           </div>
