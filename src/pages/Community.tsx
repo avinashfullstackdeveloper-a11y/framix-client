@@ -695,7 +695,7 @@ const CommunityList = () => {
                   <CardContent className="p-0">
                     <div
                       className="h-64 rounded-t-lg relative overflow-hidden"
-                      style={{ backgroundColor: "#9ca3af" }}
+                      style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
                       <div className="absolute top-3 right-3 z-10">
@@ -982,7 +982,7 @@ const CommunityList = () => {
 
                     <div
                       className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
-                      style={{ backgroundColor: "#9ca3af" }}
+                      style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
                     </div>
