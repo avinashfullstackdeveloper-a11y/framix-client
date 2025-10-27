@@ -494,3 +494,8 @@ All colors MUST be HSL.
     flex-wrap: wrap;
   }
 }
+.copy-btn-pink-hover:hover {
+  background-color: #FF479C !important;
+  border-color: #FF479C !important;
+  color: #fff !important;
+}

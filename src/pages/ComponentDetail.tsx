@@ -87,7 +87,7 @@ const ComponentDetail: React.FC = () => {
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -702,6 +702,7 @@ const ComponentDetail: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="copy-btn-pink-hover"
                     onClick={() => {
                       let codeToCopy = "";
                       if (technology === "css") {
@@ -719,13 +720,7 @@ const ComponentDetail: React.FC = () => {
                   >
                     Copy
                   </Button>
-                  <Button
-                    variant={isEditing ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsEditing(!isEditing)}
-                  >
-                    {isEditing ? "Save" : "Edit"}
-                  </Button>
+                  {/* Edit button removed: editor is always editable */}
                   <FigmaButton
                     onClick={() => {
                       let codeToCopy = "";
