@@ -172,7 +172,7 @@ const CommunityList = () => {
             referrerPolicy="no-referrer"
           />
         ) : null}
-        <AvatarFallback className="text-black font-medium">
+        <AvatarFallback className="bg-white text-black font-medium">
           {initials}
         </AvatarFallback>
       </ShadAvatar>
