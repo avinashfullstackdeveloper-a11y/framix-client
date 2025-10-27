@@ -631,7 +631,6 @@ export const CommunityUserProfile = ({
     params.id ||
     params.username ||
     Object.values(params)[0]; // fallback to first param if only one exists
-  const [activeFilter, setActiveFilter] = React.useState("all");
   const [user, setUser] = React.useState<UserProfile | null>(null);
   const [loading, setLoading] = React.useState(true);
 
