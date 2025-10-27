@@ -1,5 +1,6 @@
 import React from "react";
 import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 // Types for better TypeScript support
 interface SocialLinks {
@@ -58,23 +59,38 @@ const Avatar = ({
   size = "lg",
   className = "",
   src,
+  identifier,
 }: {
   initials: string;
   size?: "sm" | "md" | "lg";
   className?: string;
   src?: string;
+  identifier?: string;
 }) => {
   const sizeClasses = {
     sm: "w-6 h-6 text-xs",
     md: "w-8 h-8 text-sm",
     lg: "w-24 h-24 text-2xl",
   };
+  
+  // Generate dynamic colors based on identifier (username, email, etc.)
+  const bgColor = generateColorFromString(identifier || initials);
+  const textColor = getContrastTextColor(bgColor);
+  
   return (
-    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 ${className}`}>
       {typeof src === "string" && src ? (
         <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
       ) : null}
-      <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+      <AvatarFallback
+        className="font-medium"
+        style={{
+          backgroundColor: bgColor,
+          color: textColor
+        }}
+      >
+        {initials}
+      </AvatarFallback>
     </ShadAvatar>
   );
 };
@@ -571,123 +587,30 @@ const SharedComponentsGrid = ({
   );
 };
 
-// Filter component with enhanced styling and icons
-const ComponentFilter = ({
-  activeFilter,
-  onFilterChange,
-}: {
-  activeFilter: string;
-  onFilterChange: (filter: string) => void;
-}) => {
-  const filters = [
-    {
-      id: "all",
-      label: "All Components",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="14" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-        </svg>
-      ),
-    },
-    {
-      id: "free",
-      label: "Free",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-        </svg>
-      ),
-    },
-    {
-      id: "pro",
-      label: "Pro",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ),
-    },
-    {
-      id: "popular",
-      label: "Most Popular",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-      ),
-    },
-    {
-      id: "recent",
-      label: "Recent",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      ),
-    },
-  ];
-
+// Filter component with only "All Components" option
+const ComponentFilter = () => {
   return (
     <div className="flex flex-wrap gap-3 mb-6">
-      {filters.map((filter) => (
-        <button
-          key={filter.id}
-          onClick={() => onFilterChange(filter.id)}
-          className={`group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-            activeFilter === filter.id
-              ? "bg-[#FF479C] text-white scale-105"
-              : "bg-secondary/40 text-secondary-foreground hover:bg-secondary/60 hover:scale-105 border border-white/5"
-          }`}
-        >
-          <span
-            className={`transition-transform duration-300 ${
-              activeFilter === filter.id ? "scale-110" : "group-hover:scale-110"
-            }`}
+      <button
+        className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 bg-[#FF479C] text-white scale-105"
+      >
+        <span className="transition-transform duration-300 scale-110">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
           >
-            {filter.icon}
-          </span>
-          {filter.label}
-        </button>
-      ))}
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+          </svg>
+        </span>
+        All Components
+      </button>
     </div>
   );
 };
@@ -1008,6 +931,7 @@ export const CommunityUserProfile = ({
               initials={user.initials}
               size="lg"
               className="border-4 border-[#FF479C]"
+              identifier={user.username || user.name}
             />
           </div>
 
@@ -1090,24 +1014,9 @@ export const CommunityUserProfile = ({
         </div>
       </div>
 
-      {/* Divider with gradient */}
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-[#FF479C] px-6 py-2 rounded-full text-sm font-semibold text-white shadow-lg">
-            Shared Components
-          </span>
-        </div>
-      </div>
-
       {/* Components Section */}
       <div className="mt-8 relative">
-        <ComponentFilter
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
+        <ComponentFilter />
 
         {user.sharedComponents.length === 0 ? (
           // Empty state

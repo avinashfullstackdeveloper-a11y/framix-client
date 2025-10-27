@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Heart, ExternalLink, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 type FavouriteComponent = {
   id: string;
@@ -51,11 +52,13 @@ const Avatar = ({
   size = "sm",
   className = "",
   src,
+  identifier,
 }: {
   initials: string;
   size?: "sm" | "md" | "lg";
   className?: string;
   src?: string;
+  identifier?: string;
 }) => {
   const sizeClasses = {
     sm: "w-6 h-6 text-xs",
@@ -63,12 +66,24 @@ const Avatar = ({
     lg: "w-12 h-12 text-base",
   };
 
+  // Generate dynamic colors based on identifier
+  const bgColor = generateColorFromString(identifier || initials);
+  const textColor = getContrastTextColor(bgColor);
+
   return (
-    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 ${className}`}>
       {typeof src === "string" && src ? (
         <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
       ) : null}
-      <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+      <AvatarFallback
+        className="font-medium"
+        style={{
+          backgroundColor: bgColor,
+          color: textColor
+        }}
+      >
+        {initials}
+      </AvatarFallback>
     </ShadAvatar>
   );
 };
@@ -699,6 +714,10 @@ const Favourite: React.FC = () => {
                         src={component.createdBy?.avatar}
                         size="sm"
                         className="flex-shrink-0"
+                        identifier={
+                          component.createdBy?.username ||
+                          component.createdBy?.name
+                        }
                       />
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium group-hover/author:underline truncate">

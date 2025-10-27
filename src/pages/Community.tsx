@@ -10,6 +10,7 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,11 +148,13 @@ const CommunityList = () => {
     size = "sm",
     className = "",
     src,
+    identifier,
   }: {
     initials: string;
     size?: "sm" | "md" | "lg";
     className?: string;
     src?: string;
+    identifier?: string;
   }) => {
     const sizeClasses = {
       sm: "w-6 h-6 text-xs",
@@ -159,9 +162,13 @@ const CommunityList = () => {
       lg: "w-12 h-12 text-base",
     };
 
+    // Generate dynamic colors based on identifier (username, email, name)
+    const bgColor = generateColorFromString(identifier || initials);
+    const textColor = getContrastTextColor(bgColor);
+
     return (
       <ShadAvatar
-        className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}
+        className={`${sizeClasses[size]} border border-neutral-700 ${className}`}
       >
         {typeof src === "string" && src ? (
           <AvatarImage
@@ -172,7 +179,13 @@ const CommunityList = () => {
             referrerPolicy="no-referrer"
           />
         ) : null}
-        <AvatarFallback className="bg-white text-black font-medium">
+        <AvatarFallback
+          className="font-medium"
+          style={{
+            backgroundColor: bgColor,
+            color: textColor
+          }}
+        >
           {initials}
         </AvatarFallback>
       </ShadAvatar>
@@ -741,6 +754,12 @@ const CommunityList = () => {
                             }
                             size="sm"
                             className="flex-shrink-0"
+                            identifier={
+                              component.createdBy?.email ||
+                              component.createdBy?.username ||
+                              component.createdBy?.name ||
+                              component.author?.name
+                            }
                           />
                           <div className="min-w-0 flex-1">
                             <div className="text-sm font-medium group-hover:underline truncate">
@@ -1007,6 +1026,12 @@ const CommunityList = () => {
                             }
                             size="sm"
                             className="flex-shrink-0"
+                            identifier={
+                              component.createdBy?.email ||
+                              component.createdBy?.username ||
+                              component.createdBy?.name ||
+                              component.author?.name
+                            }
                           />
                           <div className="min-w-0 flex-1">
                             <div className="text-sm font-medium group-hover:underline truncate">

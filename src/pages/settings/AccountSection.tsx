@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
   // Avatar UI: show user.avatar if present, else initials fallback
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 interface AccountSectionProps {
   className?: string;
@@ -22,6 +23,11 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  
+  // Generate dynamic colors
+  const bgColor = generateColorFromString(user?.email || displayName);
+  const textColor = getContrastTextColor(bgColor);
+  
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -88,7 +94,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
         {/* Account Information Section */}
         <section className="w-full max-md:max-w-full">
           <div className="flex w-full items-center gap-2 text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose flex-wrap max-md:max-w-full">
-            <Avatar className="h-8 w-8 border border-neutral-700 bg-white text-black">
+            <Avatar className="h-8 w-8 border border-neutral-700">
               {typeof user?.avatar === "string" && user.avatar ? (
                 <AvatarImage
                   key={user.avatar}
@@ -98,7 +104,13 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
                   referrerPolicy="no-referrer"
                 />
               ) : null}
-              <AvatarFallback className="text-black font-semibold">
+              <AvatarFallback
+                className="font-semibold"
+                style={{
+                  backgroundColor: bgColor,
+                  color: textColor
+                }}
+              >
                 {initials}
               </AvatarFallback>
             </Avatar>

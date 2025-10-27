@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  // Generate dynamic colors for users without profile pictures
+  const bgColor = generateColorFromString(user.email || displayName);
+  const textColor = getContrastTextColor(bgColor);
 
   const handleSignOut = async () => {
     try {
@@ -51,7 +56,7 @@ export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="h-10 w-10 border border-neutral-300 bg-white text-black hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200">
+        <Avatar className="h-10 w-10 border border-neutral-300 hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200">
           <AvatarImage
             key={user.avatar}
             src={user.avatar || ""}
@@ -59,7 +64,13 @@ export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
             referrerPolicy="no-referrer"
             crossOrigin="anonymous"
           />
-          <AvatarFallback className="text-black font-semibold">
+          <AvatarFallback
+            className="font-semibold"
+            style={{
+              backgroundColor: bgColor,
+              color: textColor
+            }}
+          >
             {initials}
           </AvatarFallback>
         </Avatar>

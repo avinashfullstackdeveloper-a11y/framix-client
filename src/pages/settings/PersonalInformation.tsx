@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
   // Avatar UI: show user.avatar if present, else initials fallback
   import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 interface ProfileData {
   name: string;
@@ -360,6 +361,10 @@ export default function PersonalInformation() {
       .toUpperCase()
       .slice(0, 2);
 
+  // Generate dynamic colors
+  const bgColor = generateColorFromString(user?.email || displayName);
+  const textColor = getContrastTextColor(bgColor);
+
   return (
     <div className="min-h-[600px] bg-black text-white">
       <div className="space-y-8">
@@ -381,11 +386,17 @@ export default function PersonalInformation() {
           <CardContent>
             {/* Avatar display */}
             <div className="flex items-center mb-6">
-              <Avatar className="h-16 w-16 border border-neutral-700 bg-white text-black mr-4">
+              <Avatar className="h-16 w-16 border border-neutral-700 mr-4">
                 {typeof user?.avatar === "string" && user.avatar ? (
                   <AvatarImage key={user.avatar} src={user.avatar} alt={displayName} crossOrigin="anonymous" referrerPolicy="no-referrer" />
                 ) : null}
-                <AvatarFallback className="text-black font-semibold">
+                <AvatarFallback
+                  className="font-semibold"
+                  style={{
+                    backgroundColor: bgColor,
+                    color: textColor
+                  }}
+                >
                   {initials}
                 </AvatarFallback>
               </Avatar>
