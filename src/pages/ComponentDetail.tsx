@@ -611,10 +611,7 @@ const ComponentDetail: React.FC = () => {
           {/* Preview Panel */}
           <Card className="overflow-hidden bg-white border-white">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-black">
-                  {backgroundColor}
-                </CardTitle>
+              <div className="flex items-center justify-end">
                 <Popover
                   open={showColorPicker}
                   onOpenChange={setShowColorPicker}
@@ -629,7 +626,7 @@ const ComponentDetail: React.FC = () => {
                         className="w-4 h-4 rounded border"
                         style={{ backgroundColor }}
                       />
-                      <span>Background</span>
+                      <span className="ml-2">{backgroundColor}</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64">

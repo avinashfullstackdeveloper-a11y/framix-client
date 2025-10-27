@@ -959,8 +959,7 @@ const ComponentEditor: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Preview Panel */}
           <div className="bg-white rounded-lg border-white shadow-sm overflow-hidden flex flex-col h-[600px]">
-            <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
-              <h3 className="font-semibold text-black">{backgroundColor}</h3>
+            <div className="p-4 border-b bg-muted/50 flex justify-end items-center">
               <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
                 <PopoverTrigger asChild>
                   <Button
@@ -972,7 +971,7 @@ const ComponentEditor: React.FC = () => {
                       className="w-4 h-4 rounded border border-gray-300"
                       style={{ backgroundColor }}
                     />
-                    <span>Background</span>
+                    <span className="ml-2">{backgroundColor}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64">
