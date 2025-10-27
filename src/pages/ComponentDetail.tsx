@@ -225,7 +225,6 @@ const ComponentDetail: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("[Comments] Fetched comments:", data);
         setComments(
           Array.isArray(data.comments)
             ? data.comments
