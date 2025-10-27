@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
   // Avatar UI: show user.avatar if present, else initials fallback
@@ -11,19 +12,16 @@ interface AccountSectionProps {
 export const AccountSection: React.FC<AccountSectionProps> = ({
   className = "",
 }) => {
-
-
   const { user, isLoading, deleteAccount } = useAuth();
   const { toast } = useToast();
 
   const displayName = user?.username || user?.name || user?.email || "";
-  const initials =
-    displayName
-      .split(" ")
-      .map((n: string) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const initials = displayName
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -48,18 +46,18 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
     try {
       // Wait for backend confirmation before clearing local data and logging out
       await deleteAccount();
-      
+
       // Show success toast
       toast({
         title: "Account Deleted",
         description: "Your account has been permanently deleted.",
         variant: "default",
       });
-      
+
       setIsDeleting(false);
       setShowConfirmDialog(false);
       setConfirmText("");
-      
+
       // Redirect to SignIn page after a short delay to show the toast
       setTimeout(() => {
         window.location.href = "/signin";
@@ -92,7 +90,13 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
           <div className="flex w-full items-center gap-2 text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose flex-wrap max-md:max-w-full">
             <Avatar className="h-8 w-8 border border-neutral-700 bg-white text-black">
               {typeof user?.avatar === "string" && user.avatar ? (
-                <AvatarImage key={user.avatar} src={user.avatar} alt={displayName} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                <AvatarImage
+                  key={user.avatar}
+                  src={user.avatar}
+                  alt={displayName}
+                  crossOrigin="anonymous"
+                  referrerPolicy="no-referrer"
+                />
               ) : null}
               <AvatarFallback className="text-black font-semibold">
                 {initials}
@@ -104,7 +108,9 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
             {isLoading ? (
               <div className="text-neutral-400">Loading...</div>
             ) : !user ? (
-              <div className="text-neutral-400">Please sign in to view this page</div>
+              <div className="text-neutral-400">
+                Please sign in to view this page
+              </div>
             ) : (
               <form>
                 <div className="w-full pt-0.5 max-md:max-w-full">
@@ -176,8 +182,8 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
         </section>
 
         {/* Confirmation Dialog */}
-        {showConfirmDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        {showConfirmDialog && ReactDOM.createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
             <div className="bg-[rgba(17,17,17,1)] border border-[rgba(255,71,156,0.6)] rounded-lg p-6 max-w-md w-full mx-4">
               <h3 className="text-xl text-white font-semibold mb-4">
                 Confirm Account Deletion
@@ -225,7 +231,8 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
