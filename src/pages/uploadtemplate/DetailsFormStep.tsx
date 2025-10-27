@@ -76,7 +76,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
             value={formData.templateName}
             onChange={(e) => onInputChange('templateName', e.target.value)}
             placeholder="e.g., Modern SaaS Dashboard"
-            className="flex h-9 items-center shrink-0 self-stretch box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
+            className="flex h-9 items-center shrink-0 self-stretch box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
             required
           />
         </div>
@@ -95,7 +95,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               onChange={(e) => onInputChange('shortTagline', e.target.value)}
               placeholder="Brief description in one line"
               maxLength={100}
-              className="flex w-full h-9 items-center shrink-0 absolute box-border bg-black pl-3 pr-16 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] left-0 top-0 max-md:w-full"
+              className="flex w-full h-9 items-center shrink-0 absolute box-border bg-black pl-3 pr-16 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] left-0 top-0 max-md:w-full"
               required
             />
             <div className="flex w-[41px] justify-center items-center absolute h-6 box-border right-3 top-1.5 max-md:w-full">
@@ -118,7 +118,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
             onChange={(e) => onInputChange('description', e.target.value)}
             placeholder="Describe your template, its features, and use cases..."
             maxLength={500}
-            className="flex h-32 items-start shrink-0 self-stretch box-border bg-black px-3 py-2 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] text-white text-sm font-normal leading-5 placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] resize-none max-md:w-full"
+            className="flex h-32 items-start shrink-0 self-stretch box-border bg-black px-3 py-2 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] text-white text-sm font-normal leading-5 placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] resize-none max-md:w-full"
             required
           />
           <div className="flex h-6 justify-between items-start shrink-0 self-stretch box-border max-md:w-full">
@@ -146,7 +146,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
             <button
               type="button"
               onClick={onDropdownToggle}
-              className="flex h-9 justify-between items-center shrink-0 self-stretch w-full box-border bg-black px-3 py-0 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] focus:outline-none focus:border-[#FF479C] max-md:w-full"
+              className="flex h-9 justify-between items-center shrink-0 self-stretch w-full box-border bg-black px-3 py-0 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] focus:outline-none focus:border-[#FF479C] max-md:w-full"
             >
               <span className="flex w-[105px] h-5 items-center gap-2 box-border max-md:w-full">
                 <span className="text-sm font-normal leading-5 box-border max-md:w-full text-left">
@@ -163,7 +163,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               />
             </button>
             {isDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-black border border-[#FF9AC9] rounded-[14px] z-10 max-h-48 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-black border border-[#FF479C] rounded-[14px] z-10 max-h-48 overflow-y-auto">
                 {categories.map((category) => (
                   <button
                     key={category}
@@ -172,7 +172,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
                       onInputChange('category', category);
                       onDropdownToggle();
                     }}
-                    className="w-full text-left px-3 py-2 text-white hover:bg-[#FF9AC9] hover:text-black transition-colors text-sm"
+                    className="w-full text-left px-3 py-2 text-white hover:bg-[#FF479C] hover:text-black transition-colors text-sm"
                   >
                     {category}
                   </button>
@@ -197,10 +197,10 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               <div
                 dangerouslySetInnerHTML={{
                   __html:
-                    "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" class=\"ai-suggest-icon\" style=\"box-sizing: border-box; width: 16px; height: 16px\"> <g clip-path=\"url(#clip0_518_4924)\"> <path d=\"M6.6243 10.3334C6.56478 10.1027 6.44453 9.89215 6.27605 9.72367C6.10757 9.55519 5.89702 9.43494 5.6663 9.37542L1.5763 8.32075C1.50652 8.30095 1.44511 8.25892 1.40138 8.20105C1.35765 8.14318 1.33398 8.07262 1.33398 8.00008C1.33398 7.92755 1.35765 7.85699 1.40138 7.79912C1.44511 7.74125 1.50652 7.69922 1.5763 7.67942L5.6663 6.62408C5.89693 6.56462 6.10743 6.44447 6.2759 6.27611C6.44438 6.10775 6.56468 5.89734 6.6243 5.66675L7.67897 1.57675C7.69857 1.5067 7.74056 1.44498 7.79851 1.40101C7.85647 1.35705 7.92722 1.33325 7.99997 1.33325C8.07271 1.33325 8.14346 1.35705 8.20142 1.40101C8.25938 1.44498 8.30136 1.5067 8.32097 1.57675L9.37497 5.66675C9.43449 5.89747 9.55474 6.10802 9.72322 6.2765C9.8917 6.44498 10.1023 6.56523 10.333 6.62475L14.423 7.67875C14.4933 7.69815 14.5553 7.74009 14.5995 7.79814C14.6437 7.85618 14.6677 8.02713 14.6677 8.00008C14.6677 8.07304 14.6437 8.14399 14.5995 8.20203C14.5553 8.26008 14.4933 8.30202 14.423 8.32142L10.333 9.37542C10.1023 9.43494 9.8917 9.55519 9.72322 9.72367C9.55474 9.89215 9.43449 10.1027 9.37497 10.3334L8.3203 14.4234C8.3007 14.4935 8.25871 14.5552 8.20075 14.5992C8.1428 14.6431 8.07205 14.6669 7.9993 14.6669C7.92656 14.6669 7.85581 14.6431 7.79785 14.5992C7.73989 14.5552 7.69791 14.4935 7.6783 14.4234L6.6243 10.3334Z\" stroke=\"#FF9AC9\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M13.334 2V4.66667\" stroke=\"#FF9AC9\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M14.6667 3.33325H12\" stroke=\"#FF9AC9\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M2.66602 11.3333V12.6666\" stroke=\"#FF9AC9\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M3.33333 12H2\" stroke=\"#FF9AC9\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> </g> <defs> <clipPath id=\"clip0_518_4924\"> <rect width=\"16\" height=\"16\" fill=\"white\"></rect> </clipPath> </defs> </svg>",
+                    "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" class=\"ai-suggest-icon\" style=\"box-sizing: border-box; width: 16px; height: 16px\"> <g clip-path=\"url(#clip0_518_4924)\"> <path d=\"M6.6243 10.3334C6.56478 10.1027 6.44453 9.89215 6.27605 9.72367C6.10757 9.55519 5.89702 9.43494 5.6663 9.37542L1.5763 8.32075C1.50652 8.30095 1.44511 8.25892 1.40138 8.20105C1.35765 8.14318 1.33398 8.07262 1.33398 8.00008C1.33398 7.92755 1.35765 7.85699 1.40138 7.79912C1.44511 7.74125 1.50652 7.69922 1.5763 7.67942L5.6663 6.62408C5.89693 6.56462 6.10743 6.44447 6.2759 6.27611C6.44438 6.10775 6.56468 5.89734 6.6243 5.66675L7.67897 1.57675C7.69857 1.5067 7.74056 1.44498 7.79851 1.40101C7.85647 1.35705 7.92722 1.33325 7.99997 1.33325C8.07271 1.33325 8.14346 1.35705 8.20142 1.40101C8.25938 1.44498 8.30136 1.5067 8.32097 1.57675L9.37497 5.66675C9.43449 5.89747 9.55474 6.10802 9.72322 6.2765C9.8917 6.44498 10.1023 6.56523 10.333 6.62475L14.423 7.67875C14.4933 7.69815 14.5553 7.74009 14.5995 7.79814C14.6437 7.85618 14.6677 8.02713 14.6677 8.00008C14.6677 8.07304 14.6437 8.14399 14.5995 8.20203C14.5553 8.26008 14.4933 8.30202 14.423 8.32142L10.333 9.37542C10.1023 9.43494 9.8917 9.55519 9.72322 9.72367C9.55474 9.89215 9.43449 10.1027 9.37497 10.3334L8.3203 14.4234C8.3007 14.4935 8.25871 14.5552 8.20075 14.5992C8.1428 14.6431 8.07205 14.6669 7.9993 14.6669C7.92656 14.6669 7.85581 14.6431 7.79785 14.5992C7.73989 14.5552 7.69791 14.4935 7.6783 14.4234L6.6243 10.3334Z\" stroke=\"#FF479C\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M13.334 2V4.66667\" stroke=\"#FF479C\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M14.6667 3.33325H12\" stroke=\"#FF479C\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M2.66602 11.3333V12.6666\" stroke=\"#FF479C\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> <path d=\"M3.33333 12H2\" stroke=\"#FF479C\" stroke-width=\"1.33333\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path> </g> <defs> <clipPath id=\"clip0_518_4924\"> <rect width=\"16\" height=\"16\" fill=\"white\"></rect> </clipPath> </defs> </svg>",
                 }}
               />
-              <span className="text-[#FF9AC9] text-sm font-normal leading-5 w-[69px] h-5 box-border max-md:w-full">
+              <span className="text-[#FF479C] text-sm font-normal leading-5 w-[69px] h-5 box-border max-md:w-full">
                 AI Suggest
               </span>
             </button>
@@ -212,12 +212,12 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               onChange={(e) => onNewTagChange(e.target.value)}
               onKeyPress={onKeyPress}
               placeholder="Add tags..."
-              className="flex w-full h-9 items-center box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
+              className="flex w-full h-9 items-center box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
             />
             <button
               type="button"
               onClick={onAddTag}
-              className="flex w-10 h-9 justify-center items-center box-border bg-[#FF9AC9] rounded-[14px] hover:bg-[#FF7AB8] transition-colors max-md:w-full"
+              className="flex w-10 h-9 justify-center items-center box-border bg-[#FF479C] rounded-[14px] hover:bg-[#FF7AB8] transition-colors max-md:w-full"
             >
               <div
                 dangerouslySetInnerHTML={{
@@ -232,7 +232,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               {formData.tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-[#FF9AC9] text-black text-sm rounded-md"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-[#FF479C] text-black text-sm rounded-md"
                 >
                   {tag}
                   <button
@@ -282,7 +282,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               value={formData.liveDemoLink}
               onChange={(e) => onInputChange('liveDemoLink', e.target.value)}
               placeholder="https://demo.yourtemplate.com"
-              className="flex h-9 items-center shrink-0 self-stretch box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
+              className="flex h-9 items-center shrink-0 self-stretch box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
             />
           </div>
           <div className="flex h-[87px] flex-col items-start gap-4 shrink-0 self-stretch box-border max-md:w-full">
@@ -296,7 +296,7 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
               value={formData.teamCredits}
               onChange={(e) => onInputChange('teamCredits', e.target.value)}
               placeholder="Design by John Doe, Development by Jane Smith"
-              className="flex h-9 items-center shrink-0 self-stretch box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF9AC9] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
+              className="flex h-9 items-center shrink-0 self-stretch box-border bg-black px-3 py-1 rounded-[14px] border-[0.667px] border-solid border-[#FF479C] text-white text-sm font-normal placeholder:text-[#717182] focus:outline-none focus:border-[#FF479C] max-md:w-full"
             />
           </div>
         </div>
@@ -306,14 +306,14 @@ const DetailsFormStep: React.FC<DetailsFormStepProps> = ({
           <button
             type="button"
             onClick={onGoBack}
-            className="flex w-[120px] h-9 justify-center items-center gap-2 border box-border bg-black px-6 py-2 rounded-[14px] border-solid border-[rgba(255,154,201,0.60)] text-white text-sm font-normal leading-5 hover:border-[#FF9AC9] transition-colors max-md:w-full"
+            className="flex w-[120px] h-9 justify-center items-center gap-2 border box-border bg-black px-6 py-2 rounded-[14px] border-solid border-[rgba(255,154,201,0.60)] text-white text-sm font-normal leading-5 hover:border-[#FF479C] transition-colors max-md:w-full"
           >
             Back
           </button>
           <button
             type="button"
             onClick={onNext}
-            className="flex w-[260px] h-9 justify-center items-center gap-2 box-border bg-[#FF9AC9] px-8 py-2 rounded-[14px] text-black text-sm font-bold leading-5 hover:bg-[#FF7AB8] transition-colors max-md:w-full"
+            className="flex w-[260px] h-9 justify-center items-center gap-2 box-border bg-[#FF479C] px-8 py-2 rounded-[14px] text-black text-sm font-bold leading-5 hover:bg-[#FF7AB8] transition-colors max-md:w-full"
           >
             Set Price &amp; License
           </button>

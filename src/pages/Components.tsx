@@ -568,7 +568,7 @@ const Components = () => {
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 neon-hero">
           <span className="neon-hero-text">
-            <span className="text-[#FF9AC9] neon-hero-glow">Components</span>
+            <span className="text-[#FF479C] neon-hero-glow">Components</span>
           </span>{" "}
           Showcase
         </h1>
@@ -588,8 +588,8 @@ const Components = () => {
               onClick={() => setActiveFilter(filter)}
               className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
                 activeFilter === filter
-                  ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828]"
-                  : "bg-[rgba(0,0,0,0.80)] border-[#767676] text-white hover:border-[#FF9AC9]"
+                  ? "bg-[#FF479C] border-[#FF479C] text-[#282828]"
+                  : "bg-[rgba(0,0,0,0.80)] border-[#767676] text-white hover:border-[#FF479C]"
               }`}
             >
               <span className="text-xs sm:text-sm font-medium truncate px-2 sm:px-3">
@@ -640,7 +640,7 @@ const Components = () => {
                 className="cursor-pointer w-full"
               >
                 <div
-                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
                   style={{ backgroundColor: "#2d3135" }}
                 >
                   {/* Views moved to top left, not close to the border */}
@@ -710,7 +710,7 @@ const Components = () => {
                         <span
                           className={`text-xs sm:text-sm font-normal ${
                             componentItem.badge === "Pro"
-                              ? "text-[#FF9AC9]"
+                              ? "text-[#FF479C]"
                               : "text-white"
                           }`}
                         >
@@ -736,7 +736,7 @@ const Components = () => {
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
                 ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
-                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
+                : "bg-[#FF479C] text-[#282828] hover:opacity-90"
             }`}
           >
             Previous
@@ -754,7 +754,7 @@ const Components = () => {
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages
                 ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
-                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
+                : "bg-[#FF479C] text-[#282828] hover:opacity-90"
             }`}
           >
             Next

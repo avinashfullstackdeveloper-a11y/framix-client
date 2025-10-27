@@ -34,7 +34,7 @@ const AdminSidebar: React.FC = () => {
                 className={({ isActive }) => 
                   `block w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border ${
                     isActive 
-                      ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828] shadow-[0_0_20px_rgba(255,154,201,0.3)]" 
+                      ? "bg-[#FF479C] border-[#FF479C] text-[#282828] shadow-[0_0_20px_rgba(255,154,201,0.3)]" 
                       : "border-transparent text-[#767676] hover:text-white hover:bg-[#3A3A3A] hover:border-[#3A3A3A]"
                   }`
                 }

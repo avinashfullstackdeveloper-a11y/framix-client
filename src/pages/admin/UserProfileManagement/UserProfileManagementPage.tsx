@@ -97,7 +97,7 @@ const UserProfileManagementPage: React.FC = () => {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          <span className="text-[#FF9AC9]">User Profile</span> Management
+          <span className="text-[#FF479C]">User Profile</span> Management
         </h1>
         <p className="text-base sm:text-lg text-[#767676] max-w-2xl mx-auto">
           Manage user accounts, roles, and permissions across the platform.
@@ -106,17 +106,17 @@ const UserProfileManagementPage: React.FC = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300">
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300">
           <div className="flex justify-center mb-3">
-            <User className="w-8 h-8 text-[#FF9AC9]" />
+            <User className="w-8 h-8 text-[#FF479C]" />
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">{users.length}</h3>
           <p className="text-sm text-[#767676]">Total Users</p>
         </div>
         
-        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300">
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300">
           <div className="flex justify-center mb-3">
-            <Shield className="w-8 h-8 text-[#FF9AC9]" />
+            <Shield className="w-8 h-8 text-[#FF479C]" />
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">
             {users.filter(u => u.role === 'admin').length}
@@ -124,9 +124,9 @@ const UserProfileManagementPage: React.FC = () => {
           <p className="text-sm text-[#767676]">Admin Users</p>
         </div>
         
-        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300">
+        <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300">
           <div className="flex justify-center mb-3">
-            <Activity className="w-8 h-8 text-[#FF9AC9]" />
+            <Activity className="w-8 h-8 text-[#FF479C]" />
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">
             {users.filter(u => u.isActive).length}
@@ -139,7 +139,7 @@ const UserProfileManagementPage: React.FC = () => {
       <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl overflow-hidden">
         <div className="p-6 border-b border-[#3A3A3A]">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <User className="w-5 h-5 text-[#FF9AC9]" />
+            <User className="w-5 h-5 text-[#FF479C]" />
             User Accounts
           </h2>
         </div>
@@ -148,32 +148,32 @@ const UserProfileManagementPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-[#3A3A3A] hover:bg-transparent">
-                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                <TableHead className="text-[#FF479C] font-medium py-4">
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4" />
                     Name
                   </div>
                 </TableHead>
-                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                <TableHead className="text-[#FF479C] font-medium py-4">
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
                     Email
                   </div>
                 </TableHead>
-                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                <TableHead className="text-[#FF479C] font-medium py-4">
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4" />
                     Role
                   </div>
                 </TableHead>
-                <TableHead className="text-[#FF9AC9] font-medium py-4">
+                <TableHead className="text-[#FF479C] font-medium py-4">
                   <div className="flex items-center gap-2">
                     <Activity className="w-4 h-4" />
                     Status
                   </div>
                 </TableHead>
                 {currentUser?.role === "admin" && (
-                  <TableHead className="text-[#FF9AC9] font-medium py-4 text-center">
+                  <TableHead className="text-[#FF479C] font-medium py-4 text-center">
                     Actions
                   </TableHead>
                 )}
@@ -194,7 +194,7 @@ const UserProfileManagementPage: React.FC = () => {
                   <TableCell className="py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       u.role === 'admin' 
-                        ? 'bg-[#FF9AC9] text-[#282828]' 
+                        ? 'bg-[#FF479C] text-[#282828]' 
                         : 'bg-[#3A3A3A] text-white'
                     }`}>
                       {u.role}

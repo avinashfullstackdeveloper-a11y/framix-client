@@ -294,7 +294,7 @@ const LandingPage = () => {
                 <span className="neon-hero-text">Accelerate products with</span>
                 <span className="neon-hero-text">
                   ready-made{" "}
-                  <span className="text-[#FF9AC9] neon-hero-glow">
+                  <span className="text-[#FF479C] neon-hero-glow">
                     components
                   </span>
                 </span>
@@ -368,9 +368,9 @@ const LandingPage = () => {
                   >
                     Your{" "}
                     <span
-                      className="text-[#FF94C9]"
+                      className="text-[#FF479C]"
                       style={{
-                        WebkitTextFillColor: "#FF94C9",
+                        WebkitTextFillColor: "#FF479C",
                         background: "none",
                         WebkitBackgroundClip: "initial",
                       }}
@@ -463,7 +463,7 @@ const LandingPage = () => {
                       <Card
                         className={`h-full p-8 max-md:p-5 max-sm:p-3 flex flex-col justify-between transition-all duration-500 ease-in-out ${
                           isPrimary
-                            ? "bg-[#FF94C9] border-2 border-[#FF94C9] text-black rounded-[20px_20px_0_0] max-md:rounded-[15px_15px_0_0]"
+                            ? "bg-[#FF479C] border-2 border-[#FF479C] text-black rounded-[20px_20px_0_0] max-md:rounded-[15px_15px_0_0]"
                             : "bg-[#A67388] text-white border-0 opacity-70"
                         } ${
                           isLeft
@@ -514,7 +514,7 @@ const LandingPage = () => {
                                 exit={{ opacity: 0 }}
                                 transition={{ delay: 0.2 }}
                               >
-                                <div className="bg-[#FF94C9] rounded-md inline-block px-1 max-md:text-sm max-sm:text-xs">
+                                <div className="bg-[#FF479C] rounded-md inline-block px-1 max-md:text-sm max-sm:text-xs">
                                   <LearnMoreButton
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -560,9 +560,9 @@ const LandingPage = () => {
                   >
                     Trusted{" "}
                     <span
-                      className="text-[#FF94C9]"
+                      className="text-[#FF479C]"
                       style={{
-                        WebkitTextFillColor: "#FF94C9",
+                        WebkitTextFillColor: "#FF479C",
                         background: "none",
                         WebkitBackgroundClip: "initial",
                       }}
@@ -612,9 +612,7 @@ const LandingPage = () => {
                   style={{ borderRadius: "999px", minWidth: "200px" }}
                   asChild
                 >
-                  <Link to="/community">
-                    Start Designing
-                  </Link>
+                  <Link to="/community">Start Designing</Link>
                 </Button>
               </motion.div>
               <motion.div
@@ -743,9 +741,9 @@ const LandingPage = () => {
               >
                 Build your{" "}
                 <span
-                  className="text-[#FF94C9]"
+                  className="text-[#FF479C]"
                   style={{
-                    WebkitTextFillColor: "#FF94C9",
+                    WebkitTextFillColor: "#FF479C",
                     background: "none",
                     WebkitBackgroundClip: "initial",
                   }}
@@ -781,14 +779,14 @@ const LandingPage = () => {
                         isHovered ? "scale-105" : "scale-100"
                       } ${
                         isHovered
-                          ? "bg-gradient-to-br from-[#FF94C9] via-[#FF94C9] to-[#FF94C9]"
+                          ? "bg-gradient-to-br from-[#FF479C] via-[#FF479C] to-[#FF479C]"
                           : "bg-gradient-to-bl from-gray-500 via-gray-700 to-black"
                       }`}
                     >
                       <CardContent className="p-0 flex flex-col items-center justify-center flex-grow">
                         <div
                           className={`flex items-center justify-center w-[106px] h-[106px] rounded-full p-[10px] mb-4 transition-colors duration-300 ${
-                            isHovered ? "bg-[#141414]" : "bg-[#FF94C9]"
+                            isHovered ? "bg-[#141414]" : "bg-[#FF479C]"
                           }`}
                         >
                           <PortfolioIcon
@@ -858,9 +856,9 @@ const LandingPage = () => {
                   >
                     What's{" "}
                     <span
-                      className="text-[#FF94C9]"
+                      className="text-[#FF479C]"
                       style={{
-                        WebkitTextFillColor: "#FF94C9",
+                        WebkitTextFillColor: "#FF479C",
                         background: "none",
                         WebkitBackgroundClip: "initial",
                       }}
@@ -872,7 +870,7 @@ const LandingPage = () => {
                 </h2>
                 <div className="flex items-start mb-8">
                   <div
-                    className="w-1 h-full rounded bg-[#FF94C9] mr-4"
+                    className="w-1 h-full rounded bg-[#FF479C] mr-4"
                     style={{ minHeight: "2.5rem" }}
                   ></div>
                   <p className="text-gray-400">
@@ -886,7 +884,7 @@ const LandingPage = () => {
                     <img
                       src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/b3e01f76687760bdd63bc89d58c852773dafd9b6?placeholderIfAbsent=true"
                       alt="Production-ready UI blocks icon"
-                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                      className="w-12 h-12 flex-shrink-0 rounded-full ring-4 ring-[#FF479C]"
                     />
                     <div>
                       <p className="text-sm text-gray-400">
@@ -899,7 +897,7 @@ const LandingPage = () => {
                     <img
                       src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/baa5ef204155c19dc1745995b471723badd394b1?placeholderIfAbsent=true"
                       alt="Tech stack integration icon"
-                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                      className="w-12 h-12 flex-shrink-0 rounded-full ring-4 ring-[#FF479C]"
                     />
                     <div>
                       <p className="text-sm text-gray-400">
@@ -911,7 +909,7 @@ const LandingPage = () => {
                     <img
                       src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/c1a1cab1584735dfde7a9e9d3b6104f3f90dac06?placeholderIfAbsent=true"
                       alt="Design optimization icon"
-                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                      className="w-12 h-12 flex-shrink-0 rounded-full ring-4 ring-[#FF479C]"
                     />
                     <div>
                       <p className="text-sm text-gray-400">
@@ -924,7 +922,7 @@ const LandingPage = () => {
                     <img
                       src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/faece15b6a9adcb25dea2bf417827b9850409be3?placeholderIfAbsent=true"
                       alt="Scalable systems icon"
-                      className="w-12 h-12 flex-shrink-0 rounded-full"
+                      className="w-12 h-12 flex-shrink-0 rounded-full ring-4 ring-[#FF479C]"
                     />
                     <div>
                       <p className="text-sm text-gray-400">
@@ -1035,7 +1033,7 @@ const LandingPage = () => {
               variants={itemVariants}
               className="text-4xl font-bold mb-4"
             >
-              Voices of Our <span className="text-[#FF94C6]">Creators</span>
+              Voices of Our <span className="text-[#FF479C]">Creators</span>
             </motion.h2>
             <motion.p
               variants={itemVariants}

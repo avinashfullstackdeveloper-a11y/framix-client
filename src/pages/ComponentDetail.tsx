@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { trackComponentView } from "@/lib/api";
-import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Avatar as ShadAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 import {
   Popover,
   PopoverContent,
@@ -607,7 +611,9 @@ const ComponentDetail: React.FC = () => {
           <Card className="overflow-hidden bg-white border-white">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-black">{backgroundColor}</CardTitle>
+                <CardTitle className="text-lg text-black">
+                  {backgroundColor}
+                </CardTitle>
                 <Popover
                   open={showColorPicker}
                   onOpenChange={setShowColorPicker}
@@ -1076,7 +1082,13 @@ const ComponentDetail: React.FC = () => {
                       return (
                         <ShadAvatar className="w-10 h-10 rounded-full bg-muted text-foreground font-semibold text-sm flex-shrink-0">
                           {typeof avatarUrl === "string" && avatarUrl ? (
-                            <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                            <AvatarImage
+                              key={avatarUrl}
+                              src={avatarUrl}
+                              alt={initials}
+                              crossOrigin="anonymous"
+                              referrerPolicy="no-referrer"
+                            />
                           ) : null}
                           <AvatarFallback>{initials}</AvatarFallback>
                         </ShadAvatar>
@@ -1152,7 +1164,13 @@ const ComponentDetail: React.FC = () => {
                             return (
                               <ShadAvatar className="w-8 h-8 rounded-full bg-muted text-foreground font-semibold text-xs flex-shrink-0">
                                 {typeof avatarUrl === "string" && avatarUrl ? (
-                                  <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                  <AvatarImage
+                                    key={avatarUrl}
+                                    src={avatarUrl}
+                                    alt={initials}
+                                    crossOrigin="anonymous"
+                                    referrerPolicy="no-referrer"
+                                  />
                                 ) : null}
                                 <AvatarFallback>{initials}</AvatarFallback>
                               </ShadAvatar>
@@ -1243,8 +1261,15 @@ const ComponentDetail: React.FC = () => {
                                 const avatarUrl = reply.user?.avatar;
                                 return (
                                   <ShadAvatar className="w-8 h-8 rounded-full bg-muted text-foreground font-semibold text-xs flex-shrink-0">
-                                    {typeof avatarUrl === "string" && avatarUrl ? (
-                                      <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                    {typeof avatarUrl === "string" &&
+                                    avatarUrl ? (
+                                      <AvatarImage
+                                        key={avatarUrl}
+                                        src={avatarUrl}
+                                        alt={initials}
+                                        crossOrigin="anonymous"
+                                        referrerPolicy="no-referrer"
+                                      />
                                     ) : null}
                                     <AvatarFallback>{initials}</AvatarFallback>
                                   </ShadAvatar>

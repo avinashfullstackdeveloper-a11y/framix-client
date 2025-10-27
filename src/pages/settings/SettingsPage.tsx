@@ -204,8 +204,8 @@ function TabsMyComponents({
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-t-lg font-semibold transition-all duration-200 border-b-2 ${
               activeTab === tab.key
-                ? "border-[#FF9AC9] text-[#FF9AC9] bg-[#23272b]"
-                : "border-transparent text-white bg-transparent hover:text-[#FF9AC9]"
+                ? "border-[#FF479C] text-[#FF479C] bg-[#23272b]"
+                : "border-transparent text-white bg-transparent hover:text-[#FF479C]"
             }`}
           >
             {tab.label}

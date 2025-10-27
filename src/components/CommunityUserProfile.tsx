@@ -129,7 +129,7 @@ const statsIcons = {
 // Stats display component with simplified styling
 const UserStats = ({ stats }: { stats: UserStats }) => (
   <div className="flex items-center gap-4 md:gap-8">
-    <div className="flex items-center gap-3 bg-[#FF9AC9]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF9AC9]/20">
+    <div className="flex items-center gap-3 bg-[#FF479C]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF479C]/20">
       <div className="text-xl p-2 bg-white/10 rounded-lg">
         {statsIcons.posts}
       </div>
@@ -138,7 +138,7 @@ const UserStats = ({ stats }: { stats: UserStats }) => (
         <div className="text-xs text-muted-foreground font-medium">Posts</div>
       </div>
     </div>
-    <div className="flex items-center gap-3 bg-[#FF9AC9]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF9AC9]/20">
+    <div className="flex items-center gap-3 bg-[#FF479C]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF479C]/20">
       <div className="text-xl w-5 h-5 flex items-center justify-center p-2 bg-white/10 rounded-lg">
         {statsIcons.views}
       </div>
@@ -175,7 +175,7 @@ const SharedComponentsGrid = ({
           className="cursor-pointer w-full"
         >
           <div
-            className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+            className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
             style={{ backgroundColor: "#2d3135" }}
           >
             {/* Views badge in top-left corner */}
@@ -556,7 +556,7 @@ const SharedComponentsGrid = ({
                 <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                   <span
                     className={`text-xs sm:text-sm font-normal ${
-                      comp.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
+                      comp.badge === "Pro" ? "text-[#FF479C]" : "text-white"
                     }`}
                   >
                     {comp.badge || "Free"}
@@ -674,7 +674,7 @@ const ComponentFilter = ({
           onClick={() => onFilterChange(filter.id)}
           className={`group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
             activeFilter === filter.id
-              ? "bg-[#FF9AC9] text-white scale-105"
+              ? "bg-[#FF479C] text-white scale-105"
               : "bg-secondary/40 text-secondary-foreground hover:bg-secondary/60 hover:scale-105 border border-white/5"
           }`}
         >
@@ -898,7 +898,7 @@ export const CommunityUserProfile = ({
           {/* Animated spinner */}
           <div className="relative w-16 h-16">
             <div className="absolute inset-0 rounded-full border-4 border-gray-700"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-t-[#FF9AC9] animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-[#FF479C] animate-spin"></div>
           </div>
           {/* Skeleton loaders */}
           <div className="w-full max-w-2xl space-y-4 animate-pulse">
@@ -949,7 +949,7 @@ export const CommunityUserProfile = ({
             </p>
           </div>
           <button
-            className="mt-6 flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FF9AC9] text-white font-semibold hover:scale-105 transition-all duration-300"
+            className="mt-6 flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FF479C] text-white font-semibold hover:scale-105 transition-all duration-300"
             onClick={handleGoBack}
           >
             <svg width="16" height="17" viewBox="0 0 16 17" fill="none">
@@ -971,7 +971,7 @@ export const CommunityUserProfile = ({
   return (
     <div className="relative w-full max-w-7xl mx-auto bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8 overflow-hidden">
       {/* Decorative gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FF9AC9]/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FF479C]/5 via-transparent to-purple-500/5 pointer-events-none"></div>
 
       {/* Go back button - Simplified */}
       <div className="absolute top-6 left-8 z-10">
@@ -1007,7 +1007,7 @@ export const CommunityUserProfile = ({
               src={user.profilePicture}
               initials={user.initials}
               size="lg"
-              className="border-4 border-[#FF9AC9]"
+              className="border-4 border-[#FF479C]"
             />
           </div>
 
@@ -1096,7 +1096,7 @@ export const CommunityUserProfile = ({
           <div className="w-full border-t border-gradient-to-r from-transparent via-white/10 to-transparent"></div>
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-[#FF9AC9] px-6 py-2 rounded-full text-sm font-semibold text-white shadow-lg">
+          <span className="bg-[#FF479C] px-6 py-2 rounded-full text-sm font-semibold text-white shadow-lg">
             Shared Components
           </span>
         </div>
@@ -1112,13 +1112,13 @@ export const CommunityUserProfile = ({
         {user.sharedComponents.length === 0 ? (
           // Empty state
           <div className="flex flex-col items-center justify-center py-20 space-y-6 bg-secondary/20 backdrop-blur-sm rounded-2xl border border-white/5">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF9AC9]/20 to-purple-500/20 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF479C]/20 to-purple-500/20 flex items-center justify-center">
               <svg
                 width="48"
                 height="48"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#FF9AC9"
+                stroke="#FF479C"
                 strokeWidth="2"
               >
                 <rect x="3" y="3" width="7" height="7" rx="1" />

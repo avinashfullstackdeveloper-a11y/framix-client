@@ -30,7 +30,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps, onStepClic
                   step.completed || step.current
                     ? step.current
                       ? 'bg-white'
-                      : 'bg-[#FF9AC9]'
+                      : 'bg-[#FF479C]'
                     : 'bg-gray-600'
                 }`}
               >

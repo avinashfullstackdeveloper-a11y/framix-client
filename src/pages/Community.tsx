@@ -634,7 +634,7 @@ const CommunityList = () => {
         <h1 className="text-5xl font-bold mb-6">
           Discover
           <span className="neon-hero neon-hero-text">
-            <span className="text-[#FF9AC9] neon-hero-glow"> Incredible</span>
+            <span className="text-[#FF479C] neon-hero-glow"> Incredible</span>
           </span>
           <br />
           <span>Components</span> from Creators
@@ -646,7 +646,7 @@ const CommunityList = () => {
         <div className="flex gap-4 justify-center max-sm:flex-col max-sm:items-center">
           <Link
             to="/components"
-            className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center"
+            className="bg-[#FF479C] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center"
           >
             Browse components
           </Link>
@@ -1044,7 +1044,7 @@ const CommunityList = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === 1
                   ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
+                  : "bg-[#FF479C] hover:bg-[#ffb3da] text-white"
               }`}
             >
               Previous
@@ -1062,7 +1062,7 @@ const CommunityList = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === totalPages
                   ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
+                  : "bg-[#FF479C] hover:bg-[#ffb3da] text-white"
               }`}
             >
               Next
@@ -1080,7 +1080,7 @@ const CommunityList = () => {
         <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
           <DialogTrigger asChild>
             <button
-              className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
+              className="bg-[#FF479C] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
               onClick={() => setPopupOpen(true)}
             >
               Submit Component

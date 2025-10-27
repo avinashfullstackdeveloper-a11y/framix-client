@@ -58,7 +58,7 @@ const BugReportPage: React.FC = () => {
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          <span className="text-[#FF9AC9]">Bug</span> Reports
+          <span className="text-[#FF479C]">Bug</span> Reports
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
           Review and manage all reported bugs with detailed information and user context.
@@ -70,14 +70,14 @@ const BugReportPage: React.FC = () => {
         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl px-6 py-3">
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <Bug className="w-4 h-4 text-[#FF9AC9]" />
+              <Bug className="w-4 h-4 text-[#FF479C]" />
               <span className="text-white">{bugReports.length}</span>
               <span className="text-[#767676]">Total Reports</span>
             </div>
             <div className="w-px h-6 bg-[#3A3A3A]"></div>
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-[#FF9AC9]" />
-              <span className="text-[#FF9AC9] font-medium">Admin Access</span>
+              <AlertTriangle className="w-4 h-4 text-[#FF479C]" />
+              <span className="text-[#FF479C] font-medium">Admin Access</span>
               <span className="text-[#767676]">Priority Review</span>
             </div>
           </div>
@@ -100,16 +100,16 @@ const BugReportPage: React.FC = () => {
             <Dialog key={bug._id} open={selected?._id === bug._id} onOpenChange={open => setSelected(open ? bug : null)}>
               <DialogTrigger asChild>
                 <Card
-                  className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] text-white"
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] text-white"
                   onClick={() => setSelected(bug)}
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Bug className="w-5 h-5 text-[#FF9AC9]" />
+                        <Bug className="w-5 h-5 text-[#FF479C]" />
                         <span>{bug.title}</span>
                       </div>
-                      <span className="text-sm text-[#FF9AC9] flex items-center gap-1">
+                      <span className="text-sm text-[#FF479C] flex items-center gap-1">
                         <User className="w-4 h-4" />
                         {bug.username || "Unknown"}
                       </span>
@@ -126,7 +126,7 @@ const BugReportPage: React.FC = () => {
               <DialogContent className="bg-[rgba(0,0,0,0.95)] border border-[#3A3A3A] text-white max-w-2xl">
                 <DialogModalHeader>
                   <DialogModalTitle className="text-xl font-bold text-white flex items-center gap-2">
-                    <Bug className="w-5 h-5 text-[#FF9AC9]" />
+                    <Bug className="w-5 h-5 text-[#FF479C]" />
                     {bug.title}
                   </DialogModalTitle>
                   <DialogDescription className="text-[#767676] mt-4">

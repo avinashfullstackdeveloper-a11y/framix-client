@@ -95,7 +95,7 @@
 //       case "info":
 //         return <Info className="w-5 h-5 text-blue-400" />;
 //       default:
-//         return <Bell className="w-5 h-5 text-[#FF9AC9]" />;
+//         return <Bell className="w-5 h-5 text-[#FF479C]" />;
 //     }
 //   };
 
@@ -173,7 +173,7 @@
 //       {/* Header */}
 //       <div className="text-center mb-8 sm:mb-12">
 //         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-//           <span className="text-[#FF9AC9]">Notifications</span> Center
+//           <span className="text-[#FF479C]">Notifications</span> Center
 //         </h1>
 //         <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
 //           Stay updated with system alerts, user activities, and important announcements.
@@ -182,15 +182,15 @@
 
 //       {/* Stats Cards */}
 //       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300 group">
+//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300 group">
 //           <div className="flex justify-center mb-3">
-//             <Bell className="w-8 h-8 text-[#FF9AC9] group-hover:scale-110 transition-transform" />
+//             <Bell className="w-8 h-8 text-[#FF479C] group-hover:scale-110 transition-transform" />
 //           </div>
 //           <h3 className="text-2xl font-bold text-white mb-1">{notifications.length}</h3>
 //           <p className="text-sm text-[#767676]">Total Notifications</p>
 //         </div>
         
-//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300 group">
+//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300 group">
 //           <div className="flex justify-center mb-3">
 //             <AlertTriangle className="w-8 h-8 text-yellow-400 group-hover:scale-110 transition-transform" />
 //           </div>
@@ -198,7 +198,7 @@
 //           <p className="text-sm text-[#767676]">Unread</p>
 //         </div>
         
-//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300 group">
+//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300 group">
 //           <div className="flex justify-center mb-3">
 //             <CheckCircle className="w-8 h-8 text-green-400 group-hover:scale-110 transition-transform" />
 //           </div>
@@ -208,7 +208,7 @@
 //           <p className="text-sm text-[#767676]">Success</p>
 //         </div>
         
-//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF9AC9] transition-all duration-300 group">
+//         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl p-6 text-center hover:border-[#FF479C] transition-all duration-300 group">
 //           <div className="flex justify-center mb-3">
 //             <Settings className="w-8 h-8 text-blue-400 group-hover:scale-110 transition-transform" />
 //           </div>
@@ -224,7 +224,7 @@
 //         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 //           <div className="flex items-center gap-4">
 //             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-//               <Filter className="w-5 h-5 text-[#FF9AC9]" />
+//               <Filter className="w-5 h-5 text-[#FF479C]" />
 //               Filter Notifications
 //             </h2>
 //             <div className="flex gap-2">
@@ -232,8 +232,8 @@
 //                 onClick={() => setFilter("all")}
 //                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border ${
 //                   filter === "all"
-//                     ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828]"
-//                     : "bg-[#3A3A3A] border-[#3A3A3A] text-white hover:border-[#FF9AC9]"
+//                     ? "bg-[#FF479C] border-[#FF479C] text-[#282828]"
+//                     : "bg-[#3A3A3A] border-[#3A3A3A] text-white hover:border-[#FF479C]"
 //                 }`}
 //               >
 //                 All
@@ -242,8 +242,8 @@
 //                 onClick={() => setFilter("unread")}
 //                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 border ${
 //                   filter === "unread"
-//                     ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828]"
-//                     : "bg-[#3A3A3A] border-[#3A3A3A] text-white hover:border-[#FF9AC9]"
+//                     ? "bg-[#FF479C] border-[#FF479C] text-[#282828]"
+//                     : "bg-[#3A3A3A] border-[#3A3A3A] text-white hover:border-[#FF479C]"
 //                 }`}
 //               >
 //                 Unread
@@ -254,7 +254,7 @@
 //             <Button
 //               onClick={markAllAsRead}
 //               disabled={unreadCount === 0}
-//               className="bg-[#3A3A3A] hover:bg-[#FF9AC9] hover:text-[#282828] text-white border border-[#3A3A3A] hover:border-[#FF9AC9] transition-all duration-300 flex items-center gap-2"
+//               className="bg-[#3A3A3A] hover:bg-[#FF479C] hover:text-[#282828] text-white border border-[#3A3A3A] hover:border-[#FF479C] transition-all duration-300 flex items-center gap-2"
 //             >
 //               <CheckCheck className="w-4 h-4" />
 //               Mark All Read
@@ -285,10 +285,10 @@
 //           filteredNotifications.map((notification) => (
 //             <div
 //               key={notification._id}
-//               className={`bg-[rgba(0,0,0,0.80)] border rounded-2xl p-6 transition-all duration-300 group hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] ${
+//               className={`bg-[rgba(0,0,0,0.80)] border rounded-2xl p-6 transition-all duration-300 group hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] ${
 //                 notification.read 
 //                   ? "border-[#3A3A3A]" 
-//                   : "border-[#FF9AC9] bg-[#1A1A1A]"
+//                   : "border-[#FF479C] bg-[#1A1A1A]"
 //               }`}
 //             >
 //               <div className="flex items-start justify-between">
@@ -299,7 +299,7 @@
 //                   <div className="flex-1">
 //                     <div className="flex items-center gap-3 mb-2">
 //                       <h3 className={`text-lg font-semibold ${
-//                         notification.read ? "text-white" : "text-[#FF9AC9]"
+//                         notification.read ? "text-white" : "text-[#FF479C]"
 //                       }`}>
 //                         {notification.title}
 //                       </h3>
@@ -307,7 +307,7 @@
 //                         {notification.type}
 //                       </Badge>
 //                       {!notification.read && (
-//                         <Badge className="bg-[#FF9AC9] text-[#282828]">
+//                         <Badge className="bg-[#FF479C] text-[#282828]">
 //                           New
 //                         </Badge>
 //                       )}
@@ -321,7 +321,7 @@
 //                         {new Date(notification.createdAt).toLocaleTimeString()}
 //                       </span>
 //                       {notification.actionUrl && (
-//                         <button className="text-[#FF9AC9] hover:text-white transition-colors">
+//                         <button className="text-[#FF479C] hover:text-white transition-colors">
 //                           View Details →
 //                         </button>
 //                       )}
