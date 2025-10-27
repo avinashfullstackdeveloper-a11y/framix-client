@@ -617,7 +617,7 @@ const ComponentEditor: React.FC = () => {
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(true);
-  const [backgroundColor, setBackgroundColor] = useState<string>("#0a0a0a");
+  const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [modalLocked, setModalLocked] = useState(false);
@@ -957,9 +957,9 @@ const ComponentEditor: React.FC = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Preview Panel */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
+          <div className="bg-white rounded-lg border-white shadow-sm overflow-hidden flex flex-col h-[600px]">
             <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
-              <h3 className="font-semibold">Preview</h3>
+              <h3 className="font-semibold text-black">{backgroundColor}</h3>
               <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
                 <PopoverTrigger asChild>
                   <Button
@@ -1027,8 +1027,7 @@ const ComponentEditor: React.FC = () => {
               </Popover>
             </div>
             <div
-              className="flex-1 flex items-center justify-center p-8 overflow-hidden"
-              style={{ backgroundColor }}
+              className="flex-1 flex items-center justify-center p-8 overflow-hidden bg-gray-300"
             >
               <div className="w-full h-full flex items-center justify-center">
                 {renderPreview()}

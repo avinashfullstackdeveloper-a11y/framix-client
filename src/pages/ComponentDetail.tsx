@@ -82,7 +82,7 @@ const ComponentDetail: React.FC = () => {
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState<string>("#ffffff");
+  const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   // Favourites state
@@ -512,9 +512,12 @@ const ComponentDetail: React.FC = () => {
                     </div>
                     {component.creatorStatus && (
                       <Badge variant="secondary" className="text-xs">
-                        {component.creatorStatus === "original" && "✓ Original Creator"}
-                        {component.creatorStatus === "found" && "Found & Shared"}
-                        {component.creatorStatus === "modified" && "Found & Modified"}
+                        {component.creatorStatus === "original" &&
+                          "✓ Original Creator"}
+                        {component.creatorStatus === "found" &&
+                          "Found & Shared"}
+                        {component.creatorStatus === "modified" &&
+                          "Found & Modified"}
                       </Badge>
                     )}
                   </div>
@@ -523,7 +526,9 @@ const ComponentDetail: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground group-hover:text-primary transition-colors">
-                  <span className="text-sm font-medium hidden sm:inline">View Profile</span>
+                  <span className="text-sm font-medium hidden sm:inline">
+                    View Profile
+                  </span>
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -599,10 +604,10 @@ const ComponentDetail: React.FC = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
           {/* Preview Panel */}
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden bg-white border-white">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Preview</CardTitle>
+                <CardTitle className="text-lg text-black">{backgroundColor}</CardTitle>
                 <Popover
                   open={showColorPicker}
                   onOpenChange={setShowColorPicker}
@@ -673,10 +678,7 @@ const ComponentDetail: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div
-                className="h-[500px] flex items-center justify-center"
-                style={{ backgroundColor }}
-              >
+              <div className="h-[500px] flex items-center justify-center bg-gray-300">
                 {renderPreview()}
               </div>
             </CardContent>
