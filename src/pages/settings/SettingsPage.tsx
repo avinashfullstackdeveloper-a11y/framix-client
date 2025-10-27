@@ -134,6 +134,7 @@ export default function SettingsPage() {
           activeSection={activeSection}
           onSectionChange={setActiveSection}
         />
+        {/* Provide context for editing: store selected component in sessionStorage before navigating */}
         <main className="flex-1 max-md:mt-4 md:pl-8 md:min-h-[600px]">
           <div className="h-full">
             {activeSection === "profile" && (
@@ -175,10 +176,18 @@ export default function SettingsPage() {
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {submissions.map((submission) => (
-                              <React.Suspense fallback={<div>Loading...</div>} key={submission._id}>
-                                {/* @ts-expect-error: API returns status as string, but we enforce type */}
-                                <MyComponentCard submission={{ ...submission, status }} />
-                              </React.Suspense>
+                              <div
+                                key={submission._id}
+                                className="cursor-pointer w-full"
+                                onClick={() => {
+                                  // Store the component data for editing
+                                  navigate(
+                                    `/component-editor?id=${submission._id}`
+                                  );
+                                }}
+                              >
+                                <MyComponentCard submission={submission} />
+                              </div>
                             ))}
                           </div>
                         </div>
