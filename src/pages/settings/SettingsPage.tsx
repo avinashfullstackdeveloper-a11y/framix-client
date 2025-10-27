@@ -1,11 +1,14 @@
 // SettingsPage.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { apiRequest } from "@/lib/api";
 import PersonalInformation from "./PersonalInformation.tsx";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AccountSection } from "./AccountSection.tsx";
+  import type { MyComponentSubmission } from "@/components/MyComponentCard";
 
 import StatsSection from "./StatsSection.tsx";
+import MyComponentCard from "@/components/MyComponentCard";
 
 interface SidebarProps {
   activeSection: string;
@@ -23,6 +26,11 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
       id: "account",
       label: "Account",
       icon: "https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/e1cc128f320e2b7a88442bf103ca4680c02cf522?placeholderIfAbsent=true",
+    },
+    {
+      id: "mycomponents",
+      label: "My Components",
+      icon: "https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/724126a735e33b50219fb6953993ef586769d2c3?placeholderIfAbsent=true",
     },
     {
       id: "stats",
@@ -66,6 +74,47 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState("profile");
   const navigate = useNavigate();
 
+  // --- My Components submissions state ---
+
+  const [myComponentsApproved, setMyComponentsApproved] = useState<MyComponentSubmission[]>([]);
+  const [myComponentsRejected, setMyComponentsRejected] = useState<MyComponentSubmission[]>([]);
+  const [myComponentsPending, setMyComponentsPending] = useState<MyComponentSubmission[]>([]);
+  const [loadingMyComponents, setLoadingMyComponents] = useState(false);
+  const [myComponentsError, setMyComponentsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMyComponents() {
+      setLoadingMyComponents(true);
+      setMyComponentsError(null);
+      try {
+        const [approvedRes, rejectedRes, pendingRes] = await Promise.all([
+          apiRequest<{ data: MyComponentSubmission[] }>("/api/submissions/my-submissions?status=approved"),
+          apiRequest<{ data: MyComponentSubmission[] }>("/api/submissions/my-submissions?status=rejected"),
+          apiRequest<{ data: MyComponentSubmission[] }>("/api/submissions/my-submissions?status=pending"),
+        ]);
+        setMyComponentsApproved(approvedRes.data.filter((item) => item.status === "approved"));
+        setMyComponentsRejected(rejectedRes.data.filter((item) => item.status === "rejected"));
+        setMyComponentsPending(pendingRes.data.filter((item) => item.status === "pending"));
+      } catch (err) {
+        setMyComponentsError(
+          err instanceof Error ? err.message : "Failed to fetch submissions"
+        );
+      } finally {
+        setLoadingMyComponents(false);
+      }
+    }
+
+    if (activeSection === "mycomponents") {
+      fetchMyComponents();
+    }
+    // Optionally, clear data when leaving section
+    // else {
+    //   setMyComponentsApproved([]);
+    //   setMyComponentsRejected([]);
+    //   setMyComponentsPending([]);
+    // }
+  }, [activeSection]);
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Go Back Button */}
@@ -100,6 +149,48 @@ export default function SettingsPage() {
             {activeSection === "stats" && (
               <section className="h-full">
                 <StatsSection />
+              </section>
+            )}
+            {activeSection === "mycomponents" && (
+              <section className="h-full">
+                <h2 className="text-2xl font-bold mb-4">My Components</h2>
+                {loadingMyComponents ? (
+                  <div className="text-gray-400">Loading...</div>
+                ) : myComponentsError ? (
+                  <div className="text-red-400">{myComponentsError}</div>
+                ) : (
+                  <div className="flex flex-col gap-8">
+                    {["approved", "pending", "rejected"].map((status) => {
+                      const submissions =
+                        status === "approved"
+                          ? myComponentsApproved
+                          : status === "pending"
+                          ? myComponentsPending
+                          : myComponentsRejected;
+                      if (!submissions.length) return null;
+                      return (
+                        <div key={status}>
+                          <div className="mb-2 font-semibold capitalize text-lg">
+                            {status} ({submissions.length})
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            {submissions.map((submission) => (
+                              <React.Suspense fallback={<div>Loading...</div>} key={submission._id}>
+                                {/* @ts-expect-error: API returns status as string, but we enforce type */}
+                                <MyComponentCard submission={{ ...submission, status }} />
+                              </React.Suspense>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {!myComponentsApproved.length &&
+                      !myComponentsRejected.length &&
+                      !myComponentsPending.length && (
+                        <div className="text-gray-400">No submissions found.</div>
+                      )}
+                  </div>
+                )}
               </section>
             )}
           </div>
