@@ -155,56 +155,88 @@ export default function SettingsPage() {
             {activeSection === "mycomponents" && (
               <section className="h-full">
                 <h2 className="text-2xl font-bold mb-4">My Components</h2>
-                {loadingMyComponents ? (
-                  <div className="text-gray-400">Loading...</div>
-                ) : myComponentsError ? (
-                  <div className="text-red-400">{myComponentsError}</div>
-                ) : (
-                  <div className="flex flex-col gap-8">
-                    {["approved", "pending", "rejected"].map((status) => {
-                      const submissions =
-                        status === "approved"
-                          ? myComponentsApproved
-                          : status === "pending"
-                          ? myComponentsPending
-                          : myComponentsRejected;
-                      if (!submissions.length) return null;
-                      return (
-                        <div key={status}>
-                          <div className="mb-2 font-semibold capitalize text-lg">
-                            {status} ({submissions.length})
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {submissions.map((submission) => (
-                              <div
-                                key={submission._id}
-                                className="cursor-pointer w-full"
-                                onClick={() => {
-                                  // Store the component data for editing
-                                  navigate(
-                                    `/component-editor?id=${submission._id}`
-                                  );
-                                }}
-                              >
-                                <MyComponentCard submission={submission} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {!myComponentsApproved.length &&
-                      !myComponentsRejected.length &&
-                      !myComponentsPending.length && (
-                        <div className="text-gray-400">No submissions found.</div>
-                      )}
-                  </div>
-                )}
+                {/* Top-side tab switch for Approved/Rejected */}
+                <TabsMyComponents
+                  approved={myComponentsApproved}
+                  rejected={myComponentsRejected}
+                  loading={loadingMyComponents}
+                  error={myComponentsError}
+                  navigate={navigate}
+                />
               </section>
             )}
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+// --- Tab Switch Component ---
+function TabsMyComponents({
+  approved,
+  rejected,
+  loading,
+  error,
+  navigate,
+}: {
+  approved: MyComponentSubmission[];
+  rejected: MyComponentSubmission[];
+  loading: boolean;
+  error: string | null;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const [activeTab, setActiveTab] = React.useState<"approved" | "rejected">("approved");
+
+  const tabList = [
+    { key: "approved", label: `Approved (${approved.length})` },
+    { key: "rejected", label: `Rejected (${rejected.length})` },
+  ] as const;
+
+  const submissions = activeTab === "approved" ? approved : rejected;
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6">
+        {tabList.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 rounded-t-lg font-semibold transition-all duration-200 border-b-2 ${
+              activeTab === tab.key
+                ? "border-[#FF9AC9] text-[#FF9AC9] bg-[#23272b]"
+                : "border-transparent text-white bg-transparent hover:text-[#FF9AC9]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <div className="text-gray-400">Loading...</div>
+      ) : error ? (
+        <div className="text-red-400">{error}</div>
+      ) : (
+        <div>
+          {submissions.length === 0 ? (
+            <div className="text-gray-400">No submissions found.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {submissions.map((submission) => (
+                <div
+                  key={submission._id}
+                  className="cursor-pointer w-full"
+                  onClick={() => {
+                    navigate(`/component-editor?id=${submission._id}`);
+                  }}
+                >
+                  <MyComponentCard submission={submission} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
