@@ -1,6 +1,12 @@
 import { useAuth } from "../context/AuthContext";
 import { LiveProvider, LivePreview, LiveError } from "react-live";
-import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
 
@@ -88,7 +94,10 @@ const Components = () => {
   // OPTIMIZATION: Scroll to top of components grid when page changes
   useEffect(() => {
     if (currentPage > 1 && componentsGridRef.current) {
-      componentsGridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      componentsGridRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [currentPage]);
 
@@ -124,8 +133,8 @@ const Components = () => {
     });
   }, [components, activeFilter]);
 
-  // OPTIMIZATION: Pagination logic - 12 components per page (excluding ads)
-  const itemsPerPage = 12;
+  // OPTIMIZATION: Pagination logic - 11 components per page (excluding ads)
+  const itemsPerPage = 11;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -133,15 +142,22 @@ const Components = () => {
 
   // OPTIMIZATION: Memoize itemsWithAds array to prevent recalculation
   const itemsWithAds = useMemo(() => {
-    const items: Array<ComponentItem | { isAd: true; adIndex: number; adType: '300x250' | '160x300' }> = [];
+    const items: Array<
+      | ComponentItem
+      | { isAd: true; adIndex: number; adType: "300x250" | "160x300" }
+    > = [];
     paginatedComponents.forEach((component, index) => {
       items.push(component);
       // Insert ad after every 6th component (index 5, 11, 17, etc.)
       if ((index + 1) % 6 === 0 && index < paginatedComponents.length - 1) {
         // Alternate ad types: odd positions get 300x250, even positions get 160x300
         const adCount = Math.floor(index / 6);
-        const adType = adCount % 2 === 0 ? '300x250' : '160x300';
-        items.push({ isAd: true, adIndex: adCount + (currentPage - 1) * 2, adType });
+        const adType = adCount % 2 === 0 ? "300x250" : "160x300";
+        items.push({
+          isAd: true,
+          adIndex: adCount + (currentPage - 1) * 2,
+          adType,
+        });
       }
     });
     return items;
@@ -149,48 +165,50 @@ const Components = () => {
 
   // OPTIMIZATION: OptimizedPreview component with lazy loading via Intersection Observer
   // This prevents rendering iframes (and loading external CDNs) until they're visible
-  const OptimizedPreview = React.memo(({ componentItem }: { componentItem: ComponentItem }) => {
-    const [isVisible, setIsVisible] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+  const OptimizedPreview = React.memo(
+    ({ componentItem }: { componentItem: ComponentItem }) => {
+      const [isVisible, setIsVisible] = useState(false);
+      const containerRef = useRef<HTMLDivElement>(null);
 
-    // OPTIMIZATION: Intersection Observer to detect when component enters viewport
-    useEffect(() => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setIsVisible(true);
-              // Once visible, stop observing to prevent unnecessary checks
-              observer.disconnect();
-            }
-          });
-        },
-        {
-          rootMargin: "50px", // Start loading 50px before entering viewport
-          threshold: 0.1,
+      // OPTIMIZATION: Intersection Observer to detect when component enters viewport
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setIsVisible(true);
+                // Once visible, stop observing to prevent unnecessary checks
+                observer.disconnect();
+              }
+            });
+          },
+          {
+            rootMargin: "50px", // Start loading 50px before entering viewport
+            threshold: 0.1,
+          }
+        );
+
+        if (containerRef.current) {
+          observer.observe(containerRef.current);
         }
-      );
 
-      if (containerRef.current) {
-        observer.observe(containerRef.current);
-      }
+        return () => observer.disconnect();
+      }, []);
 
-      return () => observer.disconnect();
-    }, []);
+      // OPTIMIZATION: Memoize srcDoc generation to prevent recreation on every render
+      const previewContent = useMemo(() => {
+        if (!isVisible) return null;
 
-    // OPTIMIZATION: Memoize srcDoc generation to prevent recreation on every render
-    const previewContent = useMemo(() => {
-      if (!isVisible) return null;
-
-      // Tailwind preview (language or technology)
-      if (
-        componentItem.language &&
-        (componentItem.language.toLowerCase() === "tailwind" ||
-         componentItem.language.toLowerCase() === "tailwindcss") &&
-        (componentItem.code || componentItem.tailwind)
-      ) {
-        const tailwindHtml = componentItem.code || componentItem.tailwind || "";
-        const srcDoc = `
+        // Tailwind preview (language or technology)
+        if (
+          componentItem.language &&
+          (componentItem.language.toLowerCase() === "tailwind" ||
+            componentItem.language.toLowerCase() === "tailwindcss") &&
+          (componentItem.code || componentItem.tailwind)
+        ) {
+          const tailwindHtml =
+            componentItem.code || componentItem.tailwind || "";
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -216,48 +234,51 @@ const Components = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
+          return (
+            <iframe
+              title="Preview"
+              srcDoc={srcDoc}
+              className="w-full h-full rounded-lg border-0"
+              style={{
+                margin: 0,
+                padding: 0,
+                background: "transparent",
+                width: "100%",
+                height: "100%",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          );
+        }
 
-      // Direct full HTML document preview (zoomed out)
-      if (
-        typeof componentItem.code === "string" &&
-        componentItem.code.trim().startsWith("<!DOCTYPE html")
-      ) {
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={componentItem.code}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
+        // Direct full HTML document preview (zoomed out)
+        if (
+          typeof componentItem.code === "string" &&
+          componentItem.code.trim().startsWith("<!DOCTYPE html")
+        ) {
+          return (
+            <iframe
+              title="Preview"
+              srcDoc={componentItem.code}
+              className="w-full h-full rounded-lg border-0"
+              style={{
+                margin: 0,
+                padding: 0,
+                background: "transparent",
+                width: "100%",
+                height: "100%",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          );
+        }
 
-      // React preview (iframe Babel)
-      if (componentItem.language && componentItem.language.toLowerCase() === "react") {
-        const srcDoc = `
+        // React preview (iframe Babel)
+        if (
+          componentItem.language &&
+          componentItem.language.toLowerCase() === "react"
+        ) {
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -294,27 +315,32 @@ const Components = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
+          return (
+            <iframe
+              title="Preview"
+              srcDoc={srcDoc}
+              className="w-full h-full rounded-lg border-0"
+              style={{
+                margin: 0,
+                padding: 0,
+                background: "transparent",
+                width: "100%",
+                height: "100%",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          );
+        }
 
-      // Multi preview
-      if (componentItem.language && componentItem.language.toLowerCase() === "multi") {
-        // Build srcDoc from separate fields if code field is missing
-        const srcDoc = componentItem.code || `
+        // Multi preview
+        if (
+          componentItem.language &&
+          componentItem.language.toLowerCase() === "multi"
+        ) {
+          // Build srcDoc from separate fields if code field is missing
+          const srcDoc =
+            componentItem.code ||
+            `
           <!DOCTYPE html>
           <html>
             <head>
@@ -339,33 +365,33 @@ const Components = () => {
             </body>
           </html>
         `;
-        
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="border-0"
-            style={{
-              width: "100%",
-              height: "100%",
-              margin: 0,
-              padding: 0,
-              overflow: "hidden",
-              background: "transparent",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
 
-      // CSS + HTML combined preview (if both present)
-      if (
-        componentItem.language &&
-        componentItem.language.toLowerCase() === "css" &&
-        componentItem.htmlCode &&
-        componentItem.cssCode
-      ) {
-        const srcDoc = `
+          return (
+            <iframe
+              title="Preview"
+              srcDoc={srcDoc}
+              className="border-0"
+              style={{
+                width: "100%",
+                height: "100%",
+                margin: 0,
+                padding: 0,
+                overflow: "hidden",
+                background: "transparent",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          );
+        }
+
+        // CSS + HTML combined preview (if both present)
+        if (
+          componentItem.language &&
+          componentItem.language.toLowerCase() === "css" &&
+          componentItem.htmlCode &&
+          componentItem.cssCode
+        ) {
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -390,25 +416,25 @@ const Components = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
+          return (
+            <iframe
+              title="Preview"
+              srcDoc={srcDoc}
+              className="w-full h-full rounded-lg border-0"
+              style={{
+                margin: 0,
+                padding: 0,
+                background: "transparent",
+                width: "100%",
+                height: "100%",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          );
+        }
 
-      // Fallback: HTML/CSS/JS preview
-      const srcDoc = `<!DOCTYPE html>
+        // Fallback: HTML/CSS/JS preview
+        const srcDoc = `<!DOCTYPE html>
         <html>
           <head>
             <style>
@@ -434,7 +460,8 @@ const Components = () => {
                 transform-origin: center;
               }
               ${
-                componentItem.language && componentItem.language.toLowerCase() === "css"
+                componentItem.language &&
+                componentItem.language.toLowerCase() === "css"
                   ? componentItem.code
                   : ""
               }
@@ -443,50 +470,55 @@ const Components = () => {
           <body>
             <div id="preview-wrapper">
               ${
-                componentItem.language && componentItem.language.toLowerCase() === "html"
+                componentItem.language &&
+                componentItem.language.toLowerCase() === "html"
                   ? componentItem.code
                   : ""
               }
             </div>
             <script>${
-              componentItem.language && componentItem.language.toLowerCase() === "javascript"
+              componentItem.language &&
+              componentItem.language.toLowerCase() === "javascript"
                 ? componentItem.code
                 : ""
             }</script>
           </body>
         </html>`;
-      return (
-        <iframe
-          title="Preview"
-          srcDoc={srcDoc}
-          className="w-full h-full rounded-lg border-0"
-          style={{
-            margin: 0,
-            padding: 0,
-            background: "transparent",
-            width: "100%",
-            height: "100%",
-          }}
-          sandbox="allow-scripts allow-same-origin"
-        />
-      );
-    }, [isVisible, componentItem]);
+        return (
+          <iframe
+            title="Preview"
+            srcDoc={srcDoc}
+            className="w-full h-full rounded-lg border-0"
+            style={{
+              margin: 0,
+              padding: 0,
+              background: "transparent",
+              width: "100%",
+              height: "100%",
+            }}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        );
+      }, [isVisible, componentItem]);
 
-    // OPTIMIZATION: Return placeholder until component is visible
-    if (!isVisible) {
-      return (
-        <div
-          ref={containerRef}
-          className="w-full h-full flex items-center justify-center"
-          style={{ minHeight: "200px" }}
-        >
-          <div className="text-muted-foreground text-sm">Loading preview...</div>
-        </div>
-      );
+      // OPTIMIZATION: Return placeholder until component is visible
+      if (!isVisible) {
+        return (
+          <div
+            ref={containerRef}
+            className="w-full h-full flex items-center justify-center"
+            style={{ minHeight: "200px" }}
+          >
+            <div className="text-muted-foreground text-sm">
+              Loading preview...
+            </div>
+          </div>
+        );
+      }
+
+      return <>{previewContent}</>;
     }
-
-    return <>{previewContent}</>;
-  });
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -527,7 +559,10 @@ const Components = () => {
       </div>
 
       {/* Components Grid */}
-      <div ref={componentsGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto">
+      <div
+        ref={componentsGridRef}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto"
+      >
         {loading ? (
           <div className="text-center text-lg w-full col-span-3">
             Loading...
@@ -535,8 +570,14 @@ const Components = () => {
         ) : (
           itemsWithAds.map((item, index) => {
             // Check if this is an ad item
-            if ('isAd' in item && item.isAd) {
-              return <AdCard key={`ad-${item.adIndex}`} adKey={`ad-${item.adIndex}`} adType={item.adType} />;
+            if ("isAd" in item && item.isAd) {
+              return (
+                <AdCard
+                  key={`ad-${item.adIndex}`}
+                  adKey={`ad-${item.adIndex}`}
+                  adType={item.adType}
+                />
+              );
             }
 
             // Regular component item
@@ -547,26 +588,53 @@ const Components = () => {
                 onClick={() =>
                   navigate(
                     `/components/${componentItem.type
-                    ?.replace(/component/gi, "")
-                    .trim()
-                      .replace(/^\w/, (c) => c.toUpperCase())}/${componentItem._id}`
+                      ?.replace(/component/gi, "")
+                      .trim()
+                      .replace(/^\w/, (c) => c.toUpperCase())}/${
+                      componentItem._id
+                    }`
                   )
                 }
                 className="cursor-pointer w-full"
               >
-                <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group" style={{ backgroundColor: "#2d3135" }}>
+                <div
+                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+                  style={{ backgroundColor: "#2d3135" }}
+                >
                   {/* Views moved to top left, not close to the border */}
                   <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
-                        stroke="white" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <circle cx="12" cy="12" r="3" stroke="white" strokeOpacity="0.6" strokeWidth="1.5"/>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+                        stroke="white"
+                        strokeOpacity="0.6"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="3"
+                        stroke="white"
+                        strokeOpacity="0.6"
+                        strokeWidth="1.5"
+                      />
                     </svg>
                     <span className="text-white text-xs font-light">
                       {componentItem.views || 0} views
                     </span>
                   </div>
-                  <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden" style={{ backgroundColor: "#2d3135" }}>
+                  <div
+                    className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
+                    style={{ backgroundColor: "#2d3135" }}
+                  >
                     {/* OPTIMIZATION: Use OptimizedPreview component with lazy loading */}
                     {componentItem.language && (
                       <div
@@ -591,8 +659,8 @@ const Components = () => {
                         {/* Show cleaned type only, not title */}
                         <span className="block text-base sm:text-lg font-semibold">
                           {componentItem.type
-                          ?.replace(/component/gi, "")
-                          .trim()
+                            ?.replace(/component/gi, "")
+                            .trim()
                             .replace(/^\w/, (c) => c.toUpperCase())}
                         </span>
                       </h3>
@@ -600,7 +668,7 @@ const Components = () => {
                         <span
                           className={`text-xs sm:text-sm font-normal ${
                             componentItem.badge === "Pro"
-                            ? "text-[#FF9AC9]"
+                              ? "text-[#FF9AC9]"
                               : "text-white"
                           }`}
                         >
@@ -621,28 +689,30 @@ const Components = () => {
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-8 sm:mt-12">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
-                ? 'bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]'
-                : 'bg-[#FF9AC9] text-[#282828] hover:opacity-90'
+                ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
+                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
             }`}
           >
             Previous
           </button>
-          
+
           <span className="text-sm sm:text-base text-muted-foreground">
             Page {currentPage} of {totalPages}
           </span>
-          
+
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages
-                ? 'bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]'
-                : 'bg-[#FF9AC9] text-[#282828] hover:opacity-90'
+                ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
+                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
             }`}
           >
             Next
