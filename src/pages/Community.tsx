@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { CommunityUserProfile } from "@/components/CommunityUserProfile";
+import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -136,14 +137,17 @@ const CommunityList = () => {
   }, [components, fallbackData]);
 
   // Avatar Component
+
   const Avatar = ({
     initials,
     size = "sm",
     className = "",
+    src,
   }: {
     initials: string;
     size?: "sm" | "md" | "lg";
     className?: string;
+    src?: string;
   }) => {
     const sizeClasses = {
       sm: "w-6 h-6 text-xs",
@@ -152,11 +156,12 @@ const CommunityList = () => {
     };
 
     return (
-      <div
-        className={`flex items-center justify-center bg-white rounded-full ${sizeClasses[size]} ${className}`}
-      >
-        <span className="text-black font-medium">{initials}</span>
-      </div>
+      <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+        {typeof src === "string" && src ? (
+          <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+        ) : null}
+        <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+      </ShadAvatar>
     );
   };
 
@@ -716,6 +721,7 @@ const CommunityList = () => {
                               component.author?.initials ||
                               "U"
                             }
+                            src={component.createdBy?.avatar || component.author?.avatar}
                             size="sm"
                           />
                           <div>
@@ -984,6 +990,7 @@ const CommunityList = () => {
                           component.author?.initials ||
                           "U"
                         }
+                        src={component.createdBy?.avatar || component.author?.avatar}
                         size="sm"
                       />
                       <div>

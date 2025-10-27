@@ -1,5 +1,8 @@
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+  // Avatar UI: show user.avatar if present, else initials fallback
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 interface AccountSectionProps {
   className?: string;
 }
@@ -10,6 +13,15 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
 
 
   const { user, isLoading, deleteAccount } = useAuth();
+
+  const displayName = user?.username || user?.name || user?.email || "";
+  const initials =
+    displayName
+      .split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -65,11 +77,14 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
         {/* Account Information Section */}
         <section className="w-full max-md:max-w-full">
           <div className="flex w-full items-center gap-2 text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose flex-wrap max-md:max-w-full">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/81d9baabdc17b279e86e04c9b874120ae3a0ffd0?placeholderIfAbsent=true"
-              className="aspect-[1] object-contain w-5 self-stretch shrink-0 my-auto"
-              alt="Account info icon"
-            />
+            <Avatar className="h-8 w-8 border border-neutral-700 bg-white text-black">
+              {typeof user?.avatar === "string" && user.avatar ? (
+                <AvatarImage key={user.avatar} src={user.avatar} alt={displayName} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+              ) : null}
+              <AvatarFallback className="text-black font-semibold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
             <h3 className="self-stretch my-auto">Account Information</h3>
           </div>
           <div className="bg-[rgba(17,17,17,1)] border w-full mt-4 p-6 rounded-lg border-[rgba(255,71,156,0.6)] border-solid max-md:max-w-full max-md:px-5">

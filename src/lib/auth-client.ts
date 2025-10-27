@@ -10,6 +10,8 @@ export interface User {
   email: string;
   role: string;
   createdAt: string;
+  avatar?: string; // Profile picture URL
+  profilePicture?: string; // Google profile picture fallback
 }
 
 export interface AuthResponse {
@@ -56,6 +58,10 @@ export const authClient = {
       });
 
       const result = await response.json();
+      // Ensure avatar/profilePicture is included if present
+      if (result.user && (result.user.avatar || result.user.profilePicture)) {
+        result.user.avatar = result.user.avatar || result.user.profilePicture;
+      }
       return result;
     } catch (error: any) {
       return {
@@ -98,6 +104,12 @@ export const authClient = {
       });
 
       const result = await response.json();
+      
+      // Ensure avatar/profilePicture is included if present
+      if (result.user && (result.user.avatar || result.user.profilePicture)) {
+        result.user.avatar = result.user.avatar || result.user.profilePicture;
+      }
+      
       return {
         success: result.success,
         user: result.user || null,

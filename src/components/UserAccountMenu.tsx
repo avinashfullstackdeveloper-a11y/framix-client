@@ -1,4 +1,4 @@
-import { User, LogOut, Settings, Shield, Heart, Bell } from "lucide-react";
+import { User, LogOut, Shield, Heart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,29 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-interface UserAccountMenuProps {
-  user: {
-    id: string;
-    email: string;
-    name?: string;
-    username?: string;
-  };
-  onNavigate?: () => void;
-}
-
-export function UserAccountMenu({ user, onNavigate }: UserAccountMenuProps) {
+export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
-  const handleSignOut = async () => {
-    try {
-      await logout();
-      navigate("/signin");
-    } catch (error) {
-      console.error("Sign out failed:", error);
-    }
-  };
+  if (!user) return null;
 
   // Prioritize username over name for display
   const displayName = user.username || user.name || user.email;
@@ -43,15 +27,30 @@ export function UserAccountMenu({ user, onNavigate }: UserAccountMenuProps) {
     .toUpperCase()
     .slice(0, 2);
 
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      navigate("/signin");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative h-10 w-10 rounded-full bg-white text-black hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200 border border-neutral-300"
-        >
-          <span className="text-black font-semibold">{initials}</span>
-        </Button>
+        <Avatar className="h-10 w-10 border border-neutral-300 bg-white text-black hover:opacity-90 hover:shadow-lg hover:scale-105 active:scale-95 focus:ring-2 focus:ring-[#E84288] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] transition-all duration-200">
+          <AvatarImage
+            key={user.avatar}
+            src={user.avatar || ""}
+            alt={displayName}
+            referrerPolicy="no-referrer"
+            crossOrigin="anonymous"
+          />
+          <AvatarFallback className="text-black font-semibold">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-neutral-800" align="start">
         <DropdownMenuLabel className="text-white">

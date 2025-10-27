@@ -1,6 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 // Types for better TypeScript support
 interface SocialLinks {
@@ -53,6 +52,7 @@ interface CommunityUserProfileProps {
 }
 
 // Avatar component
+
 const Avatar = ({
   initials,
   size = "lg",
@@ -69,18 +69,13 @@ const Avatar = ({
     md: "w-8 h-8 text-sm",
     lg: "w-24 h-24 text-2xl",
   };
-  return src ? (
-    <img
-      src={src}
-      alt={initials}
-      className={`rounded-full object-cover ${sizeClasses[size]} ${className}`}
-    />
-  ) : (
-    <div
-      className={`flex items-center justify-center bg-white rounded-full ${sizeClasses[size]} ${className}`}
-    >
-      <span className="text-gray-900 font-medium">{initials}</span>
-    </div>
+  return (
+    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+      {typeof src === "string" && src ? (
+        <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+      ) : null}
+      <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+    </ShadAvatar>
   );
 };
 

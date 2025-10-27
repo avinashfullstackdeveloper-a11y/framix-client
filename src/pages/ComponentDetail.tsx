@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { trackComponentView } from "@/lib/api";
+import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   Popover,
   PopoverContent,
@@ -96,11 +97,11 @@ const ComponentDetail: React.FC = () => {
     {
       _id: string;
       text: string;
-      user?: { name?: string; _id?: string };
+      user?: { name?: string; _id?: string; avatar?: string };
       replies?: {
         _id: string;
         text: string;
-        user?: { name?: string; _id?: string };
+        user?: { name?: string; _id?: string; avatar?: string };
         timestamp?: string;
       }[];
       timestamp?: string;
@@ -1068,9 +1069,20 @@ const ComponentDetail: React.FC = () => {
                     key={comment._id}
                     className="flex gap-4 pb-6 border-b last:border-b-0 last:pb-0"
                   >
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-sm flex-shrink-0">
-                      {comment.user?.name?.charAt(0).toUpperCase() || "U"}
-                    </div>
+                    {/* Avatar for comment user */}
+                    {(() => {
+                      const initials =
+                        comment.user?.name?.charAt(0).toUpperCase() || "U";
+                      const avatarUrl = comment.user?.avatar;
+                      return (
+                        <ShadAvatar className="w-10 h-10 rounded-full bg-muted text-foreground font-semibold text-sm flex-shrink-0">
+                          {typeof avatarUrl === "string" && avatarUrl ? (
+                            <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                          ) : null}
+                          <AvatarFallback>{initials}</AvatarFallback>
+                        </ShadAvatar>
+                      );
+                    })()}
 
                     <div className="flex-1 min-w-0 space-y-3">
                       <div className="flex items-center justify-between gap-2">
@@ -1133,9 +1145,20 @@ const ComponentDetail: React.FC = () => {
                       {/* Reply Form */}
                       {replyingTo === comment._id && (
                         <div className="flex gap-3 pt-2">
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-xs flex-shrink-0">
-                            {user?.name?.charAt(0).toUpperCase() || "U"}
-                          </div>
+                          {/* Avatar for reply user (current user) */}
+                          {(() => {
+                            const initials =
+                              user?.name?.charAt(0).toUpperCase() || "U";
+                            const avatarUrl = user?.avatar;
+                            return (
+                              <ShadAvatar className="w-8 h-8 rounded-full bg-muted text-foreground font-semibold text-xs flex-shrink-0">
+                                {typeof avatarUrl === "string" && avatarUrl ? (
+                                  <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                ) : null}
+                                <AvatarFallback>{initials}</AvatarFallback>
+                              </ShadAvatar>
+                            );
+                          })()}
                           <div className="flex-1 space-y-2">
                             <Input
                               type="text"
@@ -1213,10 +1236,21 @@ const ComponentDetail: React.FC = () => {
                         <div className="space-y-4 border-l-2 border-border pl-4 ml-2 mt-4">
                           {comment.replies.map((reply) => (
                             <div key={reply._id} className="flex gap-3">
-                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold text-xs flex-shrink-0">
-                                {reply.user?.name?.charAt(0).toUpperCase() ||
-                                  "U"}
-                              </div>
+                              {/* Avatar for reply author */}
+                              {(() => {
+                                const initials =
+                                  reply.user?.name?.charAt(0).toUpperCase() ||
+                                  "U";
+                                const avatarUrl = reply.user?.avatar;
+                                return (
+                                  <ShadAvatar className="w-8 h-8 rounded-full bg-muted text-foreground font-semibold text-xs flex-shrink-0">
+                                    {typeof avatarUrl === "string" && avatarUrl ? (
+                                      <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                    ) : null}
+                                    <AvatarFallback>{initials}</AvatarFallback>
+                                  </ShadAvatar>
+                                );
+                              })()}
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="font-medium text-sm">

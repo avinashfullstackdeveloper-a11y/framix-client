@@ -101,7 +101,7 @@ const Navigation = () => {
             {isLoading ? (
               <div className="h-10 w-10 rounded-full bg-neutral-800 animate-pulse" />
             ) : user ? (
-              <UserAccountMenu user={user} />
+              <UserAccountMenu />
             ) : (
               <Link to="/signin">
                 <Button
@@ -185,7 +185,6 @@ const Navigation = () => {
                   ) : user ? (
                     <div className="py-2">
                       <UserAccountMenu
-                        user={user}
                         onNavigate={() => setMobileOpen(false)}
                       />
                     </div>
