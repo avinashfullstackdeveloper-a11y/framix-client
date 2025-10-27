@@ -644,35 +644,7 @@ const Components = () => {
                   style={{ backgroundColor: "#2d3135" }}
                 >
                   {/* Views moved to top left, not close to the border */}
-                  <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
-                        stroke="white"
-                        strokeOpacity="0.6"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                        stroke="white"
-                        strokeOpacity="0.6"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
-                    <span className="text-white text-xs font-light">
-                      {componentItem.views || 0} views
-                    </span>
-                  </div>
+                  {/* Views removed from component card */}
                   <div
                     className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
                     style={{ backgroundColor: "#2d3135" }}
