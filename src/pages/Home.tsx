@@ -136,28 +136,28 @@ const testimonialsData = [
       "The curation is top-notch, saving me hours of searching for the perfect components. A game-changer for my workflow.",
     name: "Jessica Lee",
     title: "Senior UI Designer",
-    avatar: "/assets/images/i1.png",
+    avatar: "/assets/images/jessica_lee.jpg",
   },
   {
     quote:
       "The quality and consistency of the components are unmatched. It's the first place I look for new project inspiration.",
     name: "David Miller",
     title: "Senior Developer",
-    avatar: "/assets/images/i2.png",
+    avatar: "/assets/images/david_miller.jpg",
   },
   {
     quote:
       "The well-documented code makes integration a breeze. It's saved our team countless hours in development.",
     name: "Alex Chen",
     title: "Product Manager",
-    avatar: "/assets/images/i3.png",
+    avatar: "/assets/images/alex_chen.jpg",
   },
   {
     quote:
       "It's more than just a library—it's a community. The collaboration tools are a huge plus for our entire team.",
     name: "Emily Roberts",
     title: "Freelance Designer",
-    avatar: "/assets/images/i4.png",
+    avatar: "/assets/images/emily_roberts.jpg",
   },
 ];
 
