@@ -497,5 +497,5 @@ All colors MUST be HSL.
 .copy-btn-pink-hover:hover {
   background-color: #FF479C !important;
   border-color: #FF479C !important;
-  color: #fff !important;
+  color: #000 !important;
 }

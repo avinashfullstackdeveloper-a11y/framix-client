@@ -612,7 +612,7 @@ export default function PersonalInformation() {
               <div className="flex gap-2 pt-4">
                 <Button
                   type="submit"
-                  className="bg-gradient-to-r from-[#E84288] to-[#9B4DCA] hover:opacity-90"
+                  className="copy-btn-pink-hover"
                 >
                   Save Changes
                 </Button>

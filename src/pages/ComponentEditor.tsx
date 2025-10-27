@@ -617,7 +617,7 @@ const ComponentEditor: React.FC = () => {
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -1045,16 +1045,10 @@ const ComponentEditor: React.FC = () => {
                   : `${componentType}.jsx`}
               </h3>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleCopy}>
+                <Button variant="outline" size="sm" className="copy-btn-pink-hover" onClick={handleCopy}>
                   Copy
                 </Button>
-                <Button
-                  variant={isEditing ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? "Lock" : "Edit"}
-                </Button>
+                {/* Lock/Edit button removed: editor is always editable */}
                 <FigmaButton
                   onClick={handleCopy}
                 />
@@ -1143,7 +1137,7 @@ const ComponentEditor: React.FC = () => {
 
         {/* Action Bar */}
         <div className="flex justify-end gap-4 mt-6 pt-6 border-t">
-          <Button variant="outline" onClick={handleReset}>
+          <Button variant="outline" className="copy-btn-pink-hover" onClick={handleReset}>
             Reset
           </Button>
           <Button variant="default" onClick={handleSubmit}>
