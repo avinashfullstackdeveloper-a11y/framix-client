@@ -9,15 +9,16 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { useToast } from "@/hooks/use-toast";
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const { login, user, refetchUser } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
 
   // Redirect based on user role after login/refetch
   React.useEffect(() => {
@@ -34,7 +35,6 @@ const SignIn: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       await login(email, password);
@@ -42,7 +42,11 @@ const SignIn: React.FC = () => {
       // Navigation is now handled by useEffect when user updates
     } catch (err) {
       console.error("SignIn error:", err);
-      setError((err instanceof Error ? err.message : "An error occurred"));
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "An error occurred",
+        variant: "destructive",
+      });
       setIsLoading(false);
     }
   };
@@ -64,11 +68,7 @@ const SignIn: React.FC = () => {
 
         <CardContent className="space-y-6">
           {/* Error Message */}
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+          {/* Toast notifications are used for errors */}
 
           {/* OAuth Buttons Above Form */}
           <div className="flex flex-col gap-4">
