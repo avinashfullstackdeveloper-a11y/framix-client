@@ -971,7 +971,7 @@ const CommunityList = () => {
                     </div>
 
                     <div
-                      className="flex items-center gap-2 cursor-pointer group"
+                      className="flex items-center gap-2 cursor-pointer group min-w-0"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -993,14 +993,15 @@ const CommunityList = () => {
                         }
                         src={component.createdBy?.avatar || component.author?.avatar}
                         size="sm"
+                        className="flex-shrink-0"
                       />
-                      <div>
-                        <div className="text-sm font-medium group-hover:underline">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium group-hover:underline truncate">
                           {component.createdBy?.name ||
                             component.author?.name ||
                             "Anonymous"}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-xs text-muted-foreground truncate">
                           {component.createdBy?.username ||
                             component.author?.username ||
                             ""}
