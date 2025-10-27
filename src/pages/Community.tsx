@@ -694,7 +694,7 @@ const CommunityList = () => {
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg relative overflow-hidden"
+                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
@@ -960,7 +960,7 @@ const CommunityList = () => {
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg relative overflow-hidden"
+                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
