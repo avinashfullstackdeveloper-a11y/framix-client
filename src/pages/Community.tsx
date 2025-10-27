@@ -116,7 +116,7 @@ const CommunityList = () => {
   }, [selectedCategory, searchQuery]);
 
   // Pagination calculations
-  const itemsPerPage = 12;
+  const itemsPerPage = 20;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;

@@ -175,8 +175,8 @@ const Components = () => {
     });
   }, [components, activeFilter]);
 
-  // OPTIMIZATION: Pagination logic - 11 components per page (excluding ads)
-  const itemsPerPage = 11;
+  // OPTIMIZATION: Pagination logic - 19 components per page (excluding ads)
+  const itemsPerPage = 19;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
