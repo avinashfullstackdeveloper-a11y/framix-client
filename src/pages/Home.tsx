@@ -195,7 +195,7 @@ const LearnMoreButton = ({ onClick, className = "" }) => {
 };
 
 const LandingPage = () => {
-  const [cardOrder, setCardOrder] = useState([0, 1, 2]); // Track the order of cards [left, center, right]
+  const [cardOrder, setCardOrder] = useState([1, 0, 2]); // Center is 0 ("no.1")
   const [activePortfolioCard, setActivePortfolioCard] = useState(-1);
   const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(1);
   const [videoCardOrder, setVideoCardOrder] = useState([0, 1, 2]); // Track video card order [left, center, right]

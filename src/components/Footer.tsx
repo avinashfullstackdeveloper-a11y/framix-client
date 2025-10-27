@@ -20,45 +20,16 @@ const Footer = () => {
   return (
     // Main footer container with a black background and white text
     <footer className="bg-black text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col">
           {/* Top section with navigation links */}
-          <div className="flex flex-row justify-between sm:grid sm:grid-cols-3 gap-8 mb-24">
-            {/* Company Links */}
-            <div className="flex flex-col sm:ml-32">
-              <h3 className="text-base font-semibold text-white mb-5">
-                Company
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Contact
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Legal
-                  </a>
-                </li>
-              </ul>
-              {/* Resources Links - visible only on mobile, below Company */}
-              <div className="block sm:hidden mt-8">
+          <div className="mb-12">
+            {/* Mobile: 2 rows, Desktop: 4 columns */}
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+              {/* Home Section */}
+              <div className="flex flex-col sm:ml-32">
                 <h3 className="text-base font-semibold text-white mb-5">
-                  Resources
+                  Home
                 </h3>
                 <ul className="space-y-4">
                   <li>
@@ -66,7 +37,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-gray-400 hover:text-white"
                     >
-                      Documentation
+                      About
                     </a>
                   </li>
                   <li>
@@ -74,7 +45,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-gray-400 hover:text-white"
                     >
-                      Case Studies
+                      Features
                     </a>
                   </li>
                   <li>
@@ -82,9 +53,49 @@ const Footer = () => {
                       href="#"
                       className="text-base text-gray-400 hover:text-white"
                     >
-                      Blog
+                      Testimonials
                     </a>
                   </li>
+                </ul>
+              </div>
+              {/* Products Section */}
+              <div className="sm:ml-32">
+                <h3 className="text-base font-semibold text-white mb-5">
+                  Products
+                </h3>
+                <ul className="space-y-4">
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Components
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Templates
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      UI Kits
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              {/* Resources Section */}
+              <div className="sm:ml-32">
+                <h3 className="text-base font-semibold text-white mb-5">
+                  Resources
+                </h3>
+                <ul className="space-y-4">
                   <li>
                     <a
                       href="#"
@@ -95,88 +106,30 @@ const Footer = () => {
                   </li>
                 </ul>
               </div>
-            </div>
-
-            {/* Products Links */}
-            <div className="sm:ml-32">
-              <h3 className="text-base font-semibold text-white mb-5">
-                Products
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Components
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Templates
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    UI Kits
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Pricing
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Resources Links - hidden on mobile, visible on desktop */}
-            <div className="hidden sm:block sm:ml-32">
-              <h3 className="text-base font-semibold text-white mb-5">
-                Resources
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Case Studies
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Community
-                  </a>
-                </li>
-              </ul>
+              {/* Legal & Policy Section */}
+              <div className="sm:ml-32">
+                <h3 className="text-base font-semibold text-white mb-5">
+                  Legal & Policy
+                </h3>
+                <ul className="space-y-4">
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Privacy Policy
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Terms of Service
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
