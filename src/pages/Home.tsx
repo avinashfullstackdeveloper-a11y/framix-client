@@ -304,15 +304,17 @@ const LandingPage = () => {
                 modern interface faster, without starting from scratch.
               </p>
               <div className="flex gap-4 justify-center lg:justify-start">
-                <Button className="bg-white text-black font-semibold px-6 py-3 rounded-md hover:bg-gray-200">
-                  Get Started Now
-                </Button>
                 <Link to="/components">
+                  <Button className="bg-white text-black font-semibold px-6 py-3 rounded-md hover:bg-gray-200">
+                    Get Started Now
+                  </Button>
+                </Link>
+                <Link to="/community">
                   <Button
                     variant="outline"
                     className="border-gray-600 text-white hover:bg-gray-800 hover:text-white font-semibold px-6 py-3 rounded-md"
                   >
-                    Explore Components
+                    Start Designing
                   </Button>
                 </Link>
               </div>
@@ -608,8 +610,11 @@ const LandingPage = () => {
                 <Button
                   className="bg-white text-black font-semibold px-10 py-3 rounded-full hover:bg-gray-200 shadow-lg"
                   style={{ borderRadius: "999px", minWidth: "200px" }}
+                  asChild
                 >
-                  Start Designing
+                  <Link to="/community">
+                    Start Designing
+                  </Link>
                 </Button>
               </motion.div>
               <motion.div

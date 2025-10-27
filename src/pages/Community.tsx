@@ -15,7 +15,10 @@ const CommunityList = () => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   // OPTIMIZATION: Lazy load fallback data only when needed (API fails)
-  const [fallbackData, setFallbackData] = useState<{ featured: any[], all: any[] } | null>(null);
+  const [fallbackData, setFallbackData] = useState<{
+    featured: any[];
+    all: any[];
+  } | null>(null);
 
   // Types from ComponentSelectorPopup
   const componentTypes = [
@@ -69,34 +72,29 @@ const CommunityList = () => {
 
   // OPTIMIZATION: Memoize filtered components to prevent recalculation on every render
   const filteredComponents = useMemo(() => {
-    const sourceComponents = components.length > 0
-      ? [...components]
-      : fallbackData
-      ? [...fallbackData.featured, ...fallbackData.all]
-      : [];
+    const sourceComponents =
+      components.length > 0
+        ? [...components]
+        : fallbackData
+        ? [...fallbackData.featured, ...fallbackData.all]
+        : [];
 
     return sourceComponents.filter((component) => {
       // Type/category filter
       if (selectedCategory !== "All") {
-        const type = (
-          component.type ||
-          component.category ||
-          ""
-        ).toLowerCase();
+        const type = (component.type || component.category || "").toLowerCase();
         if (type !== selectedCategory.toLowerCase()) return false;
       }
       // Search filter
       if (searchQuery.trim() !== "") {
         const q = searchQuery.toLowerCase();
         return (
-          (component.title &&
-            component.title.toLowerCase().includes(q)) ||
+          (component.title && component.title.toLowerCase().includes(q)) ||
           (component.description &&
             component.description.toLowerCase().includes(q)) ||
           (component.category &&
             component.category.toLowerCase().includes(q)) ||
-          (component.type &&
-            component.type.toLowerCase().includes(q)) ||
+          (component.type && component.type.toLowerCase().includes(q)) ||
           (component.author?.name &&
             component.author.name.toLowerCase().includes(q)) ||
           (component.createdBy?.name &&
@@ -123,7 +121,10 @@ const CommunityList = () => {
   const allComponentsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (currentPage > 1 && allComponentsRef.current) {
-      allComponentsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      allComponentsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [currentPage]);
 
@@ -163,7 +164,7 @@ const CommunityList = () => {
   const InteractionButtons = ({
     likes,
     comments,
-    views
+    views,
   }: {
     likes: number;
     comments: number;
@@ -216,10 +217,29 @@ const CommunityList = () => {
         </button>
         {views !== undefined && (
           <div className="flex items-center gap-1">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
-                stroke="white" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="12" cy="12" r="3" stroke="white" strokeOpacity="0.6" strokeWidth="1.5"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+                stroke="white"
+                strokeOpacity="0.6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke="white"
+                strokeOpacity="0.6"
+                strokeWidth="1.5"
+              />
             </svg>
             <span className="text-muted-foreground text-xs font-normal">
               {views}
@@ -266,37 +286,40 @@ const CommunityList = () => {
       if (!isVisible) return null;
 
       const renderPreview = () => {
-      // If code is a full HTML document, use it directly
-      if (
-        typeof component.code === "string" &&
-        component.code.trim().startsWith("<!DOCTYPE html")
-      ) {
-        return (
-          <iframe
-            srcDoc={component.code}
-            className="absolute inset-0 w-full h-full"
-            style={{
-              background: "transparent",
-              transform: "scale(0.7)",
-              transformOrigin: "center",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+        // If code is a full HTML document, use it directly
+        if (
+          typeof component.code === "string" &&
+          component.code.trim().startsWith("<!DOCTYPE html")
+        ) {
+          return (
+            <iframe
+              srcDoc={component.code}
+              className="absolute inset-0 w-full h-full"
+              style={{
+                background: "transparent",
+                transform: "scale(0.7)",
+                transformOrigin: "center",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Tailwind preview (language or technology)
-      if (
-        (component.language &&
-          (component.language.toLowerCase() === "tailwind" ||
-            component.language.toLowerCase() === "tailwindcss") &&
-          (component.code || component.tailwind)) ||
-        (component.technology === "tailwind" && component.tailwindCode)
-      ) {
-        const tailwindHtml =
-          component.code || component.tailwind || component.tailwindCode || "";
-        const srcDoc = `
+        // Tailwind preview (language or technology)
+        if (
+          (component.language &&
+            (component.language.toLowerCase() === "tailwind" ||
+              component.language.toLowerCase() === "tailwindcss") &&
+            (component.code || component.tailwind)) ||
+          (component.technology === "tailwind" && component.tailwindCode)
+        ) {
+          const tailwindHtml =
+            component.code ||
+            component.tailwind ||
+            component.tailwindCode ||
+            "";
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -322,25 +345,25 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // React preview (language)
-      if (
-        component.language &&
-        component.language.toLowerCase() === "react" &&
-        component.code
-      ) {
-        // Try to render the React code using Babel
-        const srcDoc = `
+        // React preview (language)
+        if (
+          component.language &&
+          component.language.toLowerCase() === "react" &&
+          component.code
+        ) {
+          // Try to render the React code using Babel
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -377,23 +400,26 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Multi-language (full HTML doc)
-      if (component.language && component.language.toLowerCase() === "multi") {
-        // Build srcDoc from separate fields if code field is missing
-        const srcDoc =
-          component.code ||
-          `
+        // Multi-language (full HTML doc)
+        if (
+          component.language &&
+          component.language.toLowerCase() === "multi"
+        ) {
+          // Build srcDoc from separate fields if code field is missing
+          const srcDoc =
+            component.code ||
+            `
           <!DOCTYPE html>
           <html>
             <head>
@@ -419,29 +445,29 @@ const CommunityList = () => {
           </html>
         `;
 
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full"
-            style={{
-              background: "transparent",
-              transform: "scale(0.6)",
-              transformOrigin: "center",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full"
+              style={{
+                background: "transparent",
+                transform: "scale(0.6)",
+                transformOrigin: "center",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // CSS + HTML code (language or technology)
-      if (
-        ((component.language && component.language.toLowerCase() === "css") ||
-          component.technology === "css") &&
-        component.htmlCode &&
-        component.cssCode
-      ) {
-        const srcDoc = `
+        // CSS + HTML code (language or technology)
+        if (
+          ((component.language && component.language.toLowerCase() === "css") ||
+            component.technology === "css") &&
+          component.htmlCode &&
+          component.cssCode
+        ) {
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -467,20 +493,20 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Fallback: HTML, CSS, JS code
-      if (component.language && component.code) {
-        const srcDoc = `
+        // Fallback: HTML, CSS, JS code
+        if (component.language && component.code) {
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -529,38 +555,38 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Fallback to preview video if available
-      if (component.preview) {
-        return (
-          <video
-            src={component.preview}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        );
-      }
+        // Fallback to preview video if available
+        if (component.preview) {
+          return (
+            <video
+              src={component.preview}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          );
+        }
 
-      // No preview available
-      return (
-        <div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500">
-          No preview
-        </div>
-      );
-    };
+        // No preview available
+        return (
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500">
+            No preview
+          </div>
+        );
+      };
 
       return renderPreview();
     }, [isVisible, component]);
@@ -572,7 +598,9 @@ const CommunityList = () => {
           ref={containerRef}
           className="absolute inset-0 w-full h-full flex items-center justify-center bg-secondary/20"
         >
-          <div className="text-muted-foreground text-sm">Loading preview...</div>
+          <div className="text-muted-foreground text-sm">
+            Loading preview...
+          </div>
         </div>
       );
     }
@@ -646,7 +674,10 @@ const CommunityList = () => {
               >
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
-                    <div className="h-64 rounded-t-lg relative overflow-hidden" style={{ backgroundColor: "#9ca3af" }}>
+                    <div
+                      className="h-64 rounded-t-lg relative overflow-hidden"
+                      style={{ backgroundColor: "#9ca3af" }}
+                    >
                       <LivePreview component={component} />
                       <div className="absolute top-3 right-3 z-10">
                         <Badge
@@ -895,113 +926,114 @@ const CommunityList = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedComponents.map((component, index) => {
-              return (
-                <Link
-                  to={`/components/${component.type || "component"}/${
-                    component._id || index
-                  }`}
-                  key={component._id || index}
-                >
-                  <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge variant="secondary" className="bg-secondary/50">
-                          {(component.type || component.category)
-                            ?.replace(/component/gi, "")
-                            .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </Badge>
-                        <InteractionButtons
-                          likes={
-                            component.likeCount ||
-                            component.likedBy?.length ||
-                            0
-                          }
-                          comments={
-                            component.commentCount ||
-                            (Array.isArray(component.comments)
-                              ? component.comments.length
-                              : 0)
-                          }
-                          views={component.views || 0}
-                        />
-                      </div>
+            return (
+              <Link
+                to={`/components/${component.type || "component"}/${
+                  component._id || index
+                }`}
+                key={component._id || index}
+              >
+                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="secondary" className="bg-secondary/50">
+                        {(component.type || component.category)
+                          ?.replace(/component/gi, "")
+                          .trim()
+                          .replace(/^\w/, (c) => c.toUpperCase())}
+                      </Badge>
+                      <InteractionButtons
+                        likes={
+                          component.likeCount || component.likedBy?.length || 0
+                        }
+                        comments={
+                          component.commentCount ||
+                          (Array.isArray(component.comments)
+                            ? component.comments.length
+                            : 0)
+                        }
+                        views={component.views || 0}
+                      />
+                    </div>
 
-                      <div className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: "#9ca3af" }}>
-                        <LivePreview component={component} />
-                      </div>
+                    <div
+                      className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
+                      style={{ backgroundColor: "#9ca3af" }}
+                    >
+                      <LivePreview component={component} />
+                    </div>
 
-                      <div
-                        className="flex items-center gap-2 cursor-pointer group"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const userId =
-                            component.createdBy?._id ||
-                            component.author?._id ||
-                            "";
-                          if (userId) {
-                            window.location.href = `/community/${userId}`;
-                          }
-                        }}
-                        title="View user profile"
-                      >
-                        <Avatar
-                          initials={
-                            component.createdBy?.name
-                              ?.charAt(0)
-                              .toUpperCase() ||
-                            component.author?.initials ||
-                            "U"
-                          }
-                          size="sm"
-                        />
-                        <div>
-                          <div className="text-sm font-medium group-hover:underline">
-                            {component.createdBy?.name ||
-                              component.author?.name ||
-                              "Anonymous"}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {component.createdBy?.username ||
-                              component.author?.username ||
-                              ""}
-                          </div>
+                    <div
+                      className="flex items-center gap-2 cursor-pointer group"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const userId =
+                          component.createdBy?._id ||
+                          component.author?._id ||
+                          "";
+                        if (userId) {
+                          window.location.href = `/community/${userId}`;
+                        }
+                      }}
+                      title="View user profile"
+                    >
+                      <Avatar
+                        initials={
+                          component.createdBy?.name?.charAt(0).toUpperCase() ||
+                          component.author?.initials ||
+                          "U"
+                        }
+                        size="sm"
+                      />
+                      <div>
+                        <div className="text-sm font-medium group-hover:underline">
+                          {component.createdBy?.name ||
+                            component.author?.name ||
+                            "Anonymous"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {component.createdBy?.username ||
+                            component.author?.username ||
+                            ""}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === 1
-                  ? 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
-                  : 'bg-gradient-primary text-primary-foreground hover:opacity-90'
+                  ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
+                  : "bg-gradient-primary text-primary-foreground hover:opacity-90"
               }`}
             >
               Previous
             </button>
-            
+
             <span className="text-sm text-muted-foreground">
               Page {currentPage} of {totalPages}
             </span>
-            
+
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === totalPages
-                  ? 'bg-secondary text-muted-foreground cursor-not-allowed opacity-50'
-                  : 'bg-gradient-primary text-primary-foreground hover:opacity-90'
+                  ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
+                  : "bg-gradient-primary text-primary-foreground hover:opacity-90"
               }`}
             >
               Next
