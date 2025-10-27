@@ -5,6 +5,7 @@ import { Badge } from "../components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { Heart, ExternalLink, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
+import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 type FavouriteComponent = {
   id: string;
@@ -18,11 +19,20 @@ type FavouriteComponent = {
     id?: string;
     name?: string;
     username?: string;
+    avatar?: string;
+    profilePicture?: string;
+    picture?: string;
+    image?: string;
   };
   htmlCode?: string;
   cssCode?: string;
   tailwindCode?: string;
   technology?: string;
+  likeCount?: number;
+  likedBy?: string[];
+  commentCount?: number;
+  comments?: Array<{ id: string; text: string }>;
+  views?: number;
 };
 
 type ComponentPreview = {
@@ -35,15 +45,17 @@ type ComponentPreview = {
   preview?: string;
 };
 
-// Avatar Component (from Community.tsx)
+// Avatar Component (matching Community.tsx)
 const Avatar = ({
   initials,
   size = "sm",
   className = "",
+  src,
 }: {
   initials: string;
   size?: "sm" | "md" | "lg";
   className?: string;
+  src?: string;
 }) => {
   const sizeClasses = {
     sm: "w-6 h-6 text-xs",
@@ -52,10 +64,101 @@ const Avatar = ({
   };
 
   return (
-    <div
-      className={`flex items-center justify-center bg-gradient-primary rounded-full ${sizeClasses[size]} ${className}`}
-    >
-      <span className="text-primary-foreground font-medium">{initials}</span>
+    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+      {typeof src === "string" && src ? (
+        <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+      ) : null}
+      <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+    </ShadAvatar>
+  );
+};
+
+// InteractionButtons Component (from Community.tsx)
+const InteractionButtons = ({
+  likes,
+  comments,
+  views,
+}: {
+  likes: number;
+  comments: number;
+  views?: number;
+}) => {
+  return (
+    <div className="flex items-center gap-3">
+      <button className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 17 17"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13.1165 9.67708C14.1099 8.70375 15.1165 7.53708 15.1165 6.01042C15.1165 5.03796 14.7302 4.10533 14.0426 3.41769C13.355 2.73006 12.4223 2.34375 11.4499 2.34375C10.2765 2.34375 9.44987 2.67708 8.44987 3.67708C7.44987 2.67708 6.6232 2.34375 5.44987 2.34375C4.47741 2.34375 3.54478 2.73006 2.85714 3.41769C2.16951 4.10533 1.7832 5.03796 1.7832 6.01042C1.7832 7.54375 2.7832 8.71042 3.7832 9.67708L8.44987 14.3438L13.1165 9.67708Z"
+            fill="#F14336"
+            stroke="white"
+            strokeOpacity="0.6"
+            strokeWidth="1.33333"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="text-muted-foreground text-xs font-normal">
+          {likes}
+        </span>
+      </button>
+      <button className="flex items-center gap-1 hover:opacity-80 transition-opacity">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 17 17"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6.12865 13.677C7.40103 14.3297 8.8647 14.5064 10.2559 14.1755C11.6471 13.8445 12.8743 13.0275 13.7165 11.8717C14.5586 10.716 14.9603 9.29742 14.849 7.87173C14.7378 6.44603 14.121 5.10693 13.1099 4.09575C12.0987 3.08456 10.7596 2.46779 9.33387 2.35656C7.90817 2.24534 6.48963 2.64698 5.33386 3.48912C4.17809 4.33125 3.36111 5.55849 3.03013 6.94969C2.69915 8.34089 2.87594 9.80457 3.52865 11.077L2.19531 15.0103L6.12865 13.677Z"
+            stroke="white"
+            strokeOpacity="0.6"
+            strokeWidth="1.33333"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <span className="text-muted-foreground text-xs font-normal">
+          {comments}
+        </span>
+      </button>
+      {views !== undefined && (
+        <div className="flex items-center gap-1">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+              stroke="white"
+              strokeOpacity="0.6"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+              stroke="white"
+              strokeOpacity="0.6"
+              strokeWidth="1.5"
+            />
+          </svg>
+          <span className="text-muted-foreground text-xs font-normal">
+            {views}
+          </span>
+        </div>
+      )}
     </div>
   );
 };
@@ -363,6 +466,7 @@ const Favourite: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        
         // Map backend favourites to FavouriteComponent[]
         const mapped: FavouriteComponent[] = Array.isArray(data)
           ? data.map((fav) => {
@@ -382,15 +486,22 @@ const Favourite: React.FC = () => {
                       id: createdBy.id || createdBy._id,
                       name: createdBy.name,
                       username: createdBy.username,
+                      avatar: createdBy.profilePicture || createdBy.avatar || "",
                     }
                   : undefined,
                 htmlCode: component?.htmlCode || "",
                 cssCode: component?.cssCode || "",
                 tailwindCode: component?.tailwindCode || "",
                 technology: component?.technology || "",
+                likeCount: component?.likeCount || 0,
+                likedBy: component?.likedBy || [],
+                commentCount: component?.commentCount || 0,
+                comments: component?.comments || [],
+                views: component?.views || 0,
               };
             })
           : [];
+        
         setFavourites(mapped);
       } catch (err) {
         setError((err as Error).message || "Unknown error");
@@ -531,40 +642,43 @@ const Favourite: React.FC = () => {
               <Card
                 key={component.id}
                 className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group"
+                onClick={() => {
+                  window.location.href = `/components/${component.type}/${component.id}`;
+                }}
               >
-                <CardContent className="p-0">
-                  {/* Preview Section */}
-                  <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
-                    <LivePreview component={component} />
-                    <div className="absolute top-3 right-3 z-10">
-                      <Badge
-                        variant="secondary"
-                        className={`${getLanguageColor(
-                          component.language
-                        )} border font-medium text-xs`}
-                      >
-                        {component.language.toUpperCase()}
-                      </Badge>
-                    </div>
+                <CardContent className="p-4">
+                  {/* Type Badge and Interaction Buttons */}
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge variant="secondary" className="bg-secondary/50">
+                      {component.type
+                        ?.replace(/component/gi, "")
+                        .trim()
+                        .replace(/^\w/, (c) => c.toUpperCase())}
+                    </Badge>
+                    <InteractionButtons
+                      likes={component.likeCount || component.likedBy?.length || 0}
+                      comments={
+                        component.commentCount ||
+                        (Array.isArray(component.comments)
+                          ? component.comments.length
+                          : 0)
+                      }
+                      views={component.views || 0}
+                    />
                   </div>
 
-                  {/* Component Info */}
-                  <div className="p-4">
-                    <div className="mb-3">
-                      <Badge
-                        variant="secondary"
-                        className="bg-secondary/50 text-xs"
-                      >
-                        {component.type
-                          ?.replace(/component/gi, "")
-                          .trim()
-                          .replace(/^\w/, (c) => c.toUpperCase())}
-                      </Badge>
-                    </div>
+                  {/* Preview Section */}
+                  <div
+                    className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
+                    style={{ backgroundColor: "#9ca3af" }}
+                  >
+                    <LivePreview component={component} />
+                  </div>
 
-                    {/* Author Information */}
+                  {/* Author Information and Remove Button */}
+                  <div className="flex items-center justify-between gap-2">
                     <div
-                      className="flex items-center gap-2 mb-3 cursor-pointer group/author"
+                      className="flex items-center gap-2 cursor-pointer group/author min-w-0 flex-1"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -582,43 +696,37 @@ const Favourite: React.FC = () => {
                             ?.charAt(0)
                             .toUpperCase() || "U"
                         }
+                        src={component.createdBy?.avatar}
                         size="sm"
+                        className="flex-shrink-0"
                       />
-                      <div>
-                        <div className="text-sm font-medium group-hover/author:underline">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium group-hover/author:underline truncate">
                           {component.createdBy?.name || "Anonymous"}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-xs text-muted-foreground truncate">
                           {component.createdBy?.username || ""}
                         </div>
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          window.location.href = `/components/${component.type}/${component.id}`;
-                        }}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-primary hover:opacity-90 text-primary-foreground rounded-lg transition-opacity text-sm font-medium"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        View Details
-                      </button>
-
-                      <button
-                        disabled={removingId === component.id}
-                        onClick={() => handleRemoveFavourite(component.id)}
-                        className="p-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-red-500/30"
-                        title="Remove from favourites"
-                      >
-                        {removingId === component.id ? (
-                          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Heart className="w-4 h-4" fill="currentColor" />
-                        )}
-                      </button>
-                    </div>
+                    {/* Remove from Favourites Button */}
+                    <button
+                      disabled={removingId === component.id}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemoveFavourite(component.id);
+                      }}
+                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-red-500/30 flex-shrink-0"
+                      title="Remove from favourites"
+                    >
+                      {removingId === component.id ? (
+                        <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Heart className="w-4 h-4" fill="currentColor" />
+                      )}
+                    </button>
                   </div>
                 </CardContent>
               </Card>
