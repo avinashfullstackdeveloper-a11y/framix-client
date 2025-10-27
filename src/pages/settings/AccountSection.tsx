@@ -174,20 +174,15 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
             <div className="self-stretch min-h-10 my-auto pl-4">
               <button
                 onClick={openDeleteDialog}
-                className="bg-[rgba(239,68,68,0.2)] flex min-h-10 items-center gap-2 justify-center px-4 py-2.5 rounded-md hover:bg-[rgba(239,68,68,0.3)] transition-colors"
+                className="bg-[rgba(239,68,68,0.2)] flex min-h-10 items-center gap-2 justify-center p-2.5 rounded-md hover:bg-[rgba(239,68,68,0.3)] transition-colors"
               >
-                <div className="self-stretch flex min-h-4 flex-col w-6 my-auto pr-2">
-                  <div className="flex min-h-4 w-4 flex-col overflow-hidden items-center justify-center">
-                    <img
-                      src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/f60683250b19aadde0b1152277cd6e5c45919b62?placeholderIfAbsent=true"
-                      className="aspect-[1] object-contain w-full flex-1"
-                      alt="Delete icon"
-                    />
-                  </div>
+                <div className="flex min-h-4 w-4 flex-col overflow-hidden items-center justify-center">
+                  <img
+                    src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/f60683250b19aadde0b1152277cd6e5c45919b62?placeholderIfAbsent=true"
+                    className="aspect-[1] object-contain w-full flex-1"
+                    alt="Delete icon"
+                  />
                 </div>
-                <span className="text-red-400 text-sm font-medium leading-none text-center self-stretch my-auto">
-                  Delete Account
-                </span>
               </button>
             </div>
           </div>
