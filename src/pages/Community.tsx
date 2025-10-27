@@ -5,7 +5,11 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { CommunityUserProfile } from "@/components/CommunityUserProfile";
-import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Avatar as ShadAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -156,11 +160,21 @@ const CommunityList = () => {
     };
 
     return (
-      <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+      <ShadAvatar
+        className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}
+      >
         {typeof src === "string" && src ? (
-          <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+          <AvatarImage
+            key={src}
+            src={src}
+            alt={initials}
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
         ) : null}
-        <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+        <AvatarFallback className="text-black font-medium">
+          {initials}
+        </AvatarFallback>
       </ShadAvatar>
     );
   };
@@ -639,7 +653,7 @@ const CommunityList = () => {
           <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
             <DialogTrigger asChild>
               <button
-                className="border border-primary/50 hover:bg-secondary px-8 py-3 rounded-full font-medium transition-colors"
+                className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
                 onClick={() => setPopupOpen(true)}
               >
                 Submit yours
@@ -721,7 +735,10 @@ const CommunityList = () => {
                               component.author?.initials ||
                               "U"
                             }
-                            src={component.createdBy?.avatar || component.author?.avatar}
+                            src={
+                              component.createdBy?.avatar ||
+                              component.author?.avatar
+                            }
                             size="sm"
                             className="flex-shrink-0"
                           />
@@ -991,7 +1008,10 @@ const CommunityList = () => {
                           component.author?.initials ||
                           "U"
                         }
-                        src={component.createdBy?.avatar || component.author?.avatar}
+                        src={
+                          component.createdBy?.avatar ||
+                          component.author?.avatar
+                        }
                         size="sm"
                         className="flex-shrink-0"
                       />
@@ -1024,7 +1044,7 @@ const CommunityList = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === 1
                   ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-gradient-primary text-primary-foreground hover:opacity-90"
+                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
               }`}
             >
               Previous
@@ -1042,7 +1062,7 @@ const CommunityList = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === totalPages
                   ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-gradient-primary text-primary-foreground hover:opacity-90"
+                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
               }`}
             >
               Next
@@ -1060,7 +1080,7 @@ const CommunityList = () => {
         <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
           <DialogTrigger asChild>
             <button
-              className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity"
+              className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
               onClick={() => setPopupOpen(true)}
             >
               Submit Component
