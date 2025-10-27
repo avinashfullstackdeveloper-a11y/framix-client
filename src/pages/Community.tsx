@@ -653,7 +653,7 @@ const CommunityList = () => {
           <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
             <DialogTrigger asChild>
               <button
-                className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
+                className="border border-primary/50 hover:bg-secondary px-8 py-3 rounded-full font-medium transition-colors"
                 onClick={() => setPopupOpen(true)}
               >
                 Submit yours
