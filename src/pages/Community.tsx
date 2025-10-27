@@ -1,10 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { CommunityUserProfile } from "@/components/CommunityUserProfile";
+import {
+  Avatar as ShadAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,6 +18,12 @@ const CommunityList = () => {
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  // OPTIMIZATION: Lazy load fallback data only when needed (API fails)
+  const [fallbackData, setFallbackData] = useState<{
+    featured: any[];
+    all: any[];
+  } | null>(null);
 
   // Types from ComponentSelectorPopup
   const componentTypes = [
@@ -28,7 +39,7 @@ const CommunityList = () => {
     "tooltip",
   ];
 
-  // Fetch approved components from API
+  // OPTIMIZATION: Fetch approved components from API
   useEffect(() => {
     const fetchComponents = async () => {
       try {
@@ -48,6 +59,13 @@ const CommunityList = () => {
         setComponents(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching components:", error);
+        // OPTIMIZATION: Only load fallback data when API fails
+        import("@/data/fallbackComponents").then((module) => {
+          setFallbackData({
+            featured: module.featuredComponents,
+            all: module.allComponents,
+          });
+        });
         setComponents([]);
       } finally {
         setLoading(false);
@@ -57,161 +75,83 @@ const CommunityList = () => {
     fetchComponents();
   }, []);
 
-  // Get all unique categories from both API and fallback data
-  const getAllCategories = () => {
-    const apiCategories = components
-      .map((c) => c.category || c.type)
-      .filter(Boolean);
-    const fallbackCategories = [
-      ...featuredComponents.map((c) => c.category || c.type),
-      ...allComponents.map((c) => c.category || c.type),
-    ].filter(Boolean);
-    return [
-      "All",
-      ...Array.from(new Set([...apiCategories, ...fallbackCategories])),
-    ];
-  };
+  // OPTIMIZATION: Memoize filtered components to prevent recalculation on every render
+  const filteredComponents = useMemo(() => {
+    const sourceComponents =
+      components.length > 0
+        ? [...components]
+        : fallbackData
+        ? [...fallbackData.featured, ...fallbackData.all]
+        : [];
 
-  // Sample data for components (fallback)
-  const featuredComponents = [
-    {
-      title: "Animated Navigation",
-      description: "Smooth hover animations with gradient backgrounds",
-      author: {
-        name: "Alex Chen",
-        username: "@alexchen",
-        initials: "AC",
-      },
-      likes: 245,
-      comments: 32,
-      category: "Navigation",
-      preview: "/assets/videos/comp1.mp4",
-    },
-    {
-      title: "Data Dashboard",
-      description: "Interactive charts and real-time metrics display",
-      author: {
-        name: "Sarah Kim",
-        username: "@sarahk",
-        initials: "SK",
-      },
-      likes: 189,
-      comments: 21,
-      category: "Dashboard",
-      preview: "/assets/videos/comp2.mp4",
-    },
-    {
-      title: "E-commerce Card",
-      description: "Product card with image gallery and quick actions",
-      author: {
-        name: "Mike Rodriguez",
-        username: "@miker",
-        initials: "MR",
-      },
-      likes: 156,
-      comments: 18,
-      category: "E-commerce",
-      preview: "/assets/videos/comp3.mp4",
-    },
-    {
-      title: "Contact Form",
-      description: "Modern form with validation and success states",
-      author: {
-        name: "Jessica Wang",
-        username: "@jessw",
-        initials: "JW",
-      },
-      likes: 132,
-      comments: 15,
-      category: "Forms",
-      preview: "/assets/videos/comp4.mp4",
-    },
-  ];
+    return sourceComponents.filter((component) => {
+      // Type/category filter
+      if (selectedCategory !== "All") {
+        const type = (component.type || component.category || "").toLowerCase();
+        if (type !== selectedCategory.toLowerCase()) return false;
+      }
+      // Search filter
+      if (searchQuery.trim() !== "") {
+        const q = searchQuery.toLowerCase();
+        return (
+          (component.title && component.title.toLowerCase().includes(q)) ||
+          (component.description &&
+            component.description.toLowerCase().includes(q)) ||
+          (component.category &&
+            component.category.toLowerCase().includes(q)) ||
+          (component.type && component.type.toLowerCase().includes(q)) ||
+          (component.author?.name &&
+            component.author.name.toLowerCase().includes(q)) ||
+          (component.createdBy?.name &&
+            component.createdBy.name.toLowerCase().includes(q))
+        );
+      }
+      return true;
+    });
+  }, [components, fallbackData, selectedCategory, searchQuery]);
 
-  const allComponents = [
-    {
-      title: "Pricing Table",
-      description: "Three-tier pricing with toggle animation",
-      author: {
-        name: "David Park",
-        username: "@davidp",
-        initials: "DP",
-      },
-      likes: 98,
-      comments: 12,
-      category: "Pricing",
-    },
-    {
-      title: "User Profile",
-      description: "Compact profile card with social links",
-      author: {
-        name: "Lisa Thompson",
-        username: "@lisat",
-        initials: "LT",
-      },
-      likes: 87,
-      comments: 8,
-      category: "Profile",
-    },
-    {
-      title: "Notification System",
-      description: "Toast notifications with different states",
-      author: {
-        name: "Ryan Smith",
-        username: "@ryans",
-        initials: "RS",
-      },
-      likes: 76,
-      comments: 11,
-      category: "UI",
-    },
-    {
-      title: "Loading Animation",
-      description: "Elegant skeleton loading for content",
-      author: {
-        name: "Emma Davis",
-        username: "@emmad",
-        initials: "ED",
-      },
-      likes: 143,
-      comments: 9,
-      category: "Animation",
-    },
-    {
-      title: "Search Interface",
-      description: "Advanced search with filters and suggestions",
-      author: {
-        name: "Kevin Brown",
-        username: "@kevinb",
-        initials: "KB",
-      },
-      likes: 112,
-      comments: 14,
-      category: "Search",
-    },
-    {
-      title: "Calendar Widget",
-      description: "Interactive calendar with event markers",
-      author: {
-        name: "Maria Garcia",
-        username: "@mariag",
-        initials: "MG",
-      },
-      likes: 94,
-      comments: 7,
-      category: "Widget",
-    },
-  ];
+  // Reset to page 1 when filters or search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery]);
+
+  // Pagination calculations
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedComponents = filteredComponents.slice(startIndex, endIndex);
+
+  // Scroll to All Components section when page changes
+  const allComponentsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (currentPage > 1 && allComponentsRef.current) {
+      allComponentsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [currentPage]);
+
+  // OPTIMIZATION: Memoize featured components slice
+  const featuredComponentsList = useMemo(() => {
+    return components.length > 0
+      ? components.slice(0, 4)
+      : fallbackData?.featured || [];
+  }, [components, fallbackData]);
 
   // Avatar Component
+
   const Avatar = ({
     initials,
     size = "sm",
     className = "",
+    src,
   }: {
     initials: string;
     size?: "sm" | "md" | "lg";
     className?: string;
+    src?: string;
   }) => {
     const sizeClasses = {
       sm: "w-6 h-6 text-xs",
@@ -220,11 +160,22 @@ const CommunityList = () => {
     };
 
     return (
-      <div
-        className={`flex items-center justify-center bg-gradient-primary rounded-full ${sizeClasses[size]} ${className}`}
+      <ShadAvatar
+        className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}
       >
-        <span className="text-primary-foreground font-medium">{initials}</span>
-      </div>
+        {typeof src === "string" && src ? (
+          <AvatarImage
+            key={src}
+            src={src}
+            alt={initials}
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+          />
+        ) : null}
+        <AvatarFallback className="text-black font-medium">
+          {initials}
+        </AvatarFallback>
+      </ShadAvatar>
     );
   };
 
@@ -232,9 +183,11 @@ const CommunityList = () => {
   const InteractionButtons = ({
     likes,
     comments,
+    views,
   }: {
     likes: number;
     comments: number;
+    views?: number;
   }) => {
     return (
       <div className="flex items-center gap-3">
@@ -281,43 +234,111 @@ const CommunityList = () => {
             {comments}
           </span>
         </button>
+        {views !== undefined && (
+          <div className="flex items-center gap-1">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+                stroke="white"
+                strokeOpacity="0.6"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke="white"
+                strokeOpacity="0.6"
+                strokeWidth="1.5"
+              />
+            </svg>
+            <span className="text-muted-foreground text-xs font-normal">
+              {views}
+            </span>
+          </div>
+        )}
       </div>
     );
   };
 
-  // LivePreview Component
+  // OPTIMIZATION: LivePreview Component with lazy loading via Intersection Observer
+  // This prevents rendering iframes (and loading external CDNs) until they're visible
   const LivePreview = ({ component }: { component: any }) => {
-    const renderPreview = () => {
-      // If code is a full HTML document, use it directly
-      if (
-        typeof component.code === "string" &&
-        component.code.trim().startsWith("<!DOCTYPE html")
-      ) {
-        return (
-          <iframe
-            srcDoc={component.code}
-            className="absolute inset-0 w-full h-full"
-            style={{
-              background: "transparent",
-              transform: "scale(0.7)",
-              transformOrigin: "center",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
+    const [isVisible, setIsVisible] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // OPTIMIZATION: Intersection Observer to detect when component enters viewport
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsVisible(true);
+              // Once visible, stop observing to prevent unnecessary checks
+              observer.disconnect();
+            }
+          });
+        },
+        {
+          rootMargin: "50px", // Start loading 50px before entering viewport
+          threshold: 0.1,
+        }
+      );
+
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
       }
 
-      // Tailwind preview (language or technology)
-      if (
-        (component.language &&
-          (component.language.toLowerCase() === "tailwind" ||
-           component.language.toLowerCase() === "tailwindcss") &&
-          (component.code || component.tailwind)) ||
-        (component.technology === "tailwind" && component.tailwindCode)
-      ) {
-        const tailwindHtml = component.code || component.tailwind || component.tailwindCode || "";
-        const srcDoc = `
+      return () => observer.disconnect();
+    }, []);
+
+    // OPTIMIZATION: Memoize srcDoc generation to prevent recreation on every render
+    const srcDocContent = useMemo(() => {
+      if (!isVisible) return null;
+
+      const renderPreview = () => {
+        // If code is a full HTML document, use it directly
+        if (
+          typeof component.code === "string" &&
+          component.code.trim().startsWith("<!DOCTYPE html")
+        ) {
+          return (
+            <iframe
+              srcDoc={component.code}
+              className="absolute inset-0 w-full h-full"
+              style={{
+                background: "transparent",
+                transform: "scale(0.7)",
+                transformOrigin: "center",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
+
+        // Tailwind preview (language or technology)
+        if (
+          (component.language &&
+            (component.language.toLowerCase() === "tailwind" ||
+              component.language.toLowerCase() === "tailwindcss") &&
+            (component.code || component.tailwind)) ||
+          (component.technology === "tailwind" && component.tailwindCode)
+        ) {
+          const tailwindHtml =
+            component.code ||
+            component.tailwind ||
+            component.tailwindCode ||
+            "";
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -343,25 +364,25 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // React preview (language)
-      if (
-        component.language &&
-        component.language.toLowerCase() === "react" &&
-        component.code
-      ) {
-        // Try to render the React code using Babel
-        const srcDoc = `
+        // React preview (language)
+        if (
+          component.language &&
+          component.language.toLowerCase() === "react" &&
+          component.code
+        ) {
+          // Try to render the React code using Babel
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -398,24 +419,26 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Multi-language (full HTML doc)
-      if (
-        component.language &&
-        component.language.toLowerCase() === "multi"
-      ) {
-        // Build srcDoc from separate fields if code field is missing
-        const srcDoc = component.code || `
+        // Multi-language (full HTML doc)
+        if (
+          component.language &&
+          component.language.toLowerCase() === "multi"
+        ) {
+          // Build srcDoc from separate fields if code field is missing
+          const srcDoc =
+            component.code ||
+            `
           <!DOCTYPE html>
           <html>
             <head>
@@ -440,30 +463,30 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full"
-            style={{
-              background: "transparent",
-              transform: "scale(0.6)",
-              transformOrigin: "center",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
 
-      // CSS + HTML code (language or technology)
-      if (
-        ((component.language && component.language.toLowerCase() === "css") ||
-          component.technology === "css") &&
-        component.htmlCode &&
-        component.cssCode
-      ) {
-        const srcDoc = `
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full"
+              style={{
+                background: "transparent",
+                transform: "scale(0.6)",
+                transformOrigin: "center",
+              }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
+
+        // CSS + HTML code (language or technology)
+        if (
+          ((component.language && component.language.toLowerCase() === "css") ||
+            component.technology === "css") &&
+          component.htmlCode &&
+          component.cssCode
+        ) {
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -489,20 +512,20 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Fallback: HTML, CSS, JS code
-      if (component.language && component.code) {
-        const srcDoc = `
+        // Fallback: HTML, CSS, JS code
+        if (component.language && component.code) {
+          const srcDoc = `
           <!DOCTYPE html>
           <html>
             <head>
@@ -551,40 +574,57 @@ const CommunityList = () => {
             </body>
           </html>
         `;
-        return (
-          <iframe
-            srcDoc={srcDoc}
-            className="absolute inset-0 w-full h-full"
-            style={{ background: "transparent" }}
-            sandbox="allow-scripts allow-same-origin"
-            title="Preview"
-          />
-        );
-      }
+          return (
+            <iframe
+              srcDoc={srcDoc}
+              className="absolute inset-0 w-full h-full"
+              style={{ background: "transparent" }}
+              sandbox="allow-scripts allow-same-origin"
+              title="Preview"
+            />
+          );
+        }
 
-      // Fallback to preview video if available
-      if (component.preview) {
-        return (
-          <video
-            src={component.preview}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        );
-      }
+        // Fallback to preview video if available
+        if (component.preview) {
+          return (
+            <video
+              src={component.preview}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          );
+        }
 
-      // No preview available
+        // No preview available
+        return (
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500">
+            No preview
+          </div>
+        );
+      };
+
+      return renderPreview();
+    }, [isVisible, component]);
+
+    // OPTIMIZATION: Return placeholder until component is visible
+    if (!isVisible) {
       return (
-        <div className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500">
-          No preview
+        <div
+          ref={containerRef}
+          className="absolute inset-0 w-full h-full flex items-center justify-center bg-secondary/20"
+        >
+          <div className="text-muted-foreground text-sm">
+            Loading preview...
+          </div>
         </div>
       );
-    };
+    }
 
-    return renderPreview();
+    return srcDocContent;
   };
 
   return (
@@ -593,9 +633,11 @@ const CommunityList = () => {
       <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6">
           Discover
-          <span className="text-primary"> Incredible</span>
+          <span className="neon-hero neon-hero-text">
+            <span className="text-[#FF9AC9] neon-hero-glow"> Incredible</span>
+          </span>
           <br />
-          Components from Creators
+          <span>Components</span> from Creators
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
           Browse thousands of production-ready UI components built by talented
@@ -604,7 +646,7 @@ const CommunityList = () => {
         <div className="flex gap-4 justify-center max-sm:flex-col max-sm:items-center">
           <Link
             to="/components"
-            className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity flex items-center justify-center"
+            className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center"
           >
             Browse components
           </Link>
@@ -634,17 +676,14 @@ const CommunityList = () => {
       {/* Featured Components Section */}
       <div className="mb-16">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Featured Components</h2>
+          <h2 className="text-3xl font-bold mb-2">Latest Components</h2>
           <p className="text-muted-foreground">
-            Hand-picked components from top creators
+            Fresh uploads from our community
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(components.length > 0
-            ? components.slice(0, 4)
-            : featuredComponents
-          ).map((component, index) => {
+          {featuredComponentsList.map((component, index) => {
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -654,7 +693,10 @@ const CommunityList = () => {
               >
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
-                    <div className="h-64 rounded-t-lg relative overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
+                    <div
+                      className="h-64 rounded-t-lg relative overflow-hidden"
+                      style={{ backgroundColor: "#9ca3af" }}
+                    >
                       <LivePreview component={component} />
                       <div className="absolute top-3 right-3 z-10">
                         <Badge
@@ -669,9 +711,9 @@ const CommunityList = () => {
                       </div>
                     </div>
                     <div className="p-4">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <div
-                          className="flex items-center gap-2 cursor-pointer group"
+                          className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -693,15 +735,20 @@ const CommunityList = () => {
                               component.author?.initials ||
                               "U"
                             }
+                            src={
+                              component.createdBy?.avatar ||
+                              component.author?.avatar
+                            }
                             size="sm"
+                            className="flex-shrink-0"
                           />
-                          <div>
-                            <div className="text-sm font-medium group-hover:underline">
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium group-hover:underline truncate">
                               {component.createdBy?.name ||
                                 component.author?.name ||
                                 "Anonymous"}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground truncate">
                               {component.createdBy?.username ||
                                 component.author?.username ||
                                 ""}
@@ -720,6 +767,7 @@ const CommunityList = () => {
                               ? component.comments.length
                               : 0)
                           }
+                          views={component.views || 0}
                         />
                       </div>
                     </div>
@@ -892,7 +940,7 @@ const CommunityList = () => {
           </div>
         </div>
       </div>
-      <div className="mb-16">
+      <div className="mb-16" ref={allComponentsRef}>
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">All Components</h2>
           <p className="text-muted-foreground">
@@ -901,120 +949,126 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(components.length > 0
-            ? [...components]
-            : [...featuredComponents, ...allComponents]
-          )
-            .filter((component) => {
-              // Type/category filter
-              if (selectedCategory !== "All") {
-                const type = (
-                  component.type ||
-                  component.category ||
-                  ""
-                ).toLowerCase();
-                if (type !== selectedCategory.toLowerCase()) return false;
-              }
-              // Search filter
-              if (searchQuery.trim() !== "") {
-                const q = searchQuery.toLowerCase();
-                return (
-                  (component.title &&
-                    component.title.toLowerCase().includes(q)) ||
-                  (component.description &&
-                    component.description.toLowerCase().includes(q)) ||
-                  (component.category &&
-                    component.category.toLowerCase().includes(q)) ||
-                  (component.type &&
-                    component.type.toLowerCase().includes(q)) ||
-                  (component.author?.name &&
-                    component.author.name.toLowerCase().includes(q)) ||
-                  (component.createdBy?.name &&
-                    component.createdBy.name.toLowerCase().includes(q))
-                );
-              }
-              return true;
-            })
-            .map((component, index) => {
-              return (
-                <Link
-                  to={`/components/${component.type || "component"}/${
-                    component._id || index
-                  }`}
-                  key={component._id || index}
-                >
-                  <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge variant="secondary" className="bg-secondary/50">
-                          {(component.type || component.category)
-                            ?.replace(/component/gi, "")
-                            .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </Badge>
-                        <InteractionButtons
-                          likes={
-                            component.likeCount ||
-                            component.likedBy?.length ||
-                            0
-                          }
-                          comments={
-                            component.commentCount ||
-                            (Array.isArray(component.comments)
-                              ? component.comments.length
-                              : 0)
-                          }
-                        />
-                      </div>
+          {paginatedComponents.map((component, index) => {
+            return (
+              <Link
+                to={`/components/${component.type || "component"}/${
+                  component._id || index
+                }`}
+                key={component._id || index}
+              >
+                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="secondary" className="bg-secondary/50">
+                        {(component.type || component.category)
+                          ?.replace(/component/gi, "")
+                          .trim()
+                          .replace(/^\w/, (c) => c.toUpperCase())}
+                      </Badge>
+                      <InteractionButtons
+                        likes={
+                          component.likeCount || component.likedBy?.length || 0
+                        }
+                        comments={
+                          component.commentCount ||
+                          (Array.isArray(component.comments)
+                            ? component.comments.length
+                            : 0)
+                        }
+                        views={component.views || 0}
+                      />
+                    </div>
 
-                      <div className="h-96 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                        <LivePreview component={component} />
-                      </div>
+                    <div
+                      className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
+                      style={{ backgroundColor: "#9ca3af" }}
+                    >
+                      <LivePreview component={component} />
+                    </div>
 
-                      <div
-                        className="flex items-center gap-2 cursor-pointer group"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const userId =
-                            component.createdBy?._id ||
-                            component.author?._id ||
-                            "";
-                          if (userId) {
-                            window.location.href = `/community/${userId}`;
-                          }
-                        }}
-                        title="View user profile"
-                      >
-                        <Avatar
-                          initials={
-                            component.createdBy?.name
-                              ?.charAt(0)
-                              .toUpperCase() ||
-                            component.author?.initials ||
-                            "U"
-                          }
-                          size="sm"
-                        />
-                        <div>
-                          <div className="text-sm font-medium group-hover:underline">
-                            {component.createdBy?.name ||
-                              component.author?.name ||
-                              "Anonymous"}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {component.createdBy?.username ||
-                              component.author?.username ||
-                              ""}
-                          </div>
+                    <div
+                      className="flex items-center gap-2 cursor-pointer group min-w-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const userId =
+                          component.createdBy?._id ||
+                          component.author?._id ||
+                          "";
+                        if (userId) {
+                          window.location.href = `/community/${userId}`;
+                        }
+                      }}
+                      title="View user profile"
+                    >
+                      <Avatar
+                        initials={
+                          component.createdBy?.name?.charAt(0).toUpperCase() ||
+                          component.author?.initials ||
+                          "U"
+                        }
+                        src={
+                          component.createdBy?.avatar ||
+                          component.author?.avatar
+                        }
+                        size="sm"
+                        className="flex-shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium group-hover:underline truncate">
+                          {component.createdBy?.name ||
+                            component.author?.name ||
+                            "Anonymous"}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {component.createdBy?.username ||
+                            component.author?.username ||
+                            ""}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 mt-8">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                currentPage === 1
+                  ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
+                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
+              }`}
+            >
+              Previous
+            </button>
+
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                currentPage === totalPages
+                  ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
+                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* CTA Section */}
@@ -1026,7 +1080,7 @@ const CommunityList = () => {
         <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
           <DialogTrigger asChild>
             <button
-              className="bg-gradient-primary hover:opacity-90 text-primary-foreground px-8 py-3 rounded-full font-medium transition-opacity"
+              className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
               onClick={() => setPopupOpen(true)}
             >
               Submit Component

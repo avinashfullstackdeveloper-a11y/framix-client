@@ -15,6 +15,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
+  // Avatar UI: show user.avatar if present, else initials fallback
+  import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileData {
   name: string;
@@ -346,6 +348,18 @@ export default function PersonalInformation() {
     );
   }
 
+
+
+  // Compute initials for fallback
+  const displayName = user?.username || user?.name || user?.email || "";
+  const initials =
+    displayName
+      .split(" ")
+      .map((n: string) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
   return (
     <div className="min-h-[600px] bg-black text-white">
       <div className="space-y-8">
@@ -365,6 +379,21 @@ export default function PersonalInformation() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Avatar display */}
+            <div className="flex items-center mb-6">
+              <Avatar className="h-16 w-16 border border-neutral-700 bg-white text-black mr-4">
+                {typeof user?.avatar === "string" && user.avatar ? (
+                  <AvatarImage key={user.avatar} src={user.avatar} alt={displayName} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                ) : null}
+                <AvatarFallback className="text-black font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-semibold text-lg">{displayName}</div>
+                <div className="text-neutral-400 text-sm">{user?.email}</div>
+              </div>
+            </div>
             <form onSubmit={handleSaveChanges} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">

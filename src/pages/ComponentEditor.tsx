@@ -608,39 +608,71 @@ const ComponentEditor: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const componentType =
-    (searchParams.get("component") as ComponentType) || "button";
-  const technology =
-    (searchParams.get("technology") as TechnologyType) || "css";
-
-  // --- Refactor: Multi-tab for CSS, single editor for Tailwind ---
+  // New: fetch by id if present
+  const id = searchParams.get("id");
+  const [componentType, setComponentType] = useState<ComponentType>("button");
+  const [technology, setTechnology] = useState<TechnologyType>("css");
   const [htmlCode, setHtmlCode] = useState<string>("");
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
   const [isEditing, setIsEditing] = useState(true);
-
-  // Background color state for preview
-  const [backgroundColor, setBackgroundColor] = useState<string>("#0a0a0a");
+  const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
-
-  // Modal open state
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [modalLocked, setModalLocked] = useState(false);
 
   useEffect(() => {
+    if (id) {
+      // Fetch the component by id
+      fetch(`${import.meta.env.VITE_API_URL}/api/submissions/${id}`, {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          // Defensive: support both {data: {...}} and direct object
+          const comp = data.data || data;
+          setComponentType(comp.componentType || "button");
+          setTechnology(comp.technology || "css");
+          if (comp.technology === "css") {
+            setHtmlCode(comp.htmlCode || "");
+            setCssCode(comp.cssCode || "");
+          } else if (comp.technology === "tailwind") {
+            setTailwindCode(comp.tailwindCode || "");
+          }
+        });
+    } else {
+      // Default: template
+      const urlComponent = (searchParams.get("component") as ComponentType) || "button";
+      const urlTech = (searchParams.get("technology") as TechnologyType) || "css";
+      setComponentType(urlComponent);
+      setTechnology(urlTech);
+      const template = getTemplateCode(urlComponent, urlTech);
+      if (urlTech === "css") {
+        const htmlMatch = template.match(/<body>([\s\S]*?)<\/body>/);
+        const styleMatch = template.match(/<style>([\s\S]*?)<\/style>/);
+        setHtmlCode(htmlMatch ? htmlMatch[1].trim() : "");
+        setCssCode(styleMatch ? styleMatch[1].trim() : "");
+      } else if (urlTech === "tailwind") {
+        setTailwindCode(template);
+      }
+    }
+    // eslint-disable-next-line
+  }, [id]);
+
+  // If user changes type/tech manually, update code template
+  useEffect(() => {
+    if (id) return; // Don't override loaded code
     const template = getTemplateCode(componentType, technology);
     if (technology === "css") {
-      // Extract HTML and CSS from template
       const htmlMatch = template.match(/<body>([\s\S]*?)<\/body>/);
       const styleMatch = template.match(/<style>([\s\S]*?)<\/style>/);
-      const htmlVal = htmlMatch ? htmlMatch[1].trim() : "";
       setHtmlCode(htmlMatch ? htmlMatch[1].trim() : "");
       setCssCode(styleMatch ? styleMatch[1].trim() : "");
     } else if (technology === "tailwind") {
       setTailwindCode(template);
     }
-  }, [componentType, technology]);
+  }, [componentType, technology, id]);
 
   // For copy/reset actions
   const getCurrentCode = () => {
@@ -925,9 +957,9 @@ const ComponentEditor: React.FC = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Preview Panel */}
-          <div className="bg-card rounded-lg border shadow-sm overflow-hidden flex flex-col h-[600px]">
+          <div className="bg-white rounded-lg border-white shadow-sm overflow-hidden flex flex-col h-[600px]">
             <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
-              <h3 className="font-semibold">Preview</h3>
+              <h3 className="font-semibold text-black">{backgroundColor}</h3>
               <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
                 <PopoverTrigger asChild>
                   <Button
@@ -995,8 +1027,7 @@ const ComponentEditor: React.FC = () => {
               </Popover>
             </div>
             <div
-              className="flex-1 flex items-center justify-center p-8 overflow-hidden"
-              style={{ backgroundColor }}
+              className="flex-1 flex items-center justify-center p-8 overflow-hidden bg-gray-300"
             >
               <div className="w-full h-full flex items-center justify-center">
                 {renderPreview()}

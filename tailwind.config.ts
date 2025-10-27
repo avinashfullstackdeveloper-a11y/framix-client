@@ -63,7 +63,7 @@ export default {
 				'card': 'var(--shadow-card)'
 			},
 			fontFamily: {
-				'sans': ['Inter', 'system-ui', 'sans-serif']
+				'sans': ['Manrope', 'system-ui', 'sans-serif']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

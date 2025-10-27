@@ -9,7 +9,10 @@ const NavLink = ({
   to,
   children,
   ...rest
-}: { to: string; children: React.ReactNode } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+}: {
+  to: string;
+  children: React.ReactNode;
+} & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   const location = useLocation();
   const isActive = location.pathname === to;
 
@@ -18,7 +21,7 @@ const NavLink = ({
       to={to}
       // 'group' allows us to style a child element based on the parent's state (e.g., on hover)
       className={`relative group transition-colors ${
-        isActive ? 'text-white' : 'text-neutral-400 hover:text-white'
+        isActive ? "text-white" : "text-neutral-400 hover:text-white"
       }`}
       {...rest}
     >
@@ -26,30 +29,37 @@ const NavLink = ({
       {/* This is the animated underline */}
       <span
         className={`absolute bottom-[-4px] left-0 h-[2px] bg-[#E84288] transition-all duration-300 ease-in-out
-          ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}
+          ${isActive ? "w-full" : "w-0 group-hover:w-full"}
         `}
       />
     </Link>
   );
 };
 
-import { Sheet, SheetContent, SheetOverlay, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetOverlay,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import { DialogTitle } from "@/components/ui/dialog";
 // VisuallyHidden component for accessibility
 const VisuallyHidden = ({ children }: { children: React.ReactNode }) => (
-  <span style={{
-    border: 0,
-    clip: "rect(0 0 0 0)",
-    height: "1px",
-    margin: "-1px",
-    overflow: "hidden",
-    padding: 0,
-    position: "absolute",
-    width: "1px",
-    whiteSpace: "nowrap"
-  }}>
+  <span
+    style={{
+      border: 0,
+      clip: "rect(0 0 0 0)",
+      height: "1px",
+      margin: "-1px",
+      overflow: "hidden",
+      padding: 0,
+      position: "absolute",
+      width: "1px",
+      whiteSpace: "nowrap",
+    }}
+  >
     {children}
   </span>
 );
@@ -70,9 +80,8 @@ const Navigation = () => {
 
   return (
     <nav className="bg-[#111111] sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-8 sm:px-12 lg:px-20">
         <div className="flex items-center justify-between h-16">
-
           {/* LOGO */}
           <Link to="/" className="flex items-center">
             <img src="/fremix.png" alt="Framix Logo" className="h-9 w-auto" />
@@ -80,8 +89,10 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
-            {navLinks.map(link => (
-              <NavLink key={link.to} to={link.to}>{link.label}</NavLink>
+            {navLinks.map((link) => (
+              <NavLink key={link.to} to={link.to}>
+                {link.label}
+              </NavLink>
             ))}
           </div>
 
@@ -90,12 +101,12 @@ const Navigation = () => {
             {isLoading ? (
               <div className="h-10 w-10 rounded-full bg-neutral-800 animate-pulse" />
             ) : user ? (
-              <UserAccountMenu user={user} />
+              <UserAccountMenu />
             ) : (
               <Link to="/signin">
                 <Button
                   variant="default"
-                  className="bg-[#E84288] text-black font-semibold hover:bg-[#E84288]/90 rounded-lg"
+                  className="bg-[#FF9AC9] text-black font-semibold hover:bg-[#FF9AC9]/90 rounded-lg min-w-[160px]"
                 >
                   Explore Now
                 </Button>
@@ -131,7 +142,7 @@ const Navigation = () => {
                 <DialogTitle asChild>
                   <VisuallyHidden>Navigation Menu</VisuallyHidden>
                 </DialogTitle>
-                
+
                 {/* Logo Section */}
                 <div className="px-8 pb-4">
                   <Link
@@ -139,12 +150,19 @@ const Navigation = () => {
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center"
                   >
-                    <img src="/fremix.png" alt="Framix Logo" className="h-9 w-auto" />
+                    <img
+                      src="/fremix.png"
+                      alt="Framix Logo"
+                      className="h-9 w-auto"
+                    />
                   </Link>
                 </div>
-                
-                <nav className="flex flex-col gap-2 px-6 py-6 text-base font-medium" autoFocus>
-                  {navLinks.map(link => (
+
+                <nav
+                  className="flex flex-col gap-2 px-6 py-6 text-base font-medium"
+                  autoFocus
+                >
+                  {navLinks.map((link) => (
                     <NavLink
                       key={link.to}
                       to={link.to}
@@ -156,23 +174,25 @@ const Navigation = () => {
                     </NavLink>
                   ))}
                 </nav>
-                
+
                 {/* Visual separator */}
                 <div className="mx-6 my-4 border-t border-neutral-800" />
-                
+
                 {/* Account section with improved spacing */}
                 <div className="px-6 pb-6">
                   {isLoading ? (
                     <div className="h-10 w-10 rounded-full bg-neutral-800 animate-pulse" />
                   ) : user ? (
                     <div className="py-2">
-                      <UserAccountMenu user={user} onNavigate={() => setMobileOpen(false)} />
+                      <UserAccountMenu
+                        onNavigate={() => setMobileOpen(false)}
+                      />
                     </div>
                   ) : (
                     <Link to="/signin" tabIndex={0}>
                       <Button
                         variant="default"
-                        className="w-full bg-[#E84288] text-white font-semibold hover:bg-[#E84288]/90 hover:shadow-lg hover:shadow-[#E84288]/20 rounded-lg transition-all duration-300 min-h-[44px] focus-visible:ring-2 focus-visible:ring-[#E84288] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
+                        className="w-full bg-[#FF9AC9] text-white font-semibold hover:bg-[#FF9AC9]/90 hover:shadow-lg hover:shadow-[#FF9AC9]/20 rounded-lg transition-all duration-300 min-h-[44px] min-w-[160px] focus-visible:ring-2 focus-visible:ring-[#FF9AC9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
                         onClick={() => setMobileOpen(false)}
                       >
                         Explore Now

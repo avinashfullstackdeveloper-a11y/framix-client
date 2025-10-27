@@ -1,9 +1,14 @@
 // SettingsPage.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { apiRequest } from "@/lib/api";
 import PersonalInformation from "./PersonalInformation.tsx";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AccountSection } from "./AccountSection.tsx";
+  import type { MyComponentSubmission } from "@/components/MyComponentCard";
+
+import StatsSection from "./StatsSection.tsx";
+import MyComponentCard from "@/components/MyComponentCard";
 
 interface SidebarProps {
   activeSection: string;
@@ -21,6 +26,11 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
       id: "account",
       label: "Account",
       icon: "https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/e1cc128f320e2b7a88442bf103ca4680c02cf522?placeholderIfAbsent=true",
+    },
+    {
+      id: "mycomponents",
+      label: "My Components",
+      icon: "https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/724126a735e33b50219fb6953993ef586769d2c3?placeholderIfAbsent=true",
     },
     {
       id: "stats",
@@ -64,6 +74,47 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState("profile");
   const navigate = useNavigate();
 
+  // --- My Components submissions state ---
+
+  const [myComponentsApproved, setMyComponentsApproved] = useState<MyComponentSubmission[]>([]);
+  const [myComponentsRejected, setMyComponentsRejected] = useState<MyComponentSubmission[]>([]);
+  const [myComponentsPending, setMyComponentsPending] = useState<MyComponentSubmission[]>([]);
+  const [loadingMyComponents, setLoadingMyComponents] = useState(false);
+  const [myComponentsError, setMyComponentsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMyComponents() {
+      setLoadingMyComponents(true);
+      setMyComponentsError(null);
+      try {
+        const [approvedRes, rejectedRes, pendingRes] = await Promise.all([
+          apiRequest<{ data: MyComponentSubmission[] }>("/api/submissions/my-submissions?status=approved"),
+          apiRequest<{ data: MyComponentSubmission[] }>("/api/submissions/my-submissions?status=rejected"),
+          apiRequest<{ data: MyComponentSubmission[] }>("/api/submissions/my-submissions?status=pending"),
+        ]);
+        setMyComponentsApproved(approvedRes.data.filter((item) => item.status === "approved"));
+        setMyComponentsRejected(rejectedRes.data.filter((item) => item.status === "rejected"));
+        setMyComponentsPending(pendingRes.data.filter((item) => item.status === "pending"));
+      } catch (err) {
+        setMyComponentsError(
+          err instanceof Error ? err.message : "Failed to fetch submissions"
+        );
+      } finally {
+        setLoadingMyComponents(false);
+      }
+    }
+
+    if (activeSection === "mycomponents") {
+      fetchMyComponents();
+    }
+    // Optionally, clear data when leaving section
+    // else {
+    //   setMyComponentsApproved([]);
+    //   setMyComponentsRejected([]);
+    //   setMyComponentsPending([]);
+    // }
+  }, [activeSection]);
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Go Back Button */}
@@ -83,6 +134,7 @@ export default function SettingsPage() {
           activeSection={activeSection}
           onSectionChange={setActiveSection}
         />
+        {/* Provide context for editing: store selected component in sessionStorage before navigating */}
         <main className="flex-1 max-md:mt-4 md:pl-8 md:min-h-[600px]">
           <div className="h-full">
             {activeSection === "profile" && (
@@ -97,17 +149,94 @@ export default function SettingsPage() {
             )}
             {activeSection === "stats" && (
               <section className="h-full">
-                <div className="max-w-3xl mx-auto space-y-8 h-full flex flex-col justify-center">
-                  <h2 className="text-2xl font-semibold mb-4">Stats</h2>
-                  <p className="text-neutral-400">
-                    Stats section (dummy content)
-                  </p>
-                </div>
+                <StatsSection />
+              </section>
+            )}
+            {activeSection === "mycomponents" && (
+              <section className="h-full">
+                <h2 className="text-2xl font-bold mb-4">My Components</h2>
+                {/* Top-side tab switch for Approved/Rejected */}
+                <TabsMyComponents
+                  approved={myComponentsApproved}
+                  rejected={myComponentsRejected}
+                  loading={loadingMyComponents}
+                  error={myComponentsError}
+                  navigate={navigate}
+                />
               </section>
             )}
           </div>
         </main>
       </div>
+    </div>
+  );
+}
+
+// --- Tab Switch Component ---
+function TabsMyComponents({
+  approved,
+  rejected,
+  loading,
+  error,
+  navigate,
+}: {
+  approved: MyComponentSubmission[];
+  rejected: MyComponentSubmission[];
+  loading: boolean;
+  error: string | null;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const [activeTab, setActiveTab] = React.useState<"approved" | "rejected">("approved");
+
+  const tabList = [
+    { key: "approved", label: `Approved (${approved.length})` },
+    { key: "rejected", label: `Rejected (${rejected.length})` },
+  ] as const;
+
+  const submissions = activeTab === "approved" ? approved : rejected;
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6">
+        {tabList.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 rounded-t-lg font-semibold transition-all duration-200 border-b-2 ${
+              activeTab === tab.key
+                ? "border-[#FF9AC9] text-[#FF9AC9] bg-[#23272b]"
+                : "border-transparent text-white bg-transparent hover:text-[#FF9AC9]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <div className="text-gray-400">Loading...</div>
+      ) : error ? (
+        <div className="text-red-400">{error}</div>
+      ) : (
+        <div>
+          {submissions.length === 0 ? (
+            <div className="text-gray-400">No submissions found.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {submissions.map((submission) => (
+                <div
+                  key={submission._id}
+                  className="cursor-pointer w-full"
+                  onClick={() => {
+                    navigate(`/component-editor?id=${submission._id}`);
+                  }}
+                >
+                  <MyComponentCard submission={submission} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

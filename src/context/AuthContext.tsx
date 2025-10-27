@@ -8,6 +8,8 @@ type User = {
   username?: string;
   name?: string;
   role?: string;
+  avatar?: string; // Profile picture URL
+  profilePicture?: string; // Google profile picture fallback
 };
 
 type AuthContextType = {
@@ -38,13 +40,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const result = await authClient.getSession();
         if (result.user) {
-          setUser({
+          const avatarValue = result.user.avatar || result.user.profilePicture;
+          
+          const userObject = {
             id: result.user.id,
             email: result.user.email,
             name: result.user.name,
             username: result.user.name, // Use name as username for display
             role: result.user.role,
-          });
+            avatar: avatarValue, // Support both avatar/profilePicture
+          };
+          
+          setUser(userObject);
         }
       } catch (error) {
         console.error("Session check failed:", error);
@@ -74,6 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           name: result.user.name,
           username: result.user.name, // Use name as username for display
           role: result.user.role, // Ensure role is set on login
+          avatar: result.user.avatar || result.user.profilePicture, // Support both avatar/profilePicture
         });
       }
       // Do not use localStorage for user state
@@ -107,6 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
+          avatar: result.user.avatar || result.user.profilePicture, // Support both avatar/profilePicture
         });
       }
     } catch (error: any) {
@@ -179,6 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           name: result.user.name,
           username: result.user.name, // Use name as username for display
           role: result.user.role, // Ensure role is set on refetch
+          avatar: result.user.avatar || result.user.profilePicture, // Support both avatar/profilePicture
         });
         // Do not use localStorage for user state
       }

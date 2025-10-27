@@ -353,12 +353,16 @@ const AdminQueue: React.FC = () => {
 
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-semibold">
-                        {submission.createdBy.name.charAt(0).toUpperCase()}
+                        {submission.createdBy?.name
+                          ? submission.createdBy.name.charAt(0).toUpperCase()
+                          : "?"}
                       </div>
                       <div>
-                        <div className="text-sm font-medium">{submission.createdBy.name}</div>
+                        <div className="text-sm font-medium">
+                          {submission.createdBy?.name || "Unknown"}
+                        </div>
                         <div className="text-xs text-muted-foreground">
-                          {submission.createdBy.email}
+                          {submission.createdBy?.email || "Unknown"}
                         </div>
                       </div>
                     </div>
@@ -417,12 +421,16 @@ const AdminQueue: React.FC = () => {
                   <h3 className="font-semibold mb-2">Submitted By</h3>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                      {selectedSubmission.createdBy.name.charAt(0).toUpperCase()}
+                      {selectedSubmission.createdBy?.name
+                        ? selectedSubmission.createdBy.name.charAt(0).toUpperCase()
+                        : "?"}
                     </div>
                     <div>
-                      <div className="font-medium">{selectedSubmission.createdBy.name}</div>
+                      <div className="font-medium">
+                        {selectedSubmission.createdBy?.name || "Unknown"}
+                      </div>
                       <div className="text-sm text-muted-foreground">
-                        {selectedSubmission.createdBy.email}
+                        {selectedSubmission.createdBy?.email || "Unknown"}
                       </div>
                     </div>
                   </div>

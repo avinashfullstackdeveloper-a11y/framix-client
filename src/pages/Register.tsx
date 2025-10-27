@@ -9,10 +9,12 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { useToast } from "@/hooks/use-toast";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, user, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,15 +22,84 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [toastShown, setToastShown] = useState(false);
+
+  // Show welcome toast after OAuth registration redirect
+  React.useEffect(() => {
+    // Wait for auth to finish loading before showing toast
+    if (authLoading) return;
+
+    if (
+      localStorage.getItem("showWelcomeToast") === "1" &&
+      user &&
+      user.role &&
+      !toastShown
+    ) {
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
+        variant: "default",
+      });
+      localStorage.removeItem("showWelcomeToast");
+      setToastShown(true);
+      
+      // Navigate to appropriate page based on role
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/components", { replace: true });
+      }
+    }
+  }, [toast, user, authLoading, toastShown, navigate]);
 
   // Handle Email/Password Registration
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+
+    // Username must be at least 4 characters
+    if (username.trim().length < 4) {
+      toast({
+        title: "Invalid Username",
+        description: "Username must be at least 4 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Email: check if part before @ is at least 4 characters
+    const emailParts = email.split("@");
+    if (
+      emailParts.length !== 2 ||
+      emailParts[0].length < 4
+    ) {
+      toast({
+        title: "Invalid Email",
+        description: "The part before '@' in your email must be at least 4 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Password strength recommendation
+    // At least 8 chars, one uppercase, one lowercase, one number, one special char
+    // eslint-disable-next-line no-useless-escape
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
+      toast({
+        title: "Weak Password",
+        description:
+          "Password should be at least 8 characters and include uppercase, lowercase, number, and special character.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      toast({
+        title: "Error",
+        description: "Passwords don't match",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -36,11 +107,21 @@ const Register: React.FC = () => {
     try {
       await register(email, password, username);
 
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
+        variant: "default",
+      });
+
       // Navigate immediately after successful registration
       navigate("/components", { replace: true });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("SignUp error:", err);
-      setError((err as Error).message || "An error occurred");
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "An error occurred",
+        variant: "destructive",
+      });
       setIsLoading(false);
     }
   };
@@ -48,6 +129,8 @@ const Register: React.FC = () => {
   // Handle OAuth Login
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    // Set a flag in localStorage to show welcome toast after OAuth redirect
+    localStorage.setItem("showWelcomeToast", "1");
     window.location.href = `${apiUrl}/api/auth/${provider}`;
   };
 
@@ -62,11 +145,7 @@ const Register: React.FC = () => {
 
         <CardContent className="space-y-6">
           {/* Error Message */}
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+          {/* Toast notifications are used for errors */}
 
           {/* OAuth Buttons Above Form */}
           <div className="flex flex-col gap-4">
@@ -136,6 +215,30 @@ const Register: React.FC = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
+              {/* Password strength visual */}
+              {password.length > 0 && (
+                <div className="mt-2">
+                  {(() => {
+                    // eslint-disable-next-line no-useless-escape
+                    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,}$/;
+                    if (strongPasswordRegex.test(password)) {
+                      return (
+                        <div className="text-green-600 text-xs font-semibold flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                          Strong password
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="text-red-500 text-xs font-semibold flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
+                          Weak password
+                        </div>
+                      );
+                    }
+                  })()}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -158,6 +261,22 @@ const Register: React.FC = () => {
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
+              {/* Confirm password match/mismatch visual */}
+              {confirmPassword.length > 0 && (
+                <div className="mt-2">
+                  {confirmPassword === password ? (
+                    <div className="text-green-600 text-xs font-semibold flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                      Passwords match
+                    </div>
+                  ) : (
+                    <div className="text-red-500 text-xs font-semibold flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-red-500 inline-block"></span>
+                      Passwords do not match
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <Button
