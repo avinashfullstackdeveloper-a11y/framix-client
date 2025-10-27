@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
   // Avatar UI: show user.avatar if present, else initials fallback
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -13,6 +14,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
 
 
   const { user, isLoading, deleteAccount } = useAuth();
+  const { toast } = useToast();
 
   const displayName = user?.username || user?.name || user?.email || "";
   const initials =
@@ -46,11 +48,22 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
     try {
       // Wait for backend confirmation before clearing local data and logging out
       await deleteAccount();
+      
+      // Show success toast
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted.",
+        variant: "default",
+      });
+      
       setIsDeleting(false);
       setShowConfirmDialog(false);
       setConfirmText("");
-      // Redirect to SignIn page or home (logged-out state)
-      window.location.href = "/signin";
+      
+      // Redirect to SignIn page after a short delay to show the toast
+      setTimeout(() => {
+        window.location.href = "/signin";
+      }, 1500);
     } catch (error) {
       // Show error from backend if available
       let errorMsg = "Failed to delete account. Please try again.";
