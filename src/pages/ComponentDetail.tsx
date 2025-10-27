@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { trackComponentView } from "@/lib/api";
+import { FigmaButton } from "../components/ui/FigmaButton";
 import {
   Avatar as ShadAvatar,
   AvatarImage,
@@ -725,6 +726,22 @@ const ComponentDetail: React.FC = () => {
                   >
                     {isEditing ? "Save" : "Edit"}
                   </Button>
+                  <FigmaButton
+                    onClick={() => {
+                      let codeToCopy = "";
+                      if (technology === "css") {
+                        codeToCopy = activeTab === "html" ? htmlCode : cssCode;
+                      } else if (technology === "tailwind") {
+                        codeToCopy = tailwindCode;
+                      }
+                      navigator.clipboard.writeText(codeToCopy);
+                      toast({
+                        title: "Copied to Figma!",
+                        description: "Code copied for Figma.",
+                        variant: "default",
+                      });
+                    }}
+                  />
                 </div>
               </div>
             </CardHeader>

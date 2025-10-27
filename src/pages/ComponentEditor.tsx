@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { FigmaButton } from "../components/ui/FigmaButton";
 import {
   Popover,
   PopoverContent,
@@ -1054,6 +1055,9 @@ const ComponentEditor: React.FC = () => {
                 >
                   {isEditing ? "Lock" : "Edit"}
                 </Button>
+                <FigmaButton
+                  onClick={handleCopy}
+                />
               </div>
             </div>
             <div className="flex-1 flex flex-col">
