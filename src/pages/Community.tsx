@@ -958,74 +958,83 @@ const CommunityList = () => {
                 key={component._id || index}
               >
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant="secondary" className="bg-secondary/50">
-                        {(component.type || component.category)
-                          ?.replace(/component/gi, "")
-                          .trim()
-                          .replace(/^\w/, (c) => c.toUpperCase())}
-                      </Badge>
-                      <InteractionButtons
-                        likes={
-                          component.likeCount || component.likedBy?.length || 0
-                        }
-                        comments={
-                          component.commentCount ||
-                          (Array.isArray(component.comments)
-                            ? component.comments.length
-                            : 0)
-                        }
-                        views={component.views || 0}
-                      />
-                    </div>
-
+                  <CardContent className="p-0">
                     <div
-                      className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
+                      className="h-64 rounded-t-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
+                      <div className="absolute top-3 right-3 z-10">
+                        <Badge
+                          variant="secondary"
+                          className="bg-black/50 text-white backdrop-blur-sm"
+                        >
+                          {(component.type || component.category)
+                            ?.replace(/component/gi, "")
+                            .trim()
+                            .replace(/^\w/, (c) => c.toUpperCase())}
+                        </Badge>
+                      </div>
                     </div>
-
-                    <div
-                      className="flex items-center gap-2 cursor-pointer group min-w-0"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const userId =
-                          component.createdBy?._id ||
-                          component.author?._id ||
-                          "";
-                        if (userId) {
-                          window.location.href = `/community/${userId}`;
-                        }
-                      }}
-                      title="View user profile"
-                    >
-                      <Avatar
-                        initials={
-                          component.createdBy?.name?.charAt(0).toUpperCase() ||
-                          component.author?.initials ||
-                          "U"
-                        }
-                        src={
-                          component.createdBy?.avatar ||
-                          component.author?.avatar
-                        }
-                        size="sm"
-                        className="flex-shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium group-hover:underline truncate">
-                          {component.createdBy?.name ||
-                            component.author?.name ||
-                            "Anonymous"}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div
+                          className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const userId =
+                              component.createdBy?._id ||
+                              component.author?._id ||
+                              "";
+                            if (userId) {
+                              window.location.href = `/community/${userId}`;
+                            }
+                          }}
+                          title="View user profile"
+                        >
+                          <Avatar
+                            initials={
+                              component.createdBy?.name
+                                ?.charAt(0)
+                                .toUpperCase() ||
+                              component.author?.initials ||
+                              "U"
+                            }
+                            src={
+                              component.createdBy?.avatar ||
+                              component.author?.avatar
+                            }
+                            size="sm"
+                            className="flex-shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium group-hover:underline truncate">
+                              {component.createdBy?.name ||
+                                component.author?.name ||
+                                "Anonymous"}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              {component.createdBy?.username ||
+                                component.author?.username ||
+                                ""}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {component.createdBy?.username ||
-                            component.author?.username ||
-                            ""}
-                        </div>
+                        <InteractionButtons
+                          likes={
+                            component.likeCount ||
+                            component.likedBy?.length ||
+                            0
+                          }
+                          comments={
+                            component.commentCount ||
+                            (Array.isArray(component.comments)
+                              ? component.comments.length
+                              : 0)
+                          }
+                          views={component.views || 0}
+                        />
                       </div>
                     </div>
                   </CardContent>
