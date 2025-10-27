@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
+import { useToast } from "@/hooks/use-toast";
 
 const Components = () => {
   // Filter tabs should match the fields in ComponentSelectorPopup.tsx
@@ -43,10 +44,51 @@ const Components = () => {
   const [activeFilter, setActiveFilter] = useState(filterTabs[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  const [toastShown, setToastShown] = useState(false);
 
   // Ref for scrolling to components grid on page change
   const componentsGridRef = useRef<HTMLDivElement>(null);
+
+  // Show welcome toast after OAuth login/registration
+  useEffect(() => {
+    // Wait for auth to finish loading
+    if (authLoading) return;
+
+    // Check for OAuth welcome back toast (sign in)
+    if (
+      localStorage.getItem("showWelcomeBackToast") === "1" &&
+      user &&
+      user.role &&
+      !toastShown
+    ) {
+      toast({
+        title: "Welcome back!",
+        description: "You have signed in successfully.",
+        variant: "default",
+      });
+      localStorage.removeItem("showWelcomeBackToast");
+      setToastShown(true);
+      return;
+    }
+
+    // Check for OAuth welcome toast (registration)
+    if (
+      localStorage.getItem("showWelcomeToast") === "1" &&
+      user &&
+      user.role &&
+      !toastShown
+    ) {
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
+        variant: "default",
+      });
+      localStorage.removeItem("showWelcomeToast");
+      setToastShown(true);
+    }
+  }, [user, authLoading, toast, toastShown]);
 
   const fetchComponents = () => {
     setLoading(true);

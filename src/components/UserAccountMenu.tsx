@@ -11,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { toast } = useToast();
 
   if (!user) return null;
 
@@ -30,9 +32,19 @@ export function UserAccountMenu({ onNavigate }: { onNavigate?: () => void }) {
   const handleSignOut = async () => {
     try {
       await logout();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been signed out of your account.",
+        variant: "default",
+      });
       navigate("/signin");
     } catch (error) {
       console.error("Sign out failed:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

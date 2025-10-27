@@ -13,15 +13,33 @@ import { useToast } from "@/hooks/use-toast";
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { login, user, refetchUser } = useAuth();
+  const { login, user, refetchUser, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [toastShown, setToastShown] = useState(false);
 
-  // Redirect based on user role after login/refetch
+  // Show welcome toast after OAuth login when user becomes available
   React.useEffect(() => {
+    // Wait for auth to finish loading before showing toast
+    if (authLoading) return;
+
+    if (
+      localStorage.getItem("showWelcomeBackToast") === "1" &&
+      user &&
+      user.role &&
+      !toastShown
+    ) {
+      toast({
+        title: "Welcome back!",
+        description: "You have signed in successfully.",
+        variant: "default",
+      });
+      localStorage.removeItem("showWelcomeBackToast");
+      setToastShown(true);
+    }
     if (user && user.role) {
       if (user.role === "admin") {
         navigate("/admin", { replace: true });
@@ -29,7 +47,7 @@ const SignIn: React.FC = () => {
         navigate("/components", { replace: true });
       }
     }
-  }, [user, navigate]);
+  }, [user, navigate, toast, authLoading, toastShown]);
 
   // Handle Email/Password Login
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,6 +72,8 @@ const SignIn: React.FC = () => {
   // Handle OAuth Login
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    // Set a flag in localStorage to show welcome back toast after OAuth redirect
+    localStorage.setItem("showWelcomeBackToast", "1");
     window.location.href = `${apiUrl}/api/auth/${provider}`;
   };
 

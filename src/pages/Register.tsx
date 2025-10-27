@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -22,6 +22,35 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [toastShown, setToastShown] = useState(false);
+
+  // Show welcome toast after OAuth registration redirect
+  React.useEffect(() => {
+    // Wait for auth to finish loading before showing toast
+    if (authLoading) return;
+
+    if (
+      localStorage.getItem("showWelcomeToast") === "1" &&
+      user &&
+      user.role &&
+      !toastShown
+    ) {
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
+        variant: "default",
+      });
+      localStorage.removeItem("showWelcomeToast");
+      setToastShown(true);
+      
+      // Navigate to appropriate page based on role
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/components", { replace: true });
+      }
+    }
+  }, [toast, user, authLoading, toastShown, navigate]);
 
   // Handle Email/Password Registration
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,6 +107,12 @@ const Register: React.FC = () => {
     try {
       await register(email, password, username);
 
+      toast({
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
+        variant: "default",
+      });
+
       // Navigate immediately after successful registration
       navigate("/components", { replace: true });
     } catch (err: unknown) {
@@ -94,6 +129,8 @@ const Register: React.FC = () => {
   // Handle OAuth Login
   const handleOAuthLogin = (provider: 'google' | 'github') => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    // Set a flag in localStorage to show welcome toast after OAuth redirect
+    localStorage.setItem("showWelcomeToast", "1");
     window.location.href = `${apiUrl}/api/auth/${provider}`;
   };
 
