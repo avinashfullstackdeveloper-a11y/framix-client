@@ -119,7 +119,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Go Back Button */}
-      <div className="max-md:px-4 max-md:pt-4 md:px-8 md:pt-8">
+      <div className="max-md:px-4 max-md:pt-2 md:px-8 md:pt-3 md:pl-12">
         <Button
           variant="ghost"
           size="sm"
