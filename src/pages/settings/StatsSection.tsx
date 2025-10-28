@@ -10,7 +10,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, className = '' }) => {
   return (
-    <article className={`bg-[rgba(255,255,255,0.002)] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] flex min-w-60 flex-col items-stretch justify-center grow shrink w-[258px] p-[18px] rounded-lg border-[rgba(33,33,33,0.8)] border-solid border-2 ${className}`}>
+    <article className={`bg-black shadow-[0px_1px_2px_rgba(0,0,0,0.05)] flex min-w-60 flex-col items-stretch justify-center grow shrink w-[258px] p-[18px] rounded-lg border-[rgba(33,33,33,0.8)] border-solid border-2 ${className}`}>
       <div className="w-full">
         <div className="w-full text-sm text-[rgba(153,153,153,1)] font-normal leading-none">
           <div>{title}</div>
@@ -126,7 +126,7 @@ const CustomTooltip: React.FC<TooltipProps> = ({ active, payload }) => {
     });
     
     return (
-      <div className="bg-[rgba(33,33,33,0.95)] border border-[rgba(153,153,153,0.3)] rounded-lg p-3 shadow-lg">
+      <div className="bg-black border border-[rgba(153,153,153,0.3)] rounded-lg p-3 shadow-lg">
         <p className="text-gray-300 text-sm mb-1">{formattedDate}</p>
         <p className="text-blue-400 font-semibold">
           {data.count} {data.count === 1 ? 'favorite' : 'favorites'}
@@ -184,7 +184,7 @@ export const Chart: React.FC<ChartProps> = ({ className = '' }) => {
   };
 
   return (
-    <section className={`bg-[rgba(255,255,255,0.002)] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-full mt-6 p-[26px] rounded-lg border-[rgba(33,33,33,0.8)] border-solid border-2 max-md:max-w-full max-md:px-5 ${className}`}>
+    <section className={`bg-black shadow-[0px_1px_2px_rgba(0,0,0,0.05)] w-full mt-6 p-[26px] rounded-lg border-[rgba(33,33,33,0.8)] border-solid border-2 max-md:max-w-full max-md:px-5 ${className}`}>
       <header>
         <h3 className="w-full text-xl text-gray-100 font-normal leading-[1.4] max-md:max-w-full">
           <div className="max-md:max-w-full">

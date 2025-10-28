@@ -815,7 +815,7 @@ export const CommunityUserProfile = ({
 
   if (loading) {
     return (
-      <div className="relative w-full max-w-7xl mx-auto bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8">
+      <div className="relative w-full max-w-7xl mx-auto bg-black backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8">
         <div className="flex flex-col items-center justify-center py-20 space-y-6">
           {/* Animated spinner */}
           <div className="relative w-16 h-16">
@@ -825,19 +825,19 @@ export const CommunityUserProfile = ({
           {/* Skeleton loaders */}
           <div className="w-full max-w-2xl space-y-4 animate-pulse">
             <div className="flex items-center gap-4">
-              <div className="w-24 h-24 rounded-full bg-gray-700/50"></div>
+              <div className="w-24 h-24 rounded-full bg-black"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-8 bg-gray-700/50 rounded-lg w-3/4"></div>
-                <div className="h-4 bg-gray-700/50 rounded-lg w-1/2"></div>
+                <div className="h-8 bg-black rounded-lg w-3/4"></div>
+                <div className="h-4 bg-black rounded-lg w-1/2"></div>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 mt-8">
-              <div className="h-32 bg-gray-700/50 rounded-xl"></div>
-              <div className="h-32 bg-gray-700/50 rounded-xl"></div>
-              <div className="h-32 bg-gray-700/50 rounded-xl"></div>
+              <div className="h-32 bg-black rounded-xl"></div>
+              <div className="h-32 bg-black rounded-xl"></div>
+              <div className="h-32 bg-black rounded-xl"></div>
             </div>
           </div>
-          <p className="text-lg text-gray-400 font-medium">
+          <p className="text-lg text-neutral-400 font-medium">
             Loading profile...
           </p>
         </div>
@@ -847,7 +847,7 @@ export const CommunityUserProfile = ({
 
   if (!user) {
     return (
-      <div className="relative w-full max-w-7xl mx-auto bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8">
+      <div className="relative w-full max-w-7xl mx-auto bg-black backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8">
         <div className="flex flex-col items-center justify-center py-20 space-y-6">
           {/* Error icon */}
           <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center">
@@ -866,7 +866,7 @@ export const CommunityUserProfile = ({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-bold text-red-400">User Not Found</h2>
-            <p className="text-gray-400">
+            <p className="text-neutral-400">
               The profile you're looking for doesn't exist or has been removed.
             </p>
           </div>
@@ -891,7 +891,7 @@ export const CommunityUserProfile = ({
   }
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8 overflow-hidden">
+    <div className="relative w-full max-w-7xl mx-auto bg-black backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8 overflow-hidden">
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FF479C]/5 via-transparent to-purple-500/5 pointer-events-none"></div>
 
@@ -921,7 +921,7 @@ export const CommunityUserProfile = ({
       </div>
 
       {/* Profile Header with gradient background */}
-      <div className="relative bg-gradient-to-r from-secondary/30 via-secondary/20 to-transparent backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/5 shadow-xl mb-8">
+      <div className="relative bg-black backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/5 shadow-xl mb-8">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
           {/* Profile Picture - Simplified */}
           <div className="flex-shrink-0 relative">
@@ -939,7 +939,7 @@ export const CommunityUserProfile = ({
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex-1 space-y-4">
                 <div>
-                  <h1 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-2 leading-tight">
+                  <h1 className="text-3xl lg:text-5xl font-bold text-white mb-2 leading-tight">
                     {user.name}
                   </h1>
                   <div className="text-muted-foreground text-lg font-medium">
@@ -998,7 +998,7 @@ export const CommunityUserProfile = ({
 
                 {/* Show bio if present */}
                 {user.bio && (
-                  <div className="text-neutral-300 text-base leading-relaxed bg-secondary/20 backdrop-blur-sm rounded-lg p-4 border border-white/5">
+                  <div className="text-neutral-300 text-base leading-relaxed bg-black backdrop-blur-sm rounded-lg p-4 border border-white/5">
                     {user.bio}
                   </div>
                 )}
@@ -1019,8 +1019,8 @@ export const CommunityUserProfile = ({
 
         {user.sharedComponents.length === 0 ? (
           // Empty state
-          <div className="flex flex-col items-center justify-center py-20 space-y-6 bg-secondary/20 backdrop-blur-sm rounded-2xl border border-white/5">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF479C]/20 to-purple-500/20 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center py-20 space-y-6 bg-black backdrop-blur-sm rounded-2xl border border-white/5">
+            <div className="w-24 h-24 rounded-full bg-black flex items-center justify-center">
               <svg
                 width="48"
                 height="48"
@@ -1039,7 +1039,7 @@ export const CommunityUserProfile = ({
               <h3 className="text-2xl font-bold text-white">
                 No Components Yet
               </h3>
-              <p className="text-gray-400 max-w-md">
+              <p className="text-neutral-400 max-w-md">
                 This user hasn't shared any components yet. Check back later to
                 see their creations!
               </p>

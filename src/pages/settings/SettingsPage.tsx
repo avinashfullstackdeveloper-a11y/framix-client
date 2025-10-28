@@ -41,7 +41,7 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
   ];
 
   return (
-    <aside className="max-md:w-full md:min-h-[600px] md:w-64 md:flex-shrink-0 bg-[#181818] whitespace-nowrap max-md:border-b md:border-r border-neutral-800 max-md:pr-0 md:pr-0.5">
+    <aside className="max-md:w-full md:min-h-[600px] md:w-64 md:flex-shrink-0 bg-black whitespace-nowrap max-md:border-b md:border-r border-neutral-800 max-md:pr-0 md:pr-0.5">
       <div className="w-full max-md:px-4 max-md:py-3 md:px-3 md:py-2">
         <div className="w-full text-lg text-[rgba(242,242,242,1)] font-semibold tracking-[-0.45px] leading-loose max-md:hidden md:px-4">
           <div>Settings</div>
@@ -53,8 +53,8 @@ const Sidebar = ({ activeSection, onSectionChange }: SidebarProps) => {
               onClick={() => onSectionChange(section.id)}
               className={`flex items-center gap-2 max-md:flex-shrink-0 max-md:px-4 max-md:py-2 md:w-full md:mt-1 md:px-4 md:py-2 rounded-md transition-colors ${
                 activeSection === section.id
-                  ? "bg-[rgba(33,33,33,1)] text-[rgba(230,230,230,1)]"
-                  : "hover:bg-[rgba(33,33,33,1)] hover:text-[rgba(230,230,230,1)]"
+                  ? "bg-black text-[rgba(230,230,230,1)]"
+                  : "hover:bg-black hover:text-[rgba(230,230,230,1)]"
               }`}
             >
               <img
@@ -119,7 +119,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Go Back Button */}
-      <div className="max-md:px-4 max-md:pt-4 md:px-8 md:pt-8">
+      <div className="max-md:px-4 max-md:pt-2 md:px-8 md:pt-3 md:pl-12">
         <Button
           variant="ghost"
           size="sm"
@@ -205,8 +205,8 @@ function TabsMyComponents({
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-t-lg font-semibold transition-all duration-200 border-b-2 ${
               activeTab === tab.key
-                ? "border-[#FF479C] text-[#FF479C] bg-[#23272b]"
-                : "border-transparent text-white bg-transparent hover:text-[#FF479C]"
+                ? "border-[#FF479C] text-[#FF479C] bg-black"
+                : "border-transparent text-white bg-black hover:text-[#FF479C]"
             }`}
           >
             {tab.label}
@@ -218,7 +218,7 @@ function TabsMyComponents({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={`skeleton-${index}`} className="w-full">
-              <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]" style={{ backgroundColor: "#2d3135" }}>
+              <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] bg-black">
                 <div className="flex h-full w-full items-center justify-center">
                   <Skeleton className="h-full w-full rounded-xl" />
                 </div>
@@ -237,7 +237,7 @@ function TabsMyComponents({
       ) : (
         <div>
           {submissions.length === 0 ? (
-            <div className="text-gray-400">No submissions found.</div>
+            <div className="text-neutral-500">No submissions found.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {submissions.map((submission) => (

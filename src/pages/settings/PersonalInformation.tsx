@@ -415,7 +415,7 @@ export default function PersonalInformation() {
         </div>
 
         {/* Profile Information Section */}
-        <Card className="bg-[#1a1a1a] border-neutral-800">
+        <Card className="bg-black border-neutral-800">
           <CardHeader>
             <CardTitle className="text-white">Profile Information</CardTitle>
             <CardDescription className="text-neutral-400">
@@ -456,7 +456,7 @@ export default function PersonalInformation() {
                     onChange={(e) =>
                       handleProfileInputChange("name", e.target.value)
                     }
-                    className="bg-neutral-900 border-neutral-700 text-white"
+                    className="bg-black border-neutral-700 text-white"
                     placeholder="Your display name"
                   />
                 </div>
@@ -471,7 +471,7 @@ export default function PersonalInformation() {
                       handleProfileInputChange("location", e.target.value)
                     }
                     placeholder="Your location"
-                    className="bg-neutral-900 border-neutral-700 text-white"
+                    className="bg-black border-neutral-700 text-white"
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ export default function PersonalInformation() {
                     onChange={(e) =>
                       handleProfileInputChange("email", e.target.value)
                     }
-                    className="bg-neutral-900 border-neutral-700 text-white"
+                    className="bg-black border-neutral-700 text-white"
                     disabled
                   />
                   <p className="text-xs text-neutral-500">
@@ -506,7 +506,7 @@ export default function PersonalInformation() {
                       handleProfileInputChange("socialMedia", e.target.value)
                     }
                     placeholder="Your Social media handle"
-                    className="bg-neutral-900 border-neutral-700 text-white"
+                    className="bg-black border-neutral-700 text-white"
                   />
                 </div>
               </div>
@@ -523,7 +523,7 @@ export default function PersonalInformation() {
                     handleProfileInputChange("website", e.target.value)
                   }
                   placeholder="Your website URL"
-                  className="bg-neutral-900 border-neutral-700 text-white"
+                  className="bg-black border-neutral-700 text-white"
                 />
               </div>
 
@@ -539,7 +539,7 @@ export default function PersonalInformation() {
                   }
                   placeholder="Write a few sentences about yourself"
                   rows={4}
-                  className="w-full bg-neutral-900 border border-neutral-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
+                  className="w-full bg-black border border-neutral-700 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
                 />
               </div>
 
@@ -582,7 +582,7 @@ export default function PersonalInformation() {
                           type={showCurrentPassword ? "text" : "password"}
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          className="bg-neutral-900 border-neutral-700 text-white pr-10"
+                          className="bg-black border-neutral-700 text-white pr-10"
                         />
                         <button
                           type="button"
@@ -609,7 +609,7 @@ export default function PersonalInformation() {
                           type={showNewPassword ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="bg-neutral-900 border-neutral-700 text-white pr-10"
+                          className="bg-black border-neutral-700 text-white pr-10"
                         />
                         <button
                           type="button"
@@ -637,7 +637,7 @@ export default function PersonalInformation() {
                           type={showConfirmPassword ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="bg-neutral-900 border-neutral-700 text-white pr-10"
+                          className="bg-black border-neutral-700 text-white pr-10"
                         />
                         <button
                           type="button"
