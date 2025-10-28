@@ -131,9 +131,9 @@ const FeedbackForm = () => {
   };
 
   return (
-    <main className="flex flex-col items-center min-h-screen w-full px-4 pt-6">
+    <main className="flex flex-col items-center min-h-screen w-full px-4 pt-6 pb-12">
       {/* Go Back Button - Top Left */}
-      <div className="self-start mb-8">
+      <div className="self-start mb-8 mt-4">
         <button className="flex items-center gap-3 text-2xl text-white font-semibold hover:text-[#FF479C] transition-colors" type="button">
           <img
             src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/13c323a2b9d23579e465bf3768ce9d2f6294d148?placeholderIfAbsent=true"
