@@ -199,6 +199,19 @@ const LandingPage = () => {
   const [activePortfolioCard, setActivePortfolioCard] = useState(-1);
   const [activeWhatsNewCard, setActiveWhatsNewCard] = useState(1);
   const [videoCardOrder, setVideoCardOrder] = useState([0, 1, 2]); // Track video card order [left, center, right]
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+
+  // Update window width on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Handle card click - swap clicked card with center card
   const handleCardClick = (cardIndex) => {
@@ -933,7 +946,7 @@ const LandingPage = () => {
                 </div>
               </motion.div>
               <motion.div
-                className="relative w-[400px] h-[350px] mx-auto max-md:w-[350px] max-md:h-[300px] max-sm:w-full max-sm:h-60 max-sm:px-4"
+                className="relative w-full max-w-[400px] h-[350px] mx-auto max-md:max-w-[350px] max-md:h-[300px] max-sm:h-60"
                 variants={itemVariants}
               >
                 <AnimatePresence mode="sync">
@@ -941,6 +954,22 @@ const LandingPage = () => {
                     const isLeft = position === 0;
                     const isCenter = position === 1;
                     const isRight = position === 2;
+
+                    // Calculate responsive dimensions
+                    const cardWidth =
+                      windowWidth < 640
+                        ? 140
+                        : windowWidth < 768
+                        ? 200
+                        : 223;
+                    const cardHeight =
+                      windowWidth < 640
+                        ? 180
+                        : windowWidth < 768
+                        ? 260
+                        : 287;
+                    const rotationAngle =
+                      windowWidth < 640 ? 10 : 13.37;
 
                     return (
                       <motion.div
@@ -950,27 +979,18 @@ const LandingPage = () => {
                         initial={false}
                         animate={{
                           left: isLeft
-                            ? window.innerWidth < 640
-                              ? "0px"
-                              : "0px"
+                            ? "0px"
                             : isCenter
                             ? "50%"
                             : "auto",
-                          right: isRight
-                            ? window.innerWidth < 640
-                              ? "0px"
-                              : "0px"
-                            : "auto",
+                          right: isRight ? "0px" : "auto",
                           rotate: isLeft
-                            ? window.innerWidth < 640
-                              ? -10
-                              : -13.37
+                            ? -rotationAngle
                             : isCenter
                             ? 0
-                            : window.innerWidth < 640
-                            ? 10
-                            : 13.37,
+                            : rotationAngle,
                           x: isCenter ? "-50%" : "0%",
+                          y: "0%",
                           zIndex: isLeft ? 1 : isCenter ? 3 : 2,
                           scale: isCenter ? 1 : 0.9,
                         }}
@@ -982,18 +1002,8 @@ const LandingPage = () => {
                         }}
                         onClick={() => handleVideoCardClick(videoIndex)}
                         style={{
-                          width:
-                            window.innerWidth < 640
-                              ? "140px"
-                              : window.innerWidth < 768
-                              ? "200px"
-                              : "223px",
-                          height:
-                            window.innerWidth < 640
-                              ? "180px"
-                              : window.innerWidth < 768
-                              ? "260px"
-                              : "287px",
+                          width: `${cardWidth}px`,
+                          height: `${cardHeight}px`,
                         }}
                       >
                         <div
