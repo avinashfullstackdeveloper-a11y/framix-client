@@ -192,7 +192,7 @@ const SharedComponentsGrid = ({
         >
           <div
             className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
-            style={{ backgroundColor: "#2d3135" }}
+            style={{ backgroundColor: "#F4F5F6" }}
           >
             {/* Views badge in top-left corner */}
             <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
@@ -226,7 +226,7 @@ const SharedComponentsGrid = ({
             </div>
             <div
               className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
-              style={{ backgroundColor: "#2d3135" }}
+              style={{ backgroundColor: "#F4F5F6" }}
             >
               {/* Preview based on code and language */}
               {comp.language &&
@@ -560,9 +560,9 @@ const SharedComponentsGrid = ({
             </div>
             <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
               <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
-                <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                <h3 className="flex-[1_0_0] text-black text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                   {/* Show cleaned type only, not title */}
-                  <span className="block text-base sm:text-lg font-semibold">
+                  <span className="block text-base sm:text-lg font-semibold text-black">
                     {comp.type
                       ?.replace(/component/gi, "")
                       .trim()
@@ -572,7 +572,7 @@ const SharedComponentsGrid = ({
                 <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                   <span
                     className={`text-xs sm:text-sm font-normal ${
-                      comp.badge === "Pro" ? "text-[#FF479C]" : "text-white"
+                      comp.badge === "Pro" ? "text-[#FF479C]" : "text-black"
                     }`}
                   >
                     {comp.badge || "Free"}
@@ -778,7 +778,7 @@ export const CommunityUserProfile = ({
               isFree: comp.isFree,
               children: (
                 <div className="w-full flex items-center justify-center">
-                  <span className="text-white">{comp.title}</span>
+                  <span className="text-black">{comp.title}</span>
                 </div>
               ),
             })
