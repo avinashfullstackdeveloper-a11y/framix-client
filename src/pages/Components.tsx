@@ -589,9 +589,9 @@ const Components = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 neon-hero">
-          <span className="neon-hero-text">
-            <span className="text-[#FF479C] neon-hero-glow">Components</span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
+          <span>
+            <span className="text-[#FF479C]">Components</span>
           </span>{" "}
           Showcase
         </h1>

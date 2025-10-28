@@ -303,11 +303,11 @@ const LandingPage = () => {
               className="text-center lg:text-left z-10"
               variants={itemVariants}
             >
-              <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight flex flex-col neon-hero">
-                <span className="neon-hero-text">Accelerate products with</span>
-                <span className="neon-hero-text">
+              <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight flex flex-col">
+                <span>Accelerate products with</span>
+                <span>
                   ready-made{" "}
-                  <span className="text-[#FF479C] neon-hero-glow">
+                  <span className="text-[#FF479C]">
                     components
                   </span>
                 </span>
