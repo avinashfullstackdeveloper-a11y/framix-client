@@ -115,7 +115,7 @@ const Navigation = () => {
               <Link to="/signin">
                 <Button
                   variant="default"
-                  className="bg-[#FF479C] text-black font-semibold hover:bg-[#FF479C]/90 rounded-lg min-w-[160px]"
+                  className="bg-[#FF479C] text-white font-semibold hover:bg-[#FF479C]/90 rounded-lg min-w-[160px]"
                 >
                   Explore Now
                 </Button>

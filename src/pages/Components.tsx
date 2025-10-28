@@ -707,9 +707,9 @@ const Components = () => {
                   </div>
                   <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
                     <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
-                      <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                      <h3 className="flex-[1_0_0] text-black text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                         {/* Show cleaned type only, not title */}
-                        <span className="block text-base sm:text-lg font-semibold">
+                        <span className="block text-base sm:text-lg font-semibold text-black">
                           {componentItem.type
                             ?.replace(/component/gi, "")
                             .trim()
@@ -721,7 +721,7 @@ const Components = () => {
                           className={`text-xs sm:text-sm font-normal ${
                             componentItem.badge === "Pro"
                               ? "text-[#FF479C]"
-                              : "text-white"
+                              : "text-black"
                           }`}
                         >
                           {componentItem.badge || "Free"}
