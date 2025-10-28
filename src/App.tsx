@@ -26,6 +26,7 @@ import ComponentEditor from "./pages/ComponentEditor";
 import AdminRoutes from "./pages/admin/AdminRoutes";
 // import NotificationsPage from "./pages/NotificationsPage";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 import FeedbackForm from "./pages/Feedback";
 
@@ -88,7 +89,8 @@ const App: React.FC = () => {
               }
             />
             <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-          </Routes>
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        </Routes>
         </Layout>
       </TooltipProvider>
     </QueryClientProvider>

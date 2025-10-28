@@ -159,12 +159,12 @@ const Footer = () => {
                 </h3>
                 <ul className="space-y-4">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/privacy-policy"
                       className="text-base text-gray-400 hover:text-white"
                     >
                       Privacy Policy
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     {/* Use React Router Link for Terms and Conditions */}
