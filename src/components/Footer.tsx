@@ -162,6 +162,7 @@ const Footer = () => {
                     <Link
                       to="/privacy-policy"
                       className="text-base text-gray-400 hover:text-white"
+                      onClick={() => window.scrollTo(0, 0)}
                     >
                       Privacy Policy
                     </Link>
@@ -171,6 +172,7 @@ const Footer = () => {
                     <Link
                       to="/terms-and-conditions"
                       className="text-base text-gray-400 hover:text-white"
+                      onClick={() => window.scrollTo(0, 0)}
                     >
                       Terms of Service
                     </Link>

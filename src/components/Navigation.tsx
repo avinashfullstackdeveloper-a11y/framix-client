@@ -8,13 +8,21 @@ import { useAuth } from "@/context/AuthContext";
 const NavLink = ({
   to,
   children,
+  onClick,
   ...rest
 }: {
   to: string;
   children: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   const location = useLocation();
   const isActive = location.pathname === to;
+
+  // Handler to scroll to top and call any passed onClick
+  const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (e) => {
+    window.scrollTo(0, 0);
+    if (onClick) onClick(e);
+  };
 
   return (
     <Link
@@ -23,6 +31,7 @@ const NavLink = ({
       className={`relative group transition-colors ${
         isActive ? "text-white" : "text-neutral-400 hover:text-white"
       }`}
+      onClick={handleClick}
       {...rest}
     >
       {children}
@@ -166,7 +175,10 @@ const Navigation = () => {
                     <NavLink
                       key={link.to}
                       to={link.to}
-                      onClick={() => setMobileOpen(false)}
+                      onClick={(e) => {
+                        window.scrollTo(0, 0);
+                        setMobileOpen(false);
+                      }}
                       tabIndex={0}
                       className="py-3 px-4 rounded-lg hover:bg-neutral-800/50 active:bg-neutral-800 transition-all duration-200 min-h-[44px] flex items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#E84288]"
                     >
