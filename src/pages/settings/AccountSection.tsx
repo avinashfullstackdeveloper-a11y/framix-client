@@ -90,10 +90,18 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
 
   return (
     <div className={`min-h-[600px] bg-black text-white ${className}`}>
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="space-y-8">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold">Account settings</h1>
+          <p className="text-neutral-400 mt-2">
+            Manage you're account preferences and data
+          </p>
+        </div>
+
         {/* Account Information Section */}
-        <section className="w-full max-md:max-w-full">
-          <div className="flex w-full items-center gap-2 text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose flex-wrap max-md:max-w-full">
+        <section className="w-full">
+          <div className="flex w-full items-center gap-2 text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose flex-wrap">
             <Avatar className="h-8 w-8 border border-neutral-700">
               {typeof user?.avatar === "string" && user.avatar ? (
                 <AvatarImage
@@ -116,7 +124,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
             </Avatar>
             <h3 className="self-stretch my-auto">Account Information</h3>
           </div>
-          <div className="bg-[rgba(17,17,17,1)] border w-full mt-4 p-6 rounded-lg border-[rgba(255,71,156,0.6)] border-solid max-md:max-w-full max-md:px-5">
+          <div className="bg-black border w-full mt-4 p-6 rounded-lg border-[rgba(255,71,156,0.6)] border-solid">
             {isLoading ? (
               <div className="text-neutral-400">Loading...</div>
             ) : !user ? (
@@ -125,22 +133,22 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
               </div>
             ) : (
               <form>
-                <div className="w-full pt-0.5 max-md:max-w-full">
+                <div className="w-full pt-0.5">
                   <label className="text-[rgba(153,153,153,1)] text-sm font-medium leading-none block mb-2">
                     Username
                   </label>
-                  <div className="w-full text-base text-[rgba(230,230,230,1)] font-normal max-md:max-w-full">
+                  <div className="w-full text-base text-[rgba(230,230,230,1)] font-normal">
                     {user.username || user.name || ""}
                   </div>
                   <p className="text-xs text-neutral-500">
                     Username cannot be changed
                   </p>
                 </div>
-                <div className="w-full mt-4 pt-0.5 max-md:max-w-full">
+                <div className="w-full mt-4 pt-0.5">
                   <label className="text-[rgba(153,153,153,1)] text-sm font-medium leading-none block mb-2">
                     Email
                   </label>
-                  <div className="w-full text-base text-[rgba(230,230,230,1)] font-normal max-md:max-w-full">
+                  <div className="w-full text-base text-[rgba(230,230,230,1)] font-normal">
                     {user.email}
                   </div>
                   <p className="text-xs text-neutral-500">
@@ -153,15 +161,15 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
         </section>
 
         {/* Danger Zone Section */}
-        <section className="w-full mt-8 max-md:max-w-full">
-          <h3 className="w-full text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose max-md:max-w-full">
+        <section className="w-full mt-8">
+          <h3 className="w-full text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose">
             Danger Zone
           </h3>
-          <p className="w-full text-sm text-[rgba(153,153,153,1)] font-normal leading-none mt-2 max-md:max-w-full">
+          <p className="w-full text-sm text-[rgba(153,153,153,1)] font-normal leading-none mt-2">
             Irreversible and destructive actions
           </p>
 
-          <div className="bg-[rgba(17,17,17,1)] border flex w-full items-center gap-[40px_100px] justify-between flex-wrap mt-2 pt-8 pb-6 px-6 rounded-lg border-[rgba(255,71,156,0.6)] border-solid max-md:max-w-full max-md:px-5">
+          <div className="bg-black border flex w-full items-center gap-[40px_100px] justify-between flex-wrap mt-2 pt-8 pb-6 px-6 rounded-lg border-[rgba(255,71,156,0.6)] border-solid">
             <div className="self-stretch w-[218px] my-auto">
               <h4 className="w-full text-base text-[rgba(242,242,242,1)] font-medium">
                 Delete Account
@@ -174,7 +182,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
             <div className="self-stretch min-h-10 my-auto pl-4">
               <button
                 onClick={openDeleteDialog}
-                className="bg-[rgba(239,68,68,0.2)] flex min-h-10 items-center gap-2 justify-center p-2.5 rounded-md hover:bg-[rgba(239,68,68,0.3)] transition-colors"
+                className="bg-black flex min-h-10 items-center gap-2 justify-center p-2.5 rounded-md hover:bg-red-900 transition-colors"
               >
                 <div className="flex min-h-4 w-4 flex-col overflow-hidden items-center justify-center">
                   <img
@@ -190,8 +198,8 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
 
         {/* Confirmation Dialog */}
         {showConfirmDialog && ReactDOM.createPortal(
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-            <div className="bg-[rgba(17,17,17,1)] border border-[rgba(255,71,156,0.6)] rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[9999]">
+            <div className="bg-black border border-[rgba(255,71,156,0.6)] rounded-lg p-6 max-w-md w-full mx-4">
               <h3 className="text-xl text-white font-semibold mb-4">
                 Confirm Account Deletion
               </h3>
@@ -231,7 +239,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
                     type="button"
                     onClick={closeDeleteDialog}
                     disabled={isDeleting}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                    className="bg-black text-white px-4 py-2 rounded-md hover:bg-neutral-900 disabled:opacity-50 transition-colors"
                   >
                     Cancel
                   </button>
