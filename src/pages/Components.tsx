@@ -10,6 +10,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Components = () => {
   // Filter tabs should match the fields in ComponentSelectorPopup.tsx
@@ -628,9 +629,24 @@ const Components = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto"
       >
         {loading ? (
-          <div className="text-center text-lg w-full col-span-3">
-            Loading...
-          </div>
+          // Skeleton loader grid matching component card layout
+          <>
+            {Array.from({ length: 9 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="w-full">
+                <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]" style={{ backgroundColor: "#2d3135" }}>
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Skeleton className="h-full w-full rounded-xl" />
+                  </div>
+                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5 w-full">
+                      <Skeleton className="h-5 w-24" />
+                      <Skeleton className="h-5 w-12" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </>
         ) : (
           itemsWithAds.map((item, index) => {
             // Check if this is an ad item

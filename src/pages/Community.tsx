@@ -11,6 +11,7 @@ import {
   AvatarFallback,
 } from "@/components/ui/avatar";
 import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -696,7 +697,38 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredComponentsList.map((component, index) => {
+          {loading ? (
+            // Skeleton loader for Featured Components (4 cards)
+            Array.from({ length: 4 }).map((_, index) => (
+              <Card key={`featured-skeleton-${index}`} className="bg-gradient-card border-border">
+                <CardContent className="p-0">
+                  <div className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
+                    <Skeleton className="h-full w-full" />
+                    <div className="absolute top-3 right-3 z-10">
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <Skeleton className="h-4 w-20 mb-1" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            featuredComponentsList.map((component, index) => {
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -794,7 +826,8 @@ const CommunityList = () => {
                 </Card>
               </Link>
             );
-          })}
+            })
+          )}
         </div>
       </div>
 
@@ -968,7 +1001,38 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedComponents.map((component, index) => {
+          {loading ? (
+            // Skeleton loader for All Components (6 cards)
+            Array.from({ length: 6 }).map((_, index) => (
+              <Card key={`all-skeleton-${index}`} className="bg-gradient-card border-border">
+                <CardContent className="p-0">
+                  <div className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
+                    <Skeleton className="h-full w-full" />
+                    <div className="absolute top-3 right-3 z-10">
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <Skeleton className="h-4 w-20 mb-1" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            paginatedComponents.map((component, index) => {
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -1066,7 +1130,8 @@ const CommunityList = () => {
                 </Card>
               </Link>
             );
-          })}
+            })
+          )}
         </div>
 
         {/* Pagination Controls */}
