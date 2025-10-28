@@ -22,11 +22,6 @@ const AdCard: React.FC<AdCardProps> = ({ adKey }) => {
       // Create a unique atOptions variable for each adKey
       const atOptionsVar = `atOptions_${adKey.replace(/[^a-zA-Z0-9_]/g, "")}`;
 
-      // LOG: Before script injection
-      console.log(`[AdCard] Rendering adKey:`, adKey);
-      console.log(`[AdCard] window.${atOptionsVar} before:`, window[atOptionsVar]);
-      console.log(`[AdCard] window.atOptions before:`, window.atOptions);
-
       // Create the atOptions script
       const atOptionsScript = document.createElement("script");
       atOptionsScript.type = "text/javascript";
@@ -39,7 +34,6 @@ const AdCard: React.FC<AdCardProps> = ({ adKey }) => {
           'params' : {}
         };
         atOptions = window.${atOptionsVar};
-        console.log('[AdCard] atOptions set for', '${adKey}', atOptions);
       `;
 
       // Create the invoke script
@@ -49,10 +43,8 @@ const AdCard: React.FC<AdCardProps> = ({ adKey }) => {
 
       // Add load/error listeners for diagnostics
       invokeScript.onload = () => {
-        console.log(`[AdCard] invoke.js loaded for adKey:`, adKey);
       };
       invokeScript.onerror = (e) => {
-        console.error(`[AdCard] invoke.js failed to load for adKey:`, adKey, e);
       };
 
       // Append both scripts
@@ -61,8 +53,6 @@ const AdCard: React.FC<AdCardProps> = ({ adKey }) => {
 
       // LOG: After script injection
       setTimeout(() => {
-        console.log(`[AdCard] window.${atOptionsVar} after:`, window[atOptionsVar]);
-        console.log(`[AdCard] window.atOptions after:`, window.atOptions);
       }, 1000);
     }
   }, [adKey]);
