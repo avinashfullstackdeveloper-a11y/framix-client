@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export const FooterLogo: React.FC = () => {
   return (
@@ -166,12 +167,13 @@ const Footer = () => {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    {/* Use React Router Link for Terms and Conditions */}
+                    <Link
+                      to="/terms-and-conditions"
                       className="text-base text-gray-400 hover:text-white"
                     >
                       Terms of Service
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
