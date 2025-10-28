@@ -84,7 +84,7 @@ const ReportBug: React.FC = () => {
                 if (e.target.value.length <= maxTitleCharacters) setTitle(e.target.value);
               }}
               placeholder="Bug Title"
-              className="w-full bg-black border border-[rgba(255,154,201,0.6)] rounded-[14px] px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-gray-400 outline-none mb-2 min-h-[44px]"
+              className="w-full bg-black border border-[#FF479C] rounded-[14px] px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-gray-400 outline-none mb-2 min-h-[44px]"
               aria-label="Bug Title"
               maxLength={maxTitleCharacters}
               disabled={loading}
@@ -92,7 +92,7 @@ const ReportBug: React.FC = () => {
             />
             <div className="text-white text-xs sm:text-sm text-right">{title.length}/{maxTitleCharacters} characters</div>
           </div>
-          <div className="bg-black border min-h-[180px] sm:min-h-[200px] w-full text-white font-normal pt-4 sm:pt-5 px-4 sm:px-5 rounded-[14px] border-[rgba(255,154,201,0.6)] border-solid">
+          <div className="bg-black border min-h-[180px] sm:min-h-[200px] w-full text-white font-normal pt-4 sm:pt-5 px-4 sm:px-5 rounded-[14px] border-[#FF479C] border-solid">
             <div className="bg-black flex min-h-[120px] sm:min-h-[140px] w-full overflow-hidden pt-2 pb-16 sm:pb-[92px] px-2 sm:px-3 rounded-[14px]">
               <textarea
                 value={bugDescription}
@@ -115,7 +115,7 @@ const ReportBug: React.FC = () => {
 
           <button
             type="submit"
-            className="bg-[rgba(235,142,185,1)] flex min-h-[44px] sm:min-h-12 w-full items-center gap-2 text-sm sm:text-base text-black font-semibold leading-none justify-center mt-6 sm:mt-8 px-4 sm:px-[13px] py-3 sm:py-3.5 rounded-[30px] hover:bg-[rgba(235,142,185,0.9)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#FF479C] flex min-h-[44px] sm:min-h-12 w-full items-center gap-2 text-sm sm:text-base text-white font-semibold leading-none justify-center mt-6 sm:mt-8 px-4 sm:px-[13px] py-3 sm:py-3.5 rounded-[30px] hover:bg-[#E63E8C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!title.trim() || !bugDescription.trim() || loading}
           >
             <span className="self-stretch my-auto">{loading ? "Submitting..." : "Submit Bug Report"}</span>

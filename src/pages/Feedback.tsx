@@ -46,7 +46,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, onRatingChange }) => {
   };
 
   return (
-    <div className="bg-black border flex min-h-[124px] w-full flex-col items-center mt-8 pt-6 px-6 rounded-[14px] border-[rgba(255,154,201,0.6)] border-solid max-md:max-w-full max-md:px-5">
+    <div className="bg-black border flex min-h-[124px] w-full flex-col items-center mt-8 pt-6 px-6 rounded-[14px] border-[#FF479C] border-solid max-md:max-w-full max-md:px-5">
       <div className="flex items-center gap-8">
         {[1, 2, 3, 4, 5].map((starIndex) => (
           <button
@@ -54,7 +54,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, onRatingChange }) => {
             onClick={() => handleStarClick(starIndex)}
             onMouseEnter={() => handleStarHover(starIndex)}
             onMouseLeave={handleStarLeave}
-            className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[rgba(255,154,201,0.6)] rounded-full"
+            className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#FF479C] rounded-full"
             aria-label={`Rate ${starIndex} star${starIndex > 1 ? 's' : ''}`}
             type="button"
           >
@@ -134,7 +134,7 @@ const FeedbackForm = () => {
     <main className="flex flex-col items-center min-h-screen w-full px-4 pt-6">
       {/* Go Back Button - Top Left */}
       <div className="self-start mb-8">
-        <button className="flex items-center gap-3 text-2xl text-white font-semibold hover:text-[rgba(255,154,201,1)] transition-colors" type="button">
+        <button className="flex items-center gap-3 text-2xl text-white font-semibold hover:text-[#FF479C] transition-colors" type="button">
           <img
             src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/13c323a2b9d23579e465bf3768ce9d2f6294d148?placeholderIfAbsent=true"
             alt="Back arrow"
@@ -147,7 +147,7 @@ const FeedbackForm = () => {
       {/* Centered Content */}
       <div className="flex flex-col items-center w-full max-w-[465px]">
         {success ? (
-          <div className="bg-black border flex flex-col items-center justify-center min-h-[200px] w-full rounded-[14px] border-[rgba(255,154,201,0.6)] border-solid p-8 text-white text-xl font-semibold">
+          <div className="bg-black border flex flex-col items-center justify-center min-h-[200px] w-full rounded-[14px] border-[#FF479C] border-solid p-8 text-white text-xl font-semibold">
             Thank you for your feedback!
           </div>
         ) : (
@@ -169,7 +169,7 @@ const FeedbackForm = () => {
             
             {/* Feedback Textarea - Centered */}
             <div className="w-full mt-8">
-              <div className="bg-black border min-h-[232px] w-full font-normal rounded-[14px] border-[rgba(255,154,201,0.6)] border-solid">
+              <div className="bg-black border min-h-[232px] w-full font-normal rounded-[14px] border-[#FF479C] border-solid">
                 <div className="bg-black flex min-h-[200px] w-full p-4 rounded-[14px]">
                   <textarea
                     value={feedback}
@@ -197,7 +197,7 @@ const FeedbackForm = () => {
             {/* Submit Button - Centered */}
             <button
               type="submit"
-              className="bg-[rgba(235,142,185,1)] flex min-h-12 w-full items-center justify-center text-sm text-black font-semibold leading-none mt-8 px-[13px] py-3.5 rounded-[30px] hover:bg-[rgba(225,132,175,1)] transition-colors focus:outline-none focus:ring-2 focus:ring-[rgba(255,154,201,0.6)] disabled:opacity-60"
+              className="bg-[#FF479C] flex min-h-12 w-full items-center justify-center text-sm text-white font-semibold leading-none mt-8 px-[13px] py-3.5 rounded-[30px] hover:bg-[#E63E8C] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FF479C] disabled:opacity-60"
               disabled={loading}
             >
               {loading ? 'Submitting...' : 'Submit Feedback'}
