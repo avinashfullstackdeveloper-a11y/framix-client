@@ -1,5 +1,6 @@
 import React from "react";
 import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 // Types for better TypeScript support
 interface SocialLinks {
@@ -58,23 +59,38 @@ const Avatar = ({
   size = "lg",
   className = "",
   src,
+  identifier,
 }: {
   initials: string;
   size?: "sm" | "md" | "lg";
   className?: string;
   src?: string;
+  identifier?: string;
 }) => {
   const sizeClasses = {
     sm: "w-6 h-6 text-xs",
     md: "w-8 h-8 text-sm",
     lg: "w-24 h-24 text-2xl",
   };
+  
+  // Generate dynamic colors based on identifier (username, email, etc.)
+  const bgColor = generateColorFromString(identifier || initials);
+  const textColor = getContrastTextColor(bgColor);
+  
   return (
-    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}>
+    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 ${className}`}>
       {typeof src === "string" && src ? (
         <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
       ) : null}
-      <AvatarFallback className="text-black font-medium">{initials}</AvatarFallback>
+      <AvatarFallback
+        className="font-medium"
+        style={{
+          backgroundColor: bgColor,
+          color: textColor
+        }}
+      >
+        {initials}
+      </AvatarFallback>
     </ShadAvatar>
   );
 };
@@ -129,7 +145,7 @@ const statsIcons = {
 // Stats display component with simplified styling
 const UserStats = ({ stats }: { stats: UserStats }) => (
   <div className="flex items-center gap-4 md:gap-8">
-    <div className="flex items-center gap-3 bg-[#FF9AC9]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF9AC9]/20">
+    <div className="flex items-center gap-3 bg-[#FF479C]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF479C]/20">
       <div className="text-xl p-2 bg-white/10 rounded-lg">
         {statsIcons.posts}
       </div>
@@ -138,7 +154,7 @@ const UserStats = ({ stats }: { stats: UserStats }) => (
         <div className="text-xs text-muted-foreground font-medium">Posts</div>
       </div>
     </div>
-    <div className="flex items-center gap-3 bg-[#FF9AC9]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF9AC9]/20">
+    <div className="flex items-center gap-3 bg-[#FF479C]/10 rounded-xl py-3 px-5 hover:scale-105 transition-all duration-300 border border-[#FF479C]/20">
       <div className="text-xl w-5 h-5 flex items-center justify-center p-2 bg-white/10 rounded-lg">
         {statsIcons.views}
       </div>
@@ -175,7 +191,7 @@ const SharedComponentsGrid = ({
           className="cursor-pointer w-full"
         >
           <div
-            className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+            className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
             style={{ backgroundColor: "#2d3135" }}
           >
             {/* Views badge in top-left corner */}
@@ -556,7 +572,7 @@ const SharedComponentsGrid = ({
                 <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                   <span
                     className={`text-xs sm:text-sm font-normal ${
-                      comp.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
+                      comp.badge === "Pro" ? "text-[#FF479C]" : "text-white"
                     }`}
                   >
                     {comp.badge || "Free"}
@@ -571,123 +587,30 @@ const SharedComponentsGrid = ({
   );
 };
 
-// Filter component with enhanced styling and icons
-const ComponentFilter = ({
-  activeFilter,
-  onFilterChange,
-}: {
-  activeFilter: string;
-  onFilterChange: (filter: string) => void;
-}) => {
-  const filters = [
-    {
-      id: "all",
-      label: "All Components",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="14" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-        </svg>
-      ),
-    },
-    {
-      id: "free",
-      label: "Free",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-        </svg>
-      ),
-    },
-    {
-      id: "pro",
-      label: "Pro",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ),
-    },
-    {
-      id: "popular",
-      label: "Most Popular",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-      ),
-    },
-    {
-      id: "recent",
-      label: "Recent",
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      ),
-    },
-  ];
-
+// Filter component with only "All Components" option
+const ComponentFilter = () => {
   return (
     <div className="flex flex-wrap gap-3 mb-6">
-      {filters.map((filter) => (
-        <button
-          key={filter.id}
-          onClick={() => onFilterChange(filter.id)}
-          className={`group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
-            activeFilter === filter.id
-              ? "bg-[#FF9AC9] text-white scale-105"
-              : "bg-secondary/40 text-secondary-foreground hover:bg-secondary/60 hover:scale-105 border border-white/5"
-          }`}
-        >
-          <span
-            className={`transition-transform duration-300 ${
-              activeFilter === filter.id ? "scale-110" : "group-hover:scale-110"
-            }`}
+      <button
+        className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 bg-[#FF479C] text-white scale-105"
+      >
+        <span className="transition-transform duration-300 scale-110">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
           >
-            {filter.icon}
-          </span>
-          {filter.label}
-        </button>
-      ))}
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+          </svg>
+        </span>
+        All Components
+      </button>
     </div>
   );
 };
@@ -708,7 +631,6 @@ export const CommunityUserProfile = ({
     params.id ||
     params.username ||
     Object.values(params)[0]; // fallback to first param if only one exists
-  const [activeFilter, setActiveFilter] = React.useState("all");
   const [user, setUser] = React.useState<UserProfile | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -898,7 +820,7 @@ export const CommunityUserProfile = ({
           {/* Animated spinner */}
           <div className="relative w-16 h-16">
             <div className="absolute inset-0 rounded-full border-4 border-gray-700"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-t-[#FF9AC9] animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-[#FF479C] animate-spin"></div>
           </div>
           {/* Skeleton loaders */}
           <div className="w-full max-w-2xl space-y-4 animate-pulse">
@@ -949,7 +871,7 @@ export const CommunityUserProfile = ({
             </p>
           </div>
           <button
-            className="mt-6 flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FF9AC9] text-white font-semibold hover:scale-105 transition-all duration-300"
+            className="mt-6 flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FF479C] text-white font-semibold hover:scale-105 transition-all duration-300"
             onClick={handleGoBack}
           >
             <svg width="16" height="17" viewBox="0 0 16 17" fill="none">
@@ -971,7 +893,7 @@ export const CommunityUserProfile = ({
   return (
     <div className="relative w-full max-w-7xl mx-auto bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl p-8 pt-20 pb-12 mt-12 mb-8 overflow-hidden">
       {/* Decorative gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FF9AC9]/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FF479C]/5 via-transparent to-purple-500/5 pointer-events-none"></div>
 
       {/* Go back button - Simplified */}
       <div className="absolute top-6 left-8 z-10">
@@ -1007,7 +929,8 @@ export const CommunityUserProfile = ({
               src={user.profilePicture}
               initials={user.initials}
               size="lg"
-              className="border-4 border-[#FF9AC9]"
+              className="border-4 border-[#FF479C]"
+              identifier={user.username || user.name}
             />
           </div>
 
@@ -1090,35 +1013,20 @@ export const CommunityUserProfile = ({
         </div>
       </div>
 
-      {/* Divider with gradient */}
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-[#FF9AC9] px-6 py-2 rounded-full text-sm font-semibold text-white shadow-lg">
-            Shared Components
-          </span>
-        </div>
-      </div>
-
       {/* Components Section */}
       <div className="mt-8 relative">
-        <ComponentFilter
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
+        <ComponentFilter />
 
         {user.sharedComponents.length === 0 ? (
           // Empty state
           <div className="flex flex-col items-center justify-center py-20 space-y-6 bg-secondary/20 backdrop-blur-sm rounded-2xl border border-white/5">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF9AC9]/20 to-purple-500/20 flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF479C]/20 to-purple-500/20 flex items-center justify-center">
               <svg
                 width="48"
                 height="48"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#FF9AC9"
+                stroke="#FF479C"
                 strokeWidth="2"
               >
                 <rect x="3" y="3" width="7" height="7" rx="1" />

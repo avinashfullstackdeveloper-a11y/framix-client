@@ -9,6 +9,7 @@ import { AccountSection } from "./AccountSection.tsx";
 
 import StatsSection from "./StatsSection.tsx";
 import MyComponentCard from "@/components/MyComponentCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface SidebarProps {
   activeSection: string;
@@ -79,7 +80,7 @@ export default function SettingsPage() {
   const [myComponentsApproved, setMyComponentsApproved] = useState<MyComponentSubmission[]>([]);
   const [myComponentsRejected, setMyComponentsRejected] = useState<MyComponentSubmission[]>([]);
   const [myComponentsPending, setMyComponentsPending] = useState<MyComponentSubmission[]>([]);
-  const [loadingMyComponents, setLoadingMyComponents] = useState(false);
+  const [loadingMyComponents, setLoadingMyComponents] = useState(true);
   const [myComponentsError, setMyComponentsError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -204,8 +205,8 @@ function TabsMyComponents({
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-t-lg font-semibold transition-all duration-200 border-b-2 ${
               activeTab === tab.key
-                ? "border-[#FF9AC9] text-[#FF9AC9] bg-[#23272b]"
-                : "border-transparent text-white bg-transparent hover:text-[#FF9AC9]"
+                ? "border-[#FF479C] text-[#FF479C] bg-[#23272b]"
+                : "border-transparent text-white bg-transparent hover:text-[#FF479C]"
             }`}
           >
             {tab.label}
@@ -213,7 +214,24 @@ function TabsMyComponents({
         ))}
       </div>
       {loading ? (
-        <div className="text-gray-400">Loading...</div>
+        // Skeleton loader for My Components matching the grid layout
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={`skeleton-${index}`} className="w-full">
+              <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]" style={{ backgroundColor: "#2d3135" }}>
+                <div className="flex h-full w-full items-center justify-center">
+                  <Skeleton className="h-full w-full rounded-xl" />
+                </div>
+                <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+                  <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5 w-full">
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-5 w-12" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <div className="text-red-400">{error}</div>
       ) : (

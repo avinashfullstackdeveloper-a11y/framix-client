@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { FigmaButton } from "../components/ui/FigmaButton";
 import {
   Popover,
   PopoverContent,
@@ -616,7 +617,7 @@ const ComponentEditor: React.FC = () => {
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -958,8 +959,7 @@ const ComponentEditor: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Preview Panel */}
           <div className="bg-white rounded-lg border-white shadow-sm overflow-hidden flex flex-col h-[600px]">
-            <div className="p-4 border-b bg-muted/50 flex justify-between items-center">
-              <h3 className="font-semibold text-black">{backgroundColor}</h3>
+            <div className="p-4 border-b bg-muted/50 flex justify-end items-center">
               <Popover open={showColorPicker} onOpenChange={setShowColorPicker}>
                 <PopoverTrigger asChild>
                   <Button
@@ -971,7 +971,7 @@ const ComponentEditor: React.FC = () => {
                       className="w-4 h-4 rounded border border-gray-300"
                       style={{ backgroundColor }}
                     />
-                    <span>Background</span>
+                    <span className="ml-2">{backgroundColor}</span>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64">
@@ -1044,16 +1044,13 @@ const ComponentEditor: React.FC = () => {
                   : `${componentType}.jsx`}
               </h3>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleCopy}>
+                <Button variant="outline" size="sm" className="copy-btn-pink-hover" onClick={handleCopy}>
                   Copy
                 </Button>
-                <Button
-                  variant={isEditing ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
-                  {isEditing ? "Lock" : "Edit"}
-                </Button>
+                {/* Lock/Edit button removed: editor is always editable */}
+                <FigmaButton
+                  onClick={handleCopy}
+                />
               </div>
             </div>
             <div className="flex-1 flex flex-col">
@@ -1139,7 +1136,7 @@ const ComponentEditor: React.FC = () => {
 
         {/* Action Bar */}
         <div className="flex justify-end gap-4 mt-6 pt-6 border-t">
-          <Button variant="outline" onClick={handleReset}>
+          <Button variant="outline" className="copy-btn-pink-hover" onClick={handleReset}>
             Reset
           </Button>
           <Button variant="default" onClick={handleSubmit}>

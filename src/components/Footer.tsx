@@ -1,64 +1,81 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-// SVG for the Framix logo icon, matching the design
-const FramixIcon = () => (
-  <svg
-    width="68"
-    height="68"
-    viewBox="0 0 68 68"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M17 0L34 17L17 34L0 17L17 0Z" fill="#F472B6" />
-    <path d="M17 34L34 51L17 68L0 51L17 34Z" fill="#F472B6" />
-    <path d="M51 0L68 17L51 34L34 17L51 0Z" fill="#F472B6" />
-    <path d="M51 34L68 51L51 68L34 51L51 34Z" fill="#F472B6" />
-  </svg>
-);
+export const FooterLogo: React.FC = () => {
+  return (
+    <div className="flex justify-center w-full">
+      <svg
+        width="1096"
+        height="171"
+        viewBox="0 0 1096 171"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full max-w-[1147px] h-auto"
+        style={{ aspectRatio: '1147/171' }}
+      >
+        <path
+          d="M387.292 15.4955V40.7895H275.357V80.4397H367.063V104.139H275.357V162.93H245.463V15.4955H387.292Z"
+          fill="white"
+        />
+        <path
+          d="M399.243 49.6766H428.463V162.93H399.243V49.6766ZM471.394 74.0592C463.003 74.0592 455.735 75.7303 449.591 79.0724C443.448 82.2627 438.503 86.2125 434.757 90.9219C431.01 95.6313 428.388 100.189 426.89 104.594L426.665 92.0613C426.815 90.2383 427.414 87.5797 428.463 84.0857C429.512 80.4397 431.085 76.5658 433.183 72.4641C435.281 68.2104 438.053 64.1846 441.5 60.3867C444.946 56.4369 449.142 53.2467 454.087 50.816C459.032 48.3853 464.801 47.17 471.394 47.17V74.0592Z"
+          fill="white"
+        />
+        <path
+          d="M543.852 165.437C532.763 165.437 522.649 163.006 513.508 158.145C504.518 153.132 497.325 146.219 491.93 137.408C486.686 128.445 484.064 118.115 484.064 106.417C484.064 94.416 486.761 84.0097 492.155 75.1986C497.55 66.3874 504.817 59.5512 513.958 54.6899C523.248 49.6766 533.737 47.17 545.425 47.17C558.312 47.17 568.652 49.8285 576.444 55.1456C584.385 60.3108 590.154 67.3749 593.751 76.3379C597.347 85.301 599.145 95.3275 599.145 106.417C599.145 113.102 598.096 119.938 595.998 126.926C593.901 133.762 590.679 140.143 586.333 146.068C581.988 151.84 576.294 156.55 569.251 160.196C562.208 163.69 553.742 165.437 543.852 165.437ZM553.292 142.649C562.133 142.649 569.775 141.13 576.219 138.092C582.662 135.054 587.607 130.8 591.053 125.331C594.5 119.862 596.223 113.557 596.223 106.417C596.223 98.6696 594.425 92.1372 590.829 86.8202C587.382 81.3512 582.437 77.2494 575.994 74.5149C569.7 71.6285 562.133 70.1853 553.292 70.1853C540.855 70.1853 531.19 73.5275 524.297 80.2118C517.404 86.7442 513.958 95.4794 513.958 106.417C513.958 113.709 515.606 120.09 518.903 125.559C522.199 130.876 526.77 135.054 532.614 138.092C538.607 141.13 545.5 142.649 553.292 142.649ZM596.223 49.6766H625.443V162.93H598.246C598.246 162.93 598.021 161.487 597.572 158.601C597.272 155.562 596.972 151.764 596.673 147.207C596.373 142.649 596.223 138.168 596.223 133.762V49.6766Z"
+          fill="white"
+        />
+        <path
+          d="M651.889 49.6766H681.109V162.93H651.889V49.6766ZM733.03 47.17C739.923 47.17 746.292 48.0815 752.135 49.9045C757.979 51.7275 763.074 54.5379 767.42 58.3358C771.765 62.1338 775.137 66.9951 777.534 72.9198C779.932 78.6926 781.131 85.6048 781.131 93.6564V162.93H751.911V98.8975C751.911 89.3268 749.588 82.3386 744.943 77.933C740.448 73.3756 733.03 71.0968 722.691 71.0968C714.899 71.0968 707.856 72.616 701.563 75.6543C695.269 78.6926 690.174 82.5665 686.278 87.2759C682.382 91.8334 680.135 96.6188 679.535 101.632L679.31 90.0104C680.06 84.6933 681.783 79.5282 684.48 74.5149C687.177 69.5017 690.774 64.9442 695.269 60.8425C699.914 56.5888 705.384 53.2467 711.677 50.816C717.971 48.3853 725.088 47.17 733.03 47.17ZM830.355 47.17C837.248 47.17 843.616 48.0815 849.46 49.9045C855.304 51.7275 860.399 54.5379 864.745 58.3358C869.09 62.1338 872.462 66.9951 874.859 72.9198C877.407 78.6926 878.68 85.6048 878.68 93.6564V162.93H849.46V98.8975C849.46 89.3268 847.138 82.3386 842.493 77.933C837.847 73.3756 830.355 71.0968 820.016 71.0968C812.224 71.0968 805.181 72.616 798.887 75.6543C792.594 78.6926 787.499 82.5665 783.603 87.2759C779.707 91.8334 777.534 96.6188 777.085 101.632L776.635 89.3268C777.385 84.3135 779.183 79.3003 782.03 74.2871C784.877 69.2738 788.623 64.7163 793.268 60.6146C797.913 56.5129 803.308 53.2467 809.452 50.816C815.745 48.3853 822.713 47.17 830.355 47.17Z"
+          fill="white"
+        />
+        <path
+          d="M938.683 0V25.9777H904.743V0H938.683ZM906.991 49.6766H936.211V162.93H906.991V49.6766Z"
+          fill="white"
+        />
+        <path
+          d="M1091.88 49.6766L1033.89 112.798L992.083 162.93H956.345L1016.81 96.6188L1056.37 49.6766H1091.88ZM956.345 49.6766H992.083L1095.03 162.93H1059.29L1015.91 113.481L956.345 49.6766Z"
+          fill="white"
+        />
+        <path
+          d="M108.626 83.8968C107.121 85.4229 106.276 87.4926 106.276 89.6506C106.276 91.8086 107.121 93.8782 108.626 95.4044L127.699 114.749C129.204 116.275 131.246 117.132 133.375 117.132C135.503 117.132 137.545 116.275 139.05 114.749L158.131 95.4044C159.636 93.8782 160.482 91.8086 160.482 89.6506C160.482 87.4926 159.636 85.4229 158.131 83.8968L139.05 64.5518C137.545 63.0261 135.503 62.169 133.375 62.169C131.246 62.169 129.204 63.0261 127.699 64.5518L108.626 83.8968Z"
+          fill="#FF9AC9"
+          fillOpacity="0.92"
+        />
+        <path
+          d="M2.35033 83.8968C0.845414 85.4229 0 87.4926 0 89.6506C0 91.8086 0.845414 93.8782 2.35033 95.4044L21.4316 114.749C22.937 116.275 24.9784 117.132 27.107 117.132C29.2356 117.132 31.2771 116.275 32.7824 114.749L51.8637 95.4044C53.3686 93.8782 54.214 91.8086 54.214 89.6506C54.214 87.4926 53.3686 85.4229 51.8637 83.8968L32.7824 64.5518C31.2771 63.0261 29.2356 62.169 27.107 62.169C24.9784 62.169 22.937 63.0261 21.4316 64.5518L2.35033 83.8968Z"
+          fill="#FF9AC9"
+          fillOpacity="0.92"
+        />
+        <path
+          d="M55.4841 137.765C54.7377 138.52 54.1456 139.418 53.7416 140.406C53.3377 141.394 53.1297 142.453 53.1297 143.523C53.1297 144.592 53.3377 145.651 53.7416 146.639C54.1456 147.627 54.7377 148.525 55.4841 149.28L74.5654 168.617C76.0707 170.143 78.1122 171 80.2408 171C82.3694 171 84.4108 170.143 85.9162 168.617L104.997 149.28C105.744 148.525 106.336 147.627 106.74 146.639C107.144 145.651 107.352 144.592 107.352 143.523C107.352 142.453 107.144 141.394 106.74 140.406C106.336 139.418 105.744 138.52 104.997 137.765L85.9162 118.428C84.4108 116.902 82.3694 116.045 80.2408 116.045C78.1122 116.045 76.0707 116.902 74.5654 118.428L55.4841 137.765Z"
+          fill="#FF9AC9"
+          fillOpacity="0.92"
+        />
+        <path
+          d="M55.4841 30.0289C53.9792 31.555 53.1338 33.6247 53.1338 35.7827C53.1338 37.9407 53.9792 40.0103 55.4841 41.5365L74.5654 60.8733C76.0707 62.399 78.1122 63.2561 80.2408 63.2561C82.3694 63.2561 84.4108 62.399 85.9162 60.8733L104.997 41.5365C106.502 40.0103 107.348 37.9407 107.348 35.7827C107.348 33.6247 106.502 31.555 104.997 30.0289L85.9162 10.684C84.4108 9.15824 82.3694 8.30115 80.2408 8.30115C78.1122 8.30115 76.0707 9.15824 74.5654 10.684L55.4841 30.0289Z"
+          fill="#FF9AC9"
+          fillOpacity="0.92"
+        />
+      </svg>
+    </div>
+  );
+};
 
 const Footer = () => {
   return (
     // Main footer container with a black background and white text
     <footer className="bg-black text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col">
           {/* Top section with navigation links */}
-          <div className="flex flex-row justify-between sm:grid sm:grid-cols-3 gap-8 mb-24">
-            {/* Company Links */}
-            <div className="flex flex-col sm:ml-32">
-              <h3 className="text-base font-semibold text-white mb-5">
-                Company
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Contact
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Legal
-                  </a>
-                </li>
-              </ul>
-              {/* Resources Links - visible only on mobile, below Company */}
-              <div className="block sm:hidden mt-8">
+          <div className="mb-12">
+            {/* Mobile: 2 rows, Desktop: 4 columns */}
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+              {/* Home Section */}
+              <div className="flex flex-col sm:ml-32">
                 <h3 className="text-base font-semibold text-white mb-5">
-                  Resources
+                  Home
                 </h3>
                 <ul className="space-y-4">
                   <li>
@@ -66,7 +83,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-gray-400 hover:text-white"
                     >
-                      Documentation
+                      About
                     </a>
                   </li>
                   <li>
@@ -74,7 +91,7 @@ const Footer = () => {
                       href="#"
                       className="text-base text-gray-400 hover:text-white"
                     >
-                      Case Studies
+                      Features
                     </a>
                   </li>
                   <li>
@@ -82,9 +99,49 @@ const Footer = () => {
                       href="#"
                       className="text-base text-gray-400 hover:text-white"
                     >
-                      Blog
+                      Testimonials
                     </a>
                   </li>
+                </ul>
+              </div>
+              {/* Products Section */}
+              <div className="sm:ml-32">
+                <h3 className="text-base font-semibold text-white mb-5">
+                  Products
+                </h3>
+                <ul className="space-y-4">
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Components
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Templates
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      UI Kits
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              {/* Resources Section */}
+              <div className="sm:ml-32">
+                <h3 className="text-base font-semibold text-white mb-5">
+                  Resources
+                </h3>
+                <ul className="space-y-4">
                   <li>
                     <a
                       href="#"
@@ -95,98 +152,38 @@ const Footer = () => {
                   </li>
                 </ul>
               </div>
-            </div>
-
-            {/* Products Links */}
-            <div className="sm:ml-32">
-              <h3 className="text-base font-semibold text-white mb-5">
-                Products
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Components
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Templates
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    UI Kits
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Pricing
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Resources Links - hidden on mobile, visible on desktop */}
-            <div className="hidden sm:block sm:ml-32">
-              <h3 className="text-base font-semibold text-white mb-5">
-                Resources
-              </h3>
-              <ul className="space-y-4">
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Case Studies
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-base text-gray-400 hover:text-white"
-                  >
-                    Community
-                  </a>
-                </li>
-              </ul>
+              {/* Legal & Policy Section */}
+              <div className="sm:ml-32">
+                <h3 className="text-base font-semibold text-white mb-5">
+                  Legal & Policy
+                </h3>
+                <ul className="space-y-4">
+                  <li>
+                    <Link
+                      to="/privacy-policy"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    {/* Use React Router Link for Terms and Conditions */}
+                    <Link
+                      to="/terms-and-conditions"
+                      className="text-base text-gray-400 hover:text-white"
+                    >
+                      Terms of Service
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
           {/* Bottom section with the main logo */}
           <div className="w-full flex flex-row items-center justify-center">
             <div className="w-full flex flex-row items-center justify-center">
-              <FramixIcon />
-              <span className="text-[10vw] font-bold tracking-tighter ml-8">
-                Framix
-              </span>
+              <FooterLogo />
             </div>
           </div>
         </div>

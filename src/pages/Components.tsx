@@ -10,6 +10,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Components = () => {
   // Filter tabs should match the fields in ComponentSelectorPopup.tsx
@@ -90,14 +91,36 @@ const Components = () => {
     }
   }, [user, authLoading, toast, toastShown]);
 
+  // Try to load components from localStorage first
   const fetchComponents = () => {
     setLoading(true);
+    const cached = localStorage.getItem("componentListCache");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setComponents(parsed);
+        setLoading(false);
+        // Also fetch in background to refresh cache
+        fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            setComponents(data);
+            localStorage.setItem("componentListCache", JSON.stringify(data));
+          });
+        return;
+      } catch {
+        // Ignore parse errors, fallback to fetch
+      }
+    }
     fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
+        localStorage.setItem("componentListCache", JSON.stringify(data));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -175,8 +198,8 @@ const Components = () => {
     });
   }, [components, activeFilter]);
 
-  // OPTIMIZATION: Pagination logic - 11 components per page (excluding ads)
-  const itemsPerPage = 11;
+  // OPTIMIZATION: Pagination logic - 19 components per page (excluding ads)
+  const itemsPerPage = 8;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -568,7 +591,7 @@ const Components = () => {
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 neon-hero">
           <span className="neon-hero-text">
-            <span className="text-[#FF9AC9] neon-hero-glow">Components</span>
+            <span className="text-[#FF479C] neon-hero-glow">Components</span>
           </span>{" "}
           Showcase
         </h1>
@@ -588,8 +611,8 @@ const Components = () => {
               onClick={() => setActiveFilter(filter)}
               className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
                 activeFilter === filter
-                  ? "bg-[#FF9AC9] border-[#FF9AC9] text-[#282828]"
-                  : "bg-[rgba(0,0,0,0.80)] border-[#767676] text-white hover:border-[#FF9AC9]"
+                  ? "bg-[#FF479C] border-[#FF479C] text-[#282828]"
+                  : "bg-[rgba(0,0,0,0.80)] border-[#767676] text-white hover:border-[#FF479C]"
               }`}
             >
               <span className="text-xs sm:text-sm font-medium truncate px-2 sm:px-3">
@@ -606,9 +629,24 @@ const Components = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 w-full mx-auto"
       >
         {loading ? (
-          <div className="text-center text-lg w-full col-span-3">
-            Loading...
-          </div>
+          // Skeleton loader grid matching component card layout
+          <>
+            {Array.from({ length: 9 }).map((_, index) => (
+              <div key={`skeleton-${index}`} className="w-full">
+                <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]" style={{ backgroundColor: "#2d3135" }}>
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Skeleton className="h-full w-full rounded-xl" />
+                  </div>
+                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
+                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5 w-full">
+                      <Skeleton className="h-5 w-24" />
+                      <Skeleton className="h-5 w-12" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </>
         ) : (
           itemsWithAds.map((item, index) => {
             // Check if this is an ad item
@@ -640,39 +678,11 @@ const Components = () => {
                 className="cursor-pointer w-full"
               >
                 <div
-                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
                   style={{ backgroundColor: "#2d3135" }}
                 >
                   {/* Views moved to top left, not close to the border */}
-                  <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
-                        stroke="white"
-                        strokeOpacity="0.6"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="3"
-                        stroke="white"
-                        strokeOpacity="0.6"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
-                    <span className="text-white text-xs font-light">
-                      {componentItem.views || 0} views
-                    </span>
-                  </div>
+                  {/* Views removed from component card */}
                   <div
                     className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
                     style={{ backgroundColor: "#2d3135" }}
@@ -710,7 +720,7 @@ const Components = () => {
                         <span
                           className={`text-xs sm:text-sm font-normal ${
                             componentItem.badge === "Pro"
-                              ? "text-[#FF9AC9]"
+                              ? "text-[#FF479C]"
                               : "text-white"
                           }`}
                         >
@@ -736,7 +746,7 @@ const Components = () => {
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
                 ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
-                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
+                : "bg-[#FF479C] text-[#282828] hover:opacity-90"
             }`}
           >
             Previous
@@ -754,7 +764,7 @@ const Components = () => {
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages
                 ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
-                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
+                : "bg-[#FF479C] text-[#282828] hover:opacity-90"
             }`}
           >
             Next

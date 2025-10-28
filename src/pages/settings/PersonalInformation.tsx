@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
   // Avatar UI: show user.avatar if present, else initials fallback
   import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 interface ProfileData {
   name: string;
@@ -73,16 +74,40 @@ export default function PersonalInformation() {
   const [missingFields, setMissingFields] = useState<string[]>([]);
 
   // Initialize profile data when user data changes
+  // Load profileData from sessionStorage if available
   useEffect(() => {
     if (user) {
-      setProfileData({
-        name: user?.username || user?.name || "",
-        location: user?.location || "",
-        email: user?.email || "",
-        socialMedia: user?.socialMedia || "",
-        website: user?.website || "",
-        bio: user?.bio || "",
-      });
+      const cached = sessionStorage.getItem("profileDataCache");
+      let cacheObj: Partial<ProfileData> | null = null;
+      if (cached) {
+        try {
+          cacheObj = JSON.parse(cached);
+        } catch {
+          cacheObj = null;
+        }
+      }
+      // Only use cache if both name and email are valid non-empty strings
+      const cacheHasValidName = !!(cacheObj && typeof cacheObj.name === "string" && cacheObj.name.trim());
+      const cacheHasValidEmail = !!(cacheObj && typeof cacheObj.email === "string" && cacheObj.email.trim());
+      if (cacheObj && cacheHasValidName && cacheHasValidEmail) {
+        setProfileData({
+          name: cacheObj.name!,
+          location: cacheObj.location ?? (user.location || ""),
+          email: cacheObj.email!,
+          socialMedia: cacheObj.socialMedia ?? (user.socialMedia || ""),
+          website: cacheObj.website ?? (user.website || ""),
+          bio: cacheObj.bio ?? (user.bio || ""),
+        });
+      } else {
+        setProfileData({
+          name: user?.username || user?.name || "",
+          location: user?.location || "",
+          email: user?.email || "",
+          socialMedia: user?.socialMedia || "",
+          website: user?.website || "",
+          bio: user?.bio || "",
+        });
+      }
     }
   }, [user]);
 
@@ -97,13 +122,21 @@ export default function PersonalInformation() {
         .then((res) => (res.ok ? res.json() : null))
         .then((profile) => {
           if (profile && profile.user) {
-            setProfileData((prev) => ({
-              ...prev,
-              location: profile.user.location || "",
-              socialMedia: profile.user.socialMedia || "",
-              website: profile.user.website || "",
-              bio: profile.user.bio || "",
-            }));
+            setProfileData((prev) => {
+              const updated = {
+                ...prev,
+                // Update name and email if present in API response
+                name: profile.user.username || profile.user.name || prev.name,
+                email: profile.user.email || prev.email,
+                location: profile.user.location || "",
+                socialMedia: profile.user.socialMedia || "",
+                website: profile.user.website || "",
+                bio: profile.user.bio || "",
+              };
+              // Update sessionStorage cache
+              sessionStorage.setItem("profileDataCache", JSON.stringify(updated));
+              return updated;
+            });
           }
         })
         .catch(() => {
@@ -139,6 +172,10 @@ export default function PersonalInformation() {
 
     setCompletion(completionPercentage);
     setMissingFields(missing);
+    // Update sessionStorage cache on profileData change
+  }, [profileData]);
+  useEffect(() => {
+    sessionStorage.setItem("profileDataCache", JSON.stringify(profileData));
   }, [profileData]);
 
   const handleProfileInputChange = (
@@ -267,6 +304,9 @@ export default function PersonalInformation() {
             if (profile && profile.user) {
               setProfileData((prev) => ({
                 ...prev,
+                // Update name and email if present in API response
+                name: profile.user.username || profile.user.name || prev.name,
+                email: profile.user.email || prev.email,
                 location: profile.user.location || "",
                 socialMedia: profile.user.socialMedia || "",
                 website: profile.user.website || "",
@@ -360,6 +400,10 @@ export default function PersonalInformation() {
       .toUpperCase()
       .slice(0, 2);
 
+  // Generate dynamic colors
+  const bgColor = generateColorFromString(user?.email || displayName);
+  const textColor = getContrastTextColor(bgColor);
+
   return (
     <div className="min-h-[600px] bg-black text-white">
       <div className="space-y-8">
@@ -381,11 +425,17 @@ export default function PersonalInformation() {
           <CardContent>
             {/* Avatar display */}
             <div className="flex items-center mb-6">
-              <Avatar className="h-16 w-16 border border-neutral-700 bg-white text-black mr-4">
+              <Avatar className="h-16 w-16 border border-neutral-700 mr-4">
                 {typeof user?.avatar === "string" && user.avatar ? (
                   <AvatarImage key={user.avatar} src={user.avatar} alt={displayName} crossOrigin="anonymous" referrerPolicy="no-referrer" />
                 ) : null}
-                <AvatarFallback className="text-black font-semibold">
+                <AvatarFallback
+                  className="font-semibold"
+                  style={{
+                    backgroundColor: bgColor,
+                    color: textColor
+                  }}
+                >
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -612,7 +662,7 @@ export default function PersonalInformation() {
               <div className="flex gap-2 pt-4">
                 <Button
                   type="submit"
-                  className="bg-gradient-to-r from-[#E84288] to-[#9B4DCA] hover:opacity-90"
+                  className="copy-btn-pink-hover"
                 >
                   Save Changes
                 </Button>

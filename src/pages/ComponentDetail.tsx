@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { trackComponentView } from "@/lib/api";
-import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { FigmaButton } from "../components/ui/FigmaButton";
+import {
+  Avatar as ShadAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 import {
   Popover,
   PopoverContent,
@@ -43,6 +49,7 @@ type ComponentData = {
     _id?: string;
     name?: string;
     email?: string;
+    avatar?: string;
   };
   creatorStatus?: "original" | "found" | "modified";
 };
@@ -82,7 +89,7 @@ const ComponentDetail: React.FC = () => {
   const [cssCode, setCssCode] = useState<string>("");
   const [tailwindCode, setTailwindCode] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"html" | "css">("html");
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing] = useState(true);
   const [backgroundColor, setBackgroundColor] = useState<string>("#e9edeb");
   const [showColorPicker, setShowColorPicker] = useState(false);
 
@@ -502,9 +509,35 @@ const ComponentDetail: React.FC = () => {
           >
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  {component.createdBy.name?.charAt(0).toUpperCase() || "U"}
-                </div>
+                {(() => {
+                  const initials = component.createdBy?.name?.charAt(0).toUpperCase() || "U";
+                  const avatarUrl = component.createdBy?.avatar;
+                  const bgColor = generateColorFromString(
+                    component.createdBy?.email || component.createdBy?.name || initials
+                  );
+                  const textColor = getContrastTextColor(bgColor);
+                  return (
+                    <ShadAvatar className="w-14 h-14 font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      {typeof avatarUrl === "string" && avatarUrl ? (
+                        <AvatarImage
+                          key={avatarUrl}
+                          src={avatarUrl}
+                          alt={initials}
+                          crossOrigin="anonymous"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : null}
+                      <AvatarFallback
+                        style={{
+                          backgroundColor: bgColor,
+                          color: textColor,
+                        }}
+                      >
+                        {initials}
+                      </AvatarFallback>
+                    </ShadAvatar>
+                  );
+                })()}
                 <div className="flex-1 text-left">
                   <div className="flex items-center gap-2 mb-1">
                     <div className="font-bold text-lg group-hover:text-primary transition-colors">
@@ -606,8 +639,7 @@ const ComponentDetail: React.FC = () => {
           {/* Preview Panel */}
           <Card className="overflow-hidden bg-white border-white">
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-black">{backgroundColor}</CardTitle>
+              <div className="flex items-center justify-end">
                 <Popover
                   open={showColorPicker}
                   onOpenChange={setShowColorPicker}
@@ -622,7 +654,7 @@ const ComponentDetail: React.FC = () => {
                         className="w-4 h-4 rounded border"
                         style={{ backgroundColor }}
                       />
-                      <span>Background</span>
+                      <span className="ml-2">{backgroundColor}</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64">
@@ -695,6 +727,7 @@ const ComponentDetail: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="copy-btn-pink-hover"
                     onClick={() => {
                       let codeToCopy = "";
                       if (technology === "css") {
@@ -712,13 +745,23 @@ const ComponentDetail: React.FC = () => {
                   >
                     Copy
                   </Button>
-                  <Button
-                    variant={isEditing ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsEditing(!isEditing)}
-                  >
-                    {isEditing ? "Save" : "Edit"}
-                  </Button>
+                  {/* Edit button removed: editor is always editable */}
+                  <FigmaButton
+                    onClick={() => {
+                      let codeToCopy = "";
+                      if (technology === "css") {
+                        codeToCopy = activeTab === "html" ? htmlCode : cssCode;
+                      } else if (technology === "tailwind") {
+                        codeToCopy = tailwindCode;
+                      }
+                      navigator.clipboard.writeText(codeToCopy);
+                      toast({
+                        title: "Copied to Figma!",
+                        description: "Code copied for Figma.",
+                        variant: "default",
+                      });
+                    }}
+                  />
                 </div>
               </div>
             </CardHeader>
@@ -964,9 +1007,33 @@ const ComponentDetail: React.FC = () => {
           <CardContent className="space-y-6">
             {/* Comment Input */}
             <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground font-semibold flex-shrink-0">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
-              </div>
+              {(() => {
+                const initials = user?.name?.charAt(0).toUpperCase() || "U";
+                const avatarUrl = user?.avatar;
+                const bgColor = generateColorFromString(user?.email || user?.name || initials);
+                const textColor = getContrastTextColor(bgColor);
+                return (
+                  <ShadAvatar className="w-10 h-10 font-semibold flex-shrink-0">
+                    {typeof avatarUrl === "string" && avatarUrl ? (
+                      <AvatarImage
+                        key={avatarUrl}
+                        src={avatarUrl}
+                        alt={initials}
+                        crossOrigin="anonymous"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : null}
+                    <AvatarFallback
+                      style={{
+                        backgroundColor: bgColor,
+                        color: textColor,
+                      }}
+                    >
+                      {initials}
+                    </AvatarFallback>
+                  </ShadAvatar>
+                );
+              })()}
               <div className="flex-1 space-y-3">
                 <Textarea
                   placeholder="Add a comment..."
@@ -1073,12 +1140,29 @@ const ComponentDetail: React.FC = () => {
                       const initials =
                         comment.user?.name?.charAt(0).toUpperCase() || "U";
                       const avatarUrl = comment.user?.avatar;
+                      const bgColor = generateColorFromString(
+                        comment.user?.name || comment.user?._id || initials
+                      );
+                      const textColor = getContrastTextColor(bgColor);
                       return (
-                        <ShadAvatar className="w-10 h-10 rounded-full bg-muted text-foreground font-semibold text-sm flex-shrink-0">
+                        <ShadAvatar className="w-10 h-10 rounded-full font-semibold text-sm flex-shrink-0">
                           {typeof avatarUrl === "string" && avatarUrl ? (
-                            <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                            <AvatarImage
+                              key={avatarUrl}
+                              src={avatarUrl}
+                              alt={initials}
+                              crossOrigin="anonymous"
+                              referrerPolicy="no-referrer"
+                            />
                           ) : null}
-                          <AvatarFallback>{initials}</AvatarFallback>
+                          <AvatarFallback
+                            style={{
+                              backgroundColor: bgColor,
+                              color: textColor,
+                            }}
+                          >
+                            {initials}
+                          </AvatarFallback>
                         </ShadAvatar>
                       );
                     })()}
@@ -1149,12 +1233,29 @@ const ComponentDetail: React.FC = () => {
                             const initials =
                               user?.name?.charAt(0).toUpperCase() || "U";
                             const avatarUrl = user?.avatar;
+                            const bgColor = generateColorFromString(
+                              user?.email || user?.name || initials
+                            );
+                            const textColor = getContrastTextColor(bgColor);
                             return (
-                              <ShadAvatar className="w-8 h-8 rounded-full bg-muted text-foreground font-semibold text-xs flex-shrink-0">
+                              <ShadAvatar className="w-8 h-8 rounded-full font-semibold text-xs flex-shrink-0">
                                 {typeof avatarUrl === "string" && avatarUrl ? (
-                                  <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                  <AvatarImage
+                                    key={avatarUrl}
+                                    src={avatarUrl}
+                                    alt={initials}
+                                    crossOrigin="anonymous"
+                                    referrerPolicy="no-referrer"
+                                  />
                                 ) : null}
-                                <AvatarFallback>{initials}</AvatarFallback>
+                                <AvatarFallback
+                                  style={{
+                                    backgroundColor: bgColor,
+                                    color: textColor,
+                                  }}
+                                >
+                                  {initials}
+                                </AvatarFallback>
                               </ShadAvatar>
                             );
                           })()}
@@ -1241,12 +1342,30 @@ const ComponentDetail: React.FC = () => {
                                   reply.user?.name?.charAt(0).toUpperCase() ||
                                   "U";
                                 const avatarUrl = reply.user?.avatar;
+                                const bgColor = generateColorFromString(
+                                  reply.user?.name || reply.user?._id || initials
+                                );
+                                const textColor = getContrastTextColor(bgColor);
                                 return (
-                                  <ShadAvatar className="w-8 h-8 rounded-full bg-muted text-foreground font-semibold text-xs flex-shrink-0">
-                                    {typeof avatarUrl === "string" && avatarUrl ? (
-                                      <AvatarImage key={avatarUrl} src={avatarUrl} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                                  <ShadAvatar className="w-8 h-8 rounded-full font-semibold text-xs flex-shrink-0">
+                                    {typeof avatarUrl === "string" &&
+                                    avatarUrl ? (
+                                      <AvatarImage
+                                        key={avatarUrl}
+                                        src={avatarUrl}
+                                        alt={initials}
+                                        crossOrigin="anonymous"
+                                        referrerPolicy="no-referrer"
+                                      />
                                     ) : null}
-                                    <AvatarFallback>{initials}</AvatarFallback>
+                                    <AvatarFallback
+                                      style={{
+                                        backgroundColor: bgColor,
+                                        color: textColor,
+                                      }}
+                                    >
+                                      {initials}
+                                    </AvatarFallback>
                                   </ShadAvatar>
                                 );
                               })()}

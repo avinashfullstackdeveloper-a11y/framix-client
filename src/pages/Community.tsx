@@ -10,6 +10,8 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CommunityList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -116,7 +118,7 @@ const CommunityList = () => {
   }, [selectedCategory, searchQuery]);
 
   // Pagination calculations
-  const itemsPerPage = 12;
+  const itemsPerPage = 20;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -147,11 +149,13 @@ const CommunityList = () => {
     size = "sm",
     className = "",
     src,
+    identifier,
   }: {
     initials: string;
     size?: "sm" | "md" | "lg";
     className?: string;
     src?: string;
+    identifier?: string;
   }) => {
     const sizeClasses = {
       sm: "w-6 h-6 text-xs",
@@ -159,9 +163,13 @@ const CommunityList = () => {
       lg: "w-12 h-12 text-base",
     };
 
+    // Generate dynamic colors based on identifier (username, email, name)
+    const bgColor = generateColorFromString(identifier || initials);
+    const textColor = getContrastTextColor(bgColor);
+
     return (
       <ShadAvatar
-        className={`${sizeClasses[size]} border border-neutral-700 bg-white text-black ${className}`}
+        className={`${sizeClasses[size]} border border-neutral-700 ${className}`}
       >
         {typeof src === "string" && src ? (
           <AvatarImage
@@ -172,7 +180,13 @@ const CommunityList = () => {
             referrerPolicy="no-referrer"
           />
         ) : null}
-        <AvatarFallback className="text-black font-medium">
+        <AvatarFallback
+          className="font-medium"
+          style={{
+            backgroundColor: bgColor,
+            color: textColor
+          }}
+        >
           {initials}
         </AvatarFallback>
       </ShadAvatar>
@@ -634,7 +648,7 @@ const CommunityList = () => {
         <h1 className="text-5xl font-bold mb-6">
           Discover
           <span className="neon-hero neon-hero-text">
-            <span className="text-[#FF9AC9] neon-hero-glow"> Incredible</span>
+            <span className="text-[#FF479C] neon-hero-glow"> Incredible</span>
           </span>
           <br />
           <span>Components</span> from Creators
@@ -646,7 +660,7 @@ const CommunityList = () => {
         <div className="flex gap-4 justify-center max-sm:flex-col max-sm:items-center">
           <Link
             to="/components"
-            className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center"
+            className="bg-[#FF479C] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center"
           >
             Browse components
           </Link>
@@ -683,7 +697,38 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredComponentsList.map((component, index) => {
+          {loading ? (
+            // Skeleton loader for Featured Components (4 cards)
+            Array.from({ length: 4 }).map((_, index) => (
+              <Card key={`featured-skeleton-${index}`} className="bg-gradient-card border-border">
+                <CardContent className="p-0">
+                  <div className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
+                    <Skeleton className="h-full w-full" />
+                    <div className="absolute top-3 right-3 z-10">
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <Skeleton className="h-4 w-20 mb-1" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            featuredComponentsList.map((component, index) => {
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -694,8 +739,8 @@ const CommunityList = () => {
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg relative overflow-hidden"
-                      style={{ backgroundColor: "#9ca3af" }}
+                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                      style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
                       <div className="absolute top-3 right-3 z-10">
@@ -741,6 +786,12 @@ const CommunityList = () => {
                             }
                             size="sm"
                             className="flex-shrink-0"
+                            identifier={
+                              component.createdBy?.email ||
+                              component.createdBy?.username ||
+                              component.createdBy?.name ||
+                              component.author?.name
+                            }
                           />
                           <div className="min-w-0 flex-1">
                             <div className="text-sm font-medium group-hover:underline truncate">
@@ -775,7 +826,8 @@ const CommunityList = () => {
                 </Card>
               </Link>
             );
-          })}
+            })
+          )}
         </div>
       </div>
 
@@ -949,7 +1001,38 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {paginatedComponents.map((component, index) => {
+          {loading ? (
+            // Skeleton loader for All Components (6 cards)
+            Array.from({ length: 6 }).map((_, index) => (
+              <Card key={`all-skeleton-${index}`} className="bg-gradient-card border-border">
+                <CardContent className="p-0">
+                  <div className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
+                    <Skeleton className="h-full w-full" />
+                    <div className="absolute top-3 right-3 z-10">
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <Skeleton className="h-4 w-20 mb-1" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-4 w-8" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            paginatedComponents.map((component, index) => {
             return (
               <Link
                 to={`/components/${component.type || "component"}/${
@@ -958,81 +1041,97 @@ const CommunityList = () => {
                 key={component._id || index}
               >
                 <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge variant="secondary" className="bg-secondary/50">
-                        {(component.type || component.category)
-                          ?.replace(/component/gi, "")
-                          .trim()
-                          .replace(/^\w/, (c) => c.toUpperCase())}
-                      </Badge>
-                      <InteractionButtons
-                        likes={
-                          component.likeCount || component.likedBy?.length || 0
-                        }
-                        comments={
-                          component.commentCount ||
-                          (Array.isArray(component.comments)
-                            ? component.comments.length
-                            : 0)
-                        }
-                        views={component.views || 0}
-                      />
-                    </div>
-
+                  <CardContent className="p-0">
                     <div
-                      className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
-                      style={{ backgroundColor: "#9ca3af" }}
+                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                      style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <LivePreview component={component} />
+                      <div className="absolute top-3 right-3 z-10">
+                        <Badge
+                          variant="secondary"
+                          className="bg-black/50 text-white backdrop-blur-sm"
+                        >
+                          {(component.type || component.category)
+                            ?.replace(/component/gi, "")
+                            .trim()
+                            .replace(/^\w/, (c) => c.toUpperCase())}
+                        </Badge>
+                      </div>
                     </div>
-
-                    <div
-                      className="flex items-center gap-2 cursor-pointer group min-w-0"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const userId =
-                          component.createdBy?._id ||
-                          component.author?._id ||
-                          "";
-                        if (userId) {
-                          window.location.href = `/community/${userId}`;
-                        }
-                      }}
-                      title="View user profile"
-                    >
-                      <Avatar
-                        initials={
-                          component.createdBy?.name?.charAt(0).toUpperCase() ||
-                          component.author?.initials ||
-                          "U"
-                        }
-                        src={
-                          component.createdBy?.avatar ||
-                          component.author?.avatar
-                        }
-                        size="sm"
-                        className="flex-shrink-0"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium group-hover:underline truncate">
-                          {component.createdBy?.name ||
-                            component.author?.name ||
-                            "Anonymous"}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div
+                          className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const userId =
+                              component.createdBy?._id ||
+                              component.author?._id ||
+                              "";
+                            if (userId) {
+                              window.location.href = `/community/${userId}`;
+                            }
+                          }}
+                          title="View user profile"
+                        >
+                          <Avatar
+                            initials={
+                              component.createdBy?.name
+                                ?.charAt(0)
+                                .toUpperCase() ||
+                              component.author?.initials ||
+                              "U"
+                            }
+                            src={
+                              component.createdBy?.avatar ||
+                              component.author?.avatar
+                            }
+                            size="sm"
+                            className="flex-shrink-0"
+                            identifier={
+                              component.createdBy?.email ||
+                              component.createdBy?.username ||
+                              component.createdBy?.name ||
+                              component.author?.name
+                            }
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-medium group-hover:underline truncate">
+                              {component.createdBy?.name ||
+                                component.author?.name ||
+                                "Anonymous"}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">
+                              {component.createdBy?.username ||
+                                component.author?.username ||
+                                ""}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {component.createdBy?.username ||
-                            component.author?.username ||
-                            ""}
-                        </div>
+                        <InteractionButtons
+                          likes={
+                            component.likeCount ||
+                            component.likedBy?.length ||
+                            0
+                          }
+                          comments={
+                            component.commentCount ||
+                            (Array.isArray(component.comments)
+                              ? component.comments.length
+                              : 0)
+                          }
+                          views={component.views || 0}
+                        />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               </Link>
             );
-          })}
+            })
+          )}
         </div>
 
         {/* Pagination Controls */}
@@ -1044,7 +1143,7 @@ const CommunityList = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === 1
                   ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
+                  : "bg-[#FF479C] hover:bg-[#ffb3da] text-white"
               }`}
             >
               Previous
@@ -1062,7 +1161,7 @@ const CommunityList = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === totalPages
                   ? "bg-secondary text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-[#FF9AC9] hover:bg-[#ffb3da] text-white"
+                  : "bg-[#FF479C] hover:bg-[#ffb3da] text-white"
               }`}
             >
               Next
@@ -1080,7 +1179,7 @@ const CommunityList = () => {
         <Dialog open={popupOpen} onOpenChange={setPopupOpen}>
           <DialogTrigger asChild>
             <button
-              className="bg-[#FF9AC9] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
+              className="bg-[#FF479C] hover:bg-[#ffb3da] text-white px-8 py-3 rounded-full font-medium transition-all"
               onClick={() => setPopupOpen(true)}
             >
               Submit Component

@@ -291,7 +291,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({ formData, imageFiles 
             )}
             
             {activeTab === 'pricing' && (
-              <div className="flex w-full flex-col items-start gap-4 bg-[rgba(255,154,201,0.20)] pt-[24.667px] pb-[0.667px] px-[24.667px] rounded-[18px] border-[0.667px] border-solid border-[#FF9AC9] max-sm:p-4">
+              <div className="flex w-full flex-col items-start gap-4 bg-[rgba(255,154,201,0.20)] pt-[24.667px] pb-[0.667px] px-[24.667px] rounded-[18px] border-[0.667px] border-solid border-[#FF479C] max-sm:p-4">
                 <div className="flex h-6 justify-between items-center w-full">
                   <div className="flex justify-center items-center">
                     <span className="text-[#C6C6C6] text-base font-normal leading-6">Price</span>

@@ -1,7 +1,14 @@
 // BugReportPage.tsx
 import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader as DialogModalHeader, DialogTitle as DialogModalTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader as DialogModalHeader,
+  DialogTitle as DialogModalTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { apiRequest } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
@@ -25,10 +32,15 @@ const BugReportPage: React.FC = () => {
   useEffect(() => {
     let ignore = false;
     setLoading(true);
-    apiRequest<BugReport[]>("/api/bug-reports")
+    apiRequest<any>("/api/bug-reports")
       .then((data) => {
-        console.log("Fetched bug reports:", data);
-        if (!ignore) setBugReports(data);
+        // Defensive: extract array from paginated response, fallback to empty array
+        const reports = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.bugReports)
+            ? data.bugReports
+            : [];
+        if (!ignore) setBugReports(reports);
       })
       .catch((err) => {
         console.error("Error fetching bug reports:", err);
@@ -58,10 +70,11 @@ const BugReportPage: React.FC = () => {
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          <span className="text-[#FF9AC9]">Bug</span> Reports
+          <span className="text-[#FF479C]">Bug</span> Reports
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
-          Review and manage all reported bugs with detailed information and user context.
+          Review and manage all reported bugs with detailed information and user
+          context.
         </p>
       </div>
 
@@ -70,14 +83,14 @@ const BugReportPage: React.FC = () => {
         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl px-6 py-3">
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <Bug className="w-4 h-4 text-[#FF9AC9]" />
+              <Bug className="w-4 h-4 text-[#FF479C]" />
               <span className="text-white">{bugReports.length}</span>
               <span className="text-[#767676]">Total Reports</span>
             </div>
             <div className="w-px h-6 bg-[#3A3A3A]"></div>
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-[#FF9AC9]" />
-              <span className="text-[#FF9AC9] font-medium">Admin Access</span>
+              <AlertTriangle className="w-4 h-4 text-[#FF479C]" />
+              <span className="text-[#FF479C] font-medium">Admin Access</span>
               <span className="text-[#767676]">Priority Review</span>
             </div>
           </div>
@@ -85,7 +98,9 @@ const BugReportPage: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center text-lg text-white py-12">Loading bug reports...</div>
+        <div className="text-center text-lg text-white py-12">
+          Loading bug reports...
+        </div>
       ) : bugReports.length === 0 ? (
         <div className="text-center w-full col-span-3 py-16">
           <Bug className="w-16 h-16 text-[#767676] mx-auto mb-4" />
@@ -97,19 +112,23 @@ const BugReportPage: React.FC = () => {
       ) : (
         <div className="grid gap-6">
           {bugReports.map((bug) => (
-            <Dialog key={bug._id} open={selected?._id === bug._id} onOpenChange={open => setSelected(open ? bug : null)}>
+            <Dialog
+              key={bug._id}
+              open={selected?._id === bug._id}
+              onOpenChange={(open) => setSelected(open ? bug : null)}
+            >
               <DialogTrigger asChild>
                 <Card
-                  className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] text-white"
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] text-white"
                   onClick={() => setSelected(bug)}
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Bug className="w-5 h-5 text-[#FF9AC9]" />
+                        <Bug className="w-5 h-5 text-[#FF479C]" />
                         <span>{bug.title}</span>
                       </div>
-                      <span className="text-sm text-[#FF9AC9] flex items-center gap-1">
+                      <span className="text-sm text-[#FF479C] flex items-center gap-1">
                         <User className="w-4 h-4" />
                         {bug.username || "Unknown"}
                       </span>
@@ -126,25 +145,39 @@ const BugReportPage: React.FC = () => {
               <DialogContent className="bg-[rgba(0,0,0,0.95)] border border-[#3A3A3A] text-white max-w-2xl">
                 <DialogModalHeader>
                   <DialogModalTitle className="text-xl font-bold text-white flex items-center gap-2">
-                    <Bug className="w-5 h-5 text-[#FF9AC9]" />
+                    <Bug className="w-5 h-5 text-[#FF479C]" />
                     {bug.title}
                   </DialogModalTitle>
                   <DialogDescription className="text-[#767676] mt-4">
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
-                        <span><span className="font-semibold text-white">Reported by:</span> {bug.username || "Unknown"}</span>
+                        <span>
+                          <span className="font-semibold text-white">
+                            Reported by:
+                          </span>{" "}
+                          {bug.username || "Unknown"}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        <span><span className="font-semibold text-white">Date:</span> {new Date(bug.createdAt).toLocaleString()}</span>
+                        <span>
+                          <span className="font-semibold text-white">
+                            Date:
+                          </span>{" "}
+                          {new Date(bug.createdAt).toLocaleString()}
+                        </span>
                       </div>
                     </div>
                   </DialogDescription>
                 </DialogModalHeader>
                 <div className="bg-[#1A1A1A] border border-[#3A3A3A] rounded-lg p-4 mt-4">
-                  <div className="text-sm text-[#767676] mb-2">Description:</div>
-                  <div className="text-white whitespace-pre-line text-base">{bug.description}</div>
+                  <div className="text-sm text-[#767676] mb-2">
+                    Description:
+                  </div>
+                  <div className="text-white whitespace-pre-line text-base">
+                    {bug.description}
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>

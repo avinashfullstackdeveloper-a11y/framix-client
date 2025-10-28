@@ -216,7 +216,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          <span className="text-[#FF9AC9]">Upload</span> Component
+          <span className="text-[#FF479C]">Upload</span> Component
         </h1>
         <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
           Add new components to the showcase with code preview and validation.
@@ -229,7 +229,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
         <div className="bg-black border-b border-[#3A3A3A] p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#FF9AC9] rounded-lg">
+              <div className="p-2 bg-[#FF479C] rounded-lg">
                 <Upload className="w-5 h-5 text-[#282828]" />
               </div>
               <div>
@@ -259,7 +259,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
               htmlFor="type"
               className="text-sm font-medium text-white flex items-center gap-2"
             >
-              <Code className="w-4 h-4 text-[#FF9AC9]" />
+              <Code className="w-4 h-4 text-[#FF479C]" />
               Component Type
             </Label>
             <Select
@@ -269,7 +269,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
               }
               required
             >
-              <SelectTrigger className="w-full bg-black border-[#3A3A3A] text-white placeholder:text-[#767676] focus:border-[#FF9AC9] transition-all duration-300">
+              <SelectTrigger className="w-full bg-black border-[#3A3A3A] text-white placeholder:text-[#767676] focus:border-[#FF479C] transition-all duration-300">
                 <SelectValue placeholder="Select component type" />
               </SelectTrigger>
               <SelectContent className="bg-black border-[#3A3A3A]">
@@ -338,8 +338,8 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
           </div>
 
           {/* Guidelines */}
-          <div className="bg-[#1A1A1A] border border-[#FF9AC9] rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-[#FF9AC9] mb-2 flex items-center gap-2">
+          <div className="bg-[#1A1A1A] border border-[#FF479C] rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-[#FF479C] mb-2 flex items-center gap-2">
               📋 Upload Guidelines
             </h3>
             <ul className="text-xs text-[#767676] space-y-1">
@@ -377,7 +377,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowPreview(!showPreview)}
-                className="text-xs border-[#3A3A3A] text-white hover:border-[#FF9AC9] hover:text-[#FF9AC9] transition-all duration-300"
+                className="text-xs border-[#3A3A3A] text-white hover:border-[#FF479C] hover:text-[#FF479C] transition-all duration-300"
               >
                 {showPreview ? "Hide Preview" : "Show Preview"}
               </Button>
@@ -392,7 +392,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                   onClick={() => handleTabChange(tab)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex-1 ${
                     activeTab === tab
-                      ? "bg-[#FF9AC9] text-[#282828]"
+                      ? "bg-[#FF479C] text-[#282828]"
                       : "text-[#767676] hover:text-white hover:bg-[#3A3A3A]"
                   }`}
                 >
@@ -412,7 +412,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                 rows={8}
                 required={activeTab === "htmlCode"}
                 placeholder={`Enter your ${activeTab === "htmlCode" ? "HTML" : activeTab === "cssCode" ? "CSS" : activeTab.toUpperCase()} code here...`}
-                className="font-mono text-xs bg-black border border-[#3A3A3A] text-white placeholder:text-[#767676] focus:border-[#FF9AC9] resize-none transition-all duration-300"
+                className="font-mono text-xs bg-black border border-[#3A3A3A] text-white placeholder:text-[#767676] focus:border-[#FF479C] resize-none transition-all duration-300"
               />
               <div className="absolute top-2 right-2">
                 <span className="px-2 py-0.5 bg-[#3A3A3A] text-[#767676] text-[10px] rounded-md font-medium">
@@ -477,7 +477,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
                       />
                     </div>
                   </div>
-                  <div className="bg-[#1A1A1A] border-t border-[#3A3A3A] px-3 py-1.5 text-[10px] text-[#FF9AC9]">
+                  <div className="bg-[#1A1A1A] border-t border-[#3A3A3A] px-3 py-1.5 text-[10px] text-[#FF479C]">
                     ⚠️ Preview at 50% scale (card view). Full size on detail
                     page.
                   </div>
@@ -507,7 +507,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
             <Button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 bg-[#FF9AC9] hover:bg-[#ff7eb8] text-[#282828] font-medium py-2 px-4 rounded-lg transition-all duration-300 text-sm hover:shadow-[0_0_20px_rgba(255,154,201,0.3)]"
+              className="flex-1 flex items-center justify-center gap-2 bg-[#FF479C] hover:bg-[#ff7eb8] text-[#282828] font-medium py-2 px-4 rounded-lg transition-all duration-300 text-sm hover:shadow-[0_0_20px_rgba(255,154,201,0.3)]"
             >
               {loading ? (
                 <>
@@ -526,7 +526,7 @@ const AdminComponentUpload: React.FC<AdminComponentUploadProps> = ({
               type="button"
               variant="outline"
               onClick={clearForm}
-              className="px-4 py-2 border-[#3A3A3A] text-white hover:bg-[#3A3A3A] hover:border-[#FF9AC9] text-sm transition-all duration-300"
+              className="px-4 py-2 border-[#3A3A3A] text-white hover:bg-[#3A3A3A] hover:border-[#FF479C] text-sm transition-all duration-300"
             >
               Clear
             </Button>

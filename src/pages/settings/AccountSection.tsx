@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
   // Avatar UI: show user.avatar if present, else initials fallback
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 interface AccountSectionProps {
   className?: string;
@@ -22,6 +23,11 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  
+  // Generate dynamic colors
+  const bgColor = generateColorFromString(user?.email || displayName);
+  const textColor = getContrastTextColor(bgColor);
+  
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [confirmText, setConfirmText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -88,7 +94,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
         {/* Account Information Section */}
         <section className="w-full max-md:max-w-full">
           <div className="flex w-full items-center gap-2 text-lg text-[rgba(242,242,242,1)] font-semibold leading-loose flex-wrap max-md:max-w-full">
-            <Avatar className="h-8 w-8 border border-neutral-700 bg-white text-black">
+            <Avatar className="h-8 w-8 border border-neutral-700">
               {typeof user?.avatar === "string" && user.avatar ? (
                 <AvatarImage
                   key={user.avatar}
@@ -98,7 +104,13 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
                   referrerPolicy="no-referrer"
                 />
               ) : null}
-              <AvatarFallback className="text-black font-semibold">
+              <AvatarFallback
+                className="font-semibold"
+                style={{
+                  backgroundColor: bgColor,
+                  color: textColor
+                }}
+              >
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -162,20 +174,15 @@ export const AccountSection: React.FC<AccountSectionProps> = ({
             <div className="self-stretch min-h-10 my-auto pl-4">
               <button
                 onClick={openDeleteDialog}
-                className="bg-[rgba(239,68,68,0.2)] flex min-h-10 items-center gap-2 justify-center px-4 py-2.5 rounded-md hover:bg-[rgba(239,68,68,0.3)] transition-colors"
+                className="bg-[rgba(239,68,68,0.2)] flex min-h-10 items-center gap-2 justify-center p-2.5 rounded-md hover:bg-[rgba(239,68,68,0.3)] transition-colors"
               >
-                <div className="self-stretch flex min-h-4 flex-col w-6 my-auto pr-2">
-                  <div className="flex min-h-4 w-4 flex-col overflow-hidden items-center justify-center">
-                    <img
-                      src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/f60683250b19aadde0b1152277cd6e5c45919b62?placeholderIfAbsent=true"
-                      className="aspect-[1] object-contain w-full flex-1"
-                      alt="Delete icon"
-                    />
-                  </div>
+                <div className="flex min-h-4 w-4 flex-col overflow-hidden items-center justify-center">
+                  <img
+                    src="https://api.builder.io/api/v1/image/assets/35de5dc00516421d9aa405b4c562fade/f60683250b19aadde0b1152277cd6e5c45919b62?placeholderIfAbsent=true"
+                    className="aspect-[1] object-contain w-full flex-1"
+                    alt="Delete icon"
+                  />
                 </div>
-                <span className="text-red-400 text-sm font-medium leading-none text-center self-stretch my-auto">
-                  Delete Account
-                </span>
               </button>
             </div>
           </div>

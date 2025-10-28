@@ -456,7 +456,7 @@ const ComponentsPage: React.FC = () => {
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-          <span className="text-[#FF9AC9]">Admin</span> Components
+          <span className="text-[#FF479C]">Admin</span> Components
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
           Manage all uploaded components with full administrative control and
@@ -469,13 +469,13 @@ const ComponentsPage: React.FC = () => {
         <div className="bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] rounded-2xl px-6 py-3">
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <Component className="w-4 h-4 text-[#FF9AC9]" />
+              <Component className="w-4 h-4 text-[#FF479C]" />
               <span className="text-white">{components.length}</span>
               <span className="text-[#767676]">Total Components</span>
             </div>
             <div className="w-px h-6 bg-[#3A3A3A]"></div>
             <div className="flex items-center gap-2">
-              <span className="text-[#FF9AC9] font-medium">Admin Access</span>
+              <span className="text-[#FF479C] font-medium">Admin Access</span>
               <span className="text-[#767676]">Full Control</span>
             </div>
           </div>
@@ -507,7 +507,7 @@ const ComponentsPage: React.FC = () => {
               className="cursor-pointer w-full"
             >
               <div
-                className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF9AC9] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+                className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
                 style={{ backgroundColor: "#2d3135" }}
               >
                 {/* Views moved to top left, not close to the border */}
@@ -579,7 +579,7 @@ const ComponentsPage: React.FC = () => {
                     <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                       <span
                         className={`text-xs sm:text-sm font-normal ${
-                          item.badge === "Pro" ? "text-[#FF9AC9]" : "text-white"
+                          item.badge === "Pro" ? "text-[#FF479C]" : "text-white"
                         }`}
                       >
                         {item.badge || "Free"}
@@ -618,7 +618,7 @@ const ComponentsPage: React.FC = () => {
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
                 ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
-                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
+                : "bg-[#FF479C] text-[#282828] hover:opacity-90"
             }`}
           >
             Previous
@@ -636,7 +636,7 @@ const ComponentsPage: React.FC = () => {
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages
                 ? "bg-[rgba(0,0,0,0.80)] text-[#767676] cursor-not-allowed opacity-50 border border-[#767676]"
-                : "bg-[#FF9AC9] text-[#282828] hover:opacity-90"
+                : "bg-[#FF479C] text-[#282828] hover:opacity-90"
             }`}
           >
             Next

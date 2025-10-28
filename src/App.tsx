@@ -25,6 +25,8 @@ import { CommunityUserProfile } from "./components/CommunityUserProfile";
 import ComponentEditor from "./pages/ComponentEditor";
 import AdminRoutes from "./pages/admin/AdminRoutes";
 // import NotificationsPage from "./pages/NotificationsPage";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 import FeedbackForm from "./pages/Feedback";
 
@@ -86,7 +88,9 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-          </Routes>
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        </Routes>
         </Layout>
       </TooltipProvider>
     </QueryClientProvider>

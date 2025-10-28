@@ -106,7 +106,7 @@ const Navigation = () => {
               <Link to="/signin">
                 <Button
                   variant="default"
-                  className="bg-[#FF9AC9] text-black font-semibold hover:bg-[#FF9AC9]/90 rounded-lg min-w-[160px]"
+                  className="bg-[#FF479C] text-black font-semibold hover:bg-[#FF479C]/90 rounded-lg min-w-[160px]"
                 >
                   Explore Now
                 </Button>
@@ -192,7 +192,7 @@ const Navigation = () => {
                     <Link to="/signin" tabIndex={0}>
                       <Button
                         variant="default"
-                        className="w-full bg-[#FF9AC9] text-white font-semibold hover:bg-[#FF9AC9]/90 hover:shadow-lg hover:shadow-[#FF9AC9]/20 rounded-lg transition-all duration-300 min-h-[44px] min-w-[160px] focus-visible:ring-2 focus-visible:ring-[#FF9AC9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
+                        className="w-full bg-[#FF479C] text-white font-semibold hover:bg-[#FF479C]/90 hover:shadow-lg hover:shadow-[#FF479C]/20 rounded-lg transition-all duration-300 min-h-[44px] min-w-[160px] focus-visible:ring-2 focus-visible:ring-[#FF479C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
                         onClick={() => setMobileOpen(false)}
                       >
                         Explore Now

@@ -38,7 +38,7 @@ All colors MUST be HSL.
     --popover: 0 0% 0%;
     --popover-foreground: 0 0% 100%;
     
-    --primary: 330 100% 71%;
+    --primary: 330 100% 60%;
     --primary-foreground: 0 0% 0%;
     
     --secondary: 0 0% 10%;
@@ -493,4 +493,9 @@ All colors MUST be HSL.
   .header-actions {
     flex-wrap: wrap;
   }
+}
+.copy-btn-pink-hover:hover {
+  background-color: #FF479C !important;
+  border-color: #FF479C !important;
+  color: #000 !important;
 }

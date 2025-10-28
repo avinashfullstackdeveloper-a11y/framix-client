@@ -39,7 +39,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       <button
         type="button"
         onClick={handleClick}
-        className="w-[170px] h-24 border relative box-border rounded-[10px] border-solid border-[rgba(255,154,201,0.60)] hover:border-[#FF9AC9] transition-colors max-md:w-full"
+        className="w-[170px] h-24 border relative box-border rounded-[10px] border-solid border-[rgba(255,154,201,0.60)] hover:border-[#FF479C] transition-colors max-md:w-full"
       >
         <input
           ref={fileInputRef}
