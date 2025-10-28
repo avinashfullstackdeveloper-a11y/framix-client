@@ -803,7 +803,6 @@ const ComponentEditor: React.FC = () => {
   // Actions
   const handleCopy = () => {
     const codeToCopy = getCurrentCode();
-    console.log("Copy action, code:", codeToCopy);
     navigator.clipboard.writeText(codeToCopy);
     toast({
       title: "Copied!",
