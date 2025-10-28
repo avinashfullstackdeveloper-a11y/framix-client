@@ -141,55 +141,55 @@ const ComponentDetail: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setComponent(data);
+      setComponent(data);
 
-        // Determine technology type
-        let tech: "css" | "tailwind" = "css";
-        if (data.language === "tailwind" || data.tailwind) tech = "tailwind";
-        setTechnology(tech);
+      // Determine technology type
+      let tech: "css" | "tailwind" = "css";
+      if (data.language === "tailwind" || data.tailwind) tech = "tailwind";
+      setTechnology(tech);
 
-        if (tech === "css") {
-          let htmlValue = "";
-          let cssValue = "";
+      if (tech === "css") {
+        let htmlValue = "";
+        let cssValue = "";
 
-          // Priority 1: Check for separate html/css fields (new format from admin upload)
-          if (data.html !== undefined && data.html !== null) {
-            htmlValue = data.html;
-          }
-          if (data.css !== undefined && data.css !== null) {
-            cssValue = data.css;
-          }
-
-          // Priority 2: Check for legacy htmlCode/cssCode fields
-          if (!htmlValue && data.htmlCode !== undefined) {
-            htmlValue = data.htmlCode;
-          }
-          if (!cssValue && data.cssCode !== undefined) {
-            cssValue = data.cssCode;
-          }
-
-          // Priority 3: Fallback to combined 'code' field only if no separate fields exist
-          if (!htmlValue && !cssValue && data.code) {
-            if (data.language === "html" || data.language === "multi") {
-              htmlValue = data.code;
-            } else if (data.language === "css") {
-              cssValue = data.code;
-            }
-          }
-
-          setHtmlCode(htmlValue);
-          setCssCode(cssValue);
-          setPreviewHtmlCode(htmlValue);
-          setActiveTab("html");
-        } else if (tech === "tailwind") {
-          let tailwindValue = "";
-          if (data.tailwindCode !== undefined)
-            tailwindValue = data.tailwindCode;
-          else if (data.tailwind !== undefined) tailwindValue = data.tailwind;
-          if (!tailwindValue && data.code && data.language === "tailwind")
-            tailwindValue = data.code;
-          setTailwindCode(tailwindValue);
+        // Priority 1: Check for separate html/css fields (new format from admin upload)
+        if (data.html !== undefined && data.html !== null) {
+          htmlValue = data.html;
         }
+        if (data.css !== undefined && data.css !== null) {
+          cssValue = data.css;
+        }
+
+        // Priority 2: Check for legacy htmlCode/cssCode fields
+        if (!htmlValue && data.htmlCode !== undefined) {
+          htmlValue = data.htmlCode;
+        }
+        if (!cssValue && data.cssCode !== undefined) {
+          cssValue = data.cssCode;
+        }
+
+        // Priority 3: Fallback to combined 'code' field only if no separate fields exist
+        if (!htmlValue && !cssValue && data.code) {
+          if (data.language === "html" || data.language === "multi") {
+            htmlValue = data.code;
+          } else if (data.language === "css") {
+            cssValue = data.code;
+          }
+        }
+
+        setHtmlCode(htmlValue);
+        setCssCode(cssValue);
+        setPreviewHtmlCode(htmlValue);
+        setActiveTab("html");
+      } else if (tech === "tailwind") {
+        let tailwindValue = "";
+        if (data.tailwindCode !== undefined)
+          tailwindValue = data.tailwindCode;
+        else if (data.tailwind !== undefined) tailwindValue = data.tailwind;
+        if (!tailwindValue && data.code && data.language === "tailwind")
+          tailwindValue = data.code;
+        setTailwindCode(tailwindValue);
+      }
 
         setLoading(false);
       })

@@ -91,7 +91,7 @@ const Components = () => {
     }
   }, [user, authLoading, toast, toastShown]);
 
-  // Try to load components from localStorage first
+  // Fetch components (now includes both user-uploaded and scraped from same endpoint)
   const fetchComponents = () => {
     setLoading(true);
     const cached = localStorage.getItem("componentListCache");
