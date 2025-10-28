@@ -46,7 +46,7 @@ export const TermsSection: React.FC<TermsSectionProps> = ({
 }) => {
   return (
     <section id={id} className="w-full mt-8 max-md:max-w-full">
-      <div className="flex w-full gap-2.5 flex-wrap max-md:max-w-full">
+      <div className="flex w-full gap-2.5 flex-row items-center max-md:max-w-full">
         <div
           className={`border flex min-h-9 flex-col items-center text-lg font-normal whitespace-nowrap leading-none justify-center w-9 px-px py-2 rounded-[100px] border-solid ${
             isActive
@@ -145,7 +145,7 @@ export const TermsContent: React.FC<TermsContentProps> = ({
   onSectionChange,
 }) => {
   return (
-    <main className="min-w-60 w-[870px] max-w-[870px] max-md:max-w-full text-gray-300 pb-24">
+    <main className="min-w-60 w-[870px] max-w-[870px] max-md:max-w-full text-gray-300 pb-10">
       <article className="w-full max-md:max-w-full">
         <TermsSection
           id="introduction"
@@ -585,9 +585,9 @@ const TermsAndConditions: React.FC = () => {
     <div className="bg-black min-h-screen text-white">
       <Hero />
 
-      <div className="flex flex-col lg:flex-row gap-8 px-4 lg:px-8 py-8 max-w-7xl mx-auto pb-24">
+      <div className="flex flex-col lg:flex-row gap-8 px-4 lg:px-8 py-8 max-w-7xl mx-auto pb-10">
         {/* Table of Contents - Left Side */}
-        <div className="lg:w-[300px] w-full min-w-0 flex-shrink-0 flex items-start">
+        <div className="lg:w-[300px] w-full min-w-0 flex-shrink-0 flex items-start max-md:mx-auto max-md:ml-4">
           <div className="w-full mt-4">
             <TableOfContents
               activeSection={activeSection}
