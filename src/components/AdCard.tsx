@@ -2,44 +2,44 @@ import React, { useEffect, useRef } from "react";
 
 interface AdCardProps {
   adKey: string;
-  adType?: "300x250" | "160x300";
 }
 
-const AdCard: React.FC<AdCardProps> = ({ adKey, adType = "300x250" }) => {
+const AdCard: React.FC<AdCardProps> = ({ adKey }) => {
   const adContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (
-      adContainerRef.current &&
-      !adContainerRef.current.querySelector("script")
-    ) {
-      // Configuration for different ad types
-      const adConfigs = {
-        "300x250": {
-          key: "c72f109b40a75d322698efe5dd2b7573",
-          width: 300,
-          height: 250,
-        },
-        "160x300": {
-          key: "b1019f4a7b126df1547ac70a40bdb85c",
-          width: 160,
-          height: 300,
-        },
+    if (adContainerRef.current) {
+      // Clear previous ad content to ensure fresh script injection
+      adContainerRef.current.innerHTML = "";
+
+      // Configuration for banner ad only
+      const config = {
+        key: "c72f109b40a75d322698efe5dd2b7573",
+        width: 300,
+        height: 250,
       };
 
-      const config = adConfigs[adType];
+      // Create a unique atOptions variable for each adKey
+      const atOptionsVar = `atOptions_${adKey.replace(/[^a-zA-Z0-9_]/g, "")}`;
+
+      // LOG: Before script injection
+      console.log(`[AdCard] Rendering adKey:`, adKey);
+      console.log(`[AdCard] window.${atOptionsVar} before:`, window[atOptionsVar]);
+      console.log(`[AdCard] window.atOptions before:`, window.atOptions);
 
       // Create the atOptions script
       const atOptionsScript = document.createElement("script");
       atOptionsScript.type = "text/javascript";
       atOptionsScript.innerHTML = `
-        atOptions = {
+        window.${atOptionsVar} = {
           'key' : '${config.key}',
           'format' : 'iframe',
           'height' : ${config.height},
           'width' : ${config.width},
           'params' : {}
         };
+        atOptions = window.${atOptionsVar};
+        console.log('[AdCard] atOptions set for', '${adKey}', atOptions);
       `;
 
       // Create the invoke script
@@ -47,11 +47,25 @@ const AdCard: React.FC<AdCardProps> = ({ adKey, adType = "300x250" }) => {
       invokeScript.type = "text/javascript";
       invokeScript.src = `//www.highperformanceformat.com/${config.key}/invoke.js`;
 
+      // Add load/error listeners for diagnostics
+      invokeScript.onload = () => {
+        console.log(`[AdCard] invoke.js loaded for adKey:`, adKey);
+      };
+      invokeScript.onerror = (e) => {
+        console.error(`[AdCard] invoke.js failed to load for adKey:`, adKey, e);
+      };
+
       // Append both scripts
       adContainerRef.current.appendChild(atOptionsScript);
       adContainerRef.current.appendChild(invokeScript);
+
+      // LOG: After script injection
+      setTimeout(() => {
+        console.log(`[AdCard] window.${atOptionsVar} after:`, window[atOptionsVar]);
+        console.log(`[AdCard] window.atOptions after:`, window.atOptions);
+      }, 1000);
     }
-  }, [adType]);
+  }, [adKey]);
 
   return (
     <div className="w-full">

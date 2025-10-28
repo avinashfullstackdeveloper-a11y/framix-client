@@ -31,7 +31,18 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  // Try to load user from sessionStorage on init
+  const [user, setUser] = useState<User | null>(() => {
+    const cached = sessionStorage.getItem("userSessionCache");
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Check for existing session on mount
@@ -52,6 +63,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           };
           
           setUser(userObject);
+          // Cache user session info (never in localStorage)
+          sessionStorage.setItem("userSessionCache", JSON.stringify(userObject));
         }
       } catch (error) {
         console.error("Session check failed:", error);
@@ -75,14 +88,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (result.user) {
-        setUser({
+        const userObj = {
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
           role: result.user.role, // Ensure role is set on login
           avatar: result.user.avatar || result.user.profilePicture, // Support both avatar/profilePicture
-        });
+        };
+        setUser(userObj);
+        sessionStorage.setItem("userSessionCache", JSON.stringify(userObj));
       }
       // Do not use localStorage for user state
     } catch (error: any) {
@@ -110,13 +125,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (result.user) {
-        setUser({
+        const userObj = {
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
           avatar: result.user.avatar || result.user.profilePicture, // Support both avatar/profilePicture
-        });
+        };
+        setUser(userObj);
+        sessionStorage.setItem("userSessionCache", JSON.stringify(userObj));
       }
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -131,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await authClient.logout();
       setUser(null);
+      sessionStorage.removeItem("userSessionCache");
     } catch (error) {
       console.error("Logout error:", error);
       throw error;
@@ -172,6 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.clear();
       sessionStorage.clear();
       setUser(null);
+      sessionStorage.removeItem("userSessionCache");
     } catch (error) {
       console.error("Delete account error:", error);
       throw error;
@@ -182,14 +201,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const result = await authClient.getSession();
       if (result.user) {
-        setUser({
+        const userObj = {
           id: result.user.id,
           email: result.user.email,
           name: result.user.name,
           username: result.user.name, // Use name as username for display
           role: result.user.role, // Ensure role is set on refetch
           avatar: result.user.avatar || result.user.profilePicture, // Support both avatar/profilePicture
-        });
+        };
+        setUser(userObj);
+        sessionStorage.setItem("userSessionCache", JSON.stringify(userObj));
         // Do not use localStorage for user state
       }
     } catch (error) {

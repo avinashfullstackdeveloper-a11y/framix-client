@@ -74,16 +74,40 @@ export default function PersonalInformation() {
   const [missingFields, setMissingFields] = useState<string[]>([]);
 
   // Initialize profile data when user data changes
+  // Load profileData from sessionStorage if available
   useEffect(() => {
     if (user) {
-      setProfileData({
-        name: user?.username || user?.name || "",
-        location: user?.location || "",
-        email: user?.email || "",
-        socialMedia: user?.socialMedia || "",
-        website: user?.website || "",
-        bio: user?.bio || "",
-      });
+      const cached = sessionStorage.getItem("profileDataCache");
+      let cacheObj: Partial<ProfileData> | null = null;
+      if (cached) {
+        try {
+          cacheObj = JSON.parse(cached);
+        } catch {
+          cacheObj = null;
+        }
+      }
+      // Only use cache if both name and email are valid non-empty strings
+      const cacheHasValidName = !!(cacheObj && typeof cacheObj.name === "string" && cacheObj.name.trim());
+      const cacheHasValidEmail = !!(cacheObj && typeof cacheObj.email === "string" && cacheObj.email.trim());
+      if (cacheObj && cacheHasValidName && cacheHasValidEmail) {
+        setProfileData({
+          name: cacheObj.name!,
+          location: cacheObj.location ?? (user.location || ""),
+          email: cacheObj.email!,
+          socialMedia: cacheObj.socialMedia ?? (user.socialMedia || ""),
+          website: cacheObj.website ?? (user.website || ""),
+          bio: cacheObj.bio ?? (user.bio || ""),
+        });
+      } else {
+        setProfileData({
+          name: user?.username || user?.name || "",
+          location: user?.location || "",
+          email: user?.email || "",
+          socialMedia: user?.socialMedia || "",
+          website: user?.website || "",
+          bio: user?.bio || "",
+        });
+      }
     }
   }, [user]);
 
@@ -98,13 +122,21 @@ export default function PersonalInformation() {
         .then((res) => (res.ok ? res.json() : null))
         .then((profile) => {
           if (profile && profile.user) {
-            setProfileData((prev) => ({
-              ...prev,
-              location: profile.user.location || "",
-              socialMedia: profile.user.socialMedia || "",
-              website: profile.user.website || "",
-              bio: profile.user.bio || "",
-            }));
+            setProfileData((prev) => {
+              const updated = {
+                ...prev,
+                // Update name and email if present in API response
+                name: profile.user.username || profile.user.name || prev.name,
+                email: profile.user.email || prev.email,
+                location: profile.user.location || "",
+                socialMedia: profile.user.socialMedia || "",
+                website: profile.user.website || "",
+                bio: profile.user.bio || "",
+              };
+              // Update sessionStorage cache
+              sessionStorage.setItem("profileDataCache", JSON.stringify(updated));
+              return updated;
+            });
           }
         })
         .catch(() => {
@@ -140,6 +172,10 @@ export default function PersonalInformation() {
 
     setCompletion(completionPercentage);
     setMissingFields(missing);
+    // Update sessionStorage cache on profileData change
+  }, [profileData]);
+  useEffect(() => {
+    sessionStorage.setItem("profileDataCache", JSON.stringify(profileData));
   }, [profileData]);
 
   const handleProfileInputChange = (
@@ -268,6 +304,9 @@ export default function PersonalInformation() {
             if (profile && profile.user) {
               setProfileData((prev) => ({
                 ...prev,
+                // Update name and email if present in API response
+                name: profile.user.username || profile.user.name || prev.name,
+                email: profile.user.email || prev.email,
                 location: profile.user.location || "",
                 socialMedia: profile.user.socialMedia || "",
                 website: profile.user.website || "",

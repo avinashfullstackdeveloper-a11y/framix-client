@@ -45,8 +45,21 @@ const FeedbackHistoryPage: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    apiRequest<FeedbackSummary[]>("/api/feedback")
-      .then(setFeedbackList)
+    apiRequest<any>("/api/feedback")
+      .then((res) => {
+        // Defensive extraction: try common paginated keys, fallback to array
+        let list = [];
+        if (Array.isArray(res?.feedbacks)) {
+          list = res.feedbacks;
+        } else if (Array.isArray(res)) {
+          list = res;
+        } else if (Array.isArray(res?.results)) {
+          list = res.results;
+        } else if (Array.isArray(res?.data)) {
+          list = res.data;
+        }
+        setFeedbackList(list ?? []);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -73,7 +86,8 @@ const FeedbackHistoryPage: React.FC = () => {
           <span className="text-[#FF479C]">Feedback</span> History
         </h1>
         <p className="text-base sm:text-lg lg:text-xl text-[#767676] max-w-3xl mx-auto px-4">
-          Review and manage all user feedback with detailed insights and ratings.
+          Review and manage all user feedback with detailed insights and
+          ratings.
         </p>
       </div>
 
@@ -96,7 +110,9 @@ const FeedbackHistoryPage: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center text-lg text-white py-12">Loading feedback...</div>
+        <div className="text-center text-lg text-white py-12">
+          Loading feedback...
+        </div>
       ) : error ? (
         <div className="text-center text-red-500 py-12">Error: {error}</div>
       ) : feedbackList.length === 0 ? (
@@ -109,7 +125,7 @@ const FeedbackHistoryPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {feedbackList.map((fb) => (
+          {(Array.isArray(feedbackList) ? feedbackList : []).map((fb) => (
             <Card
               key={fb._id}
               className="cursor-pointer hover:shadow-lg transition-all duration-300 bg-[rgba(0,0,0,0.80)] border border-[#3A3A3A] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] text-white"
@@ -122,15 +138,23 @@ const FeedbackHistoryPage: React.FC = () => {
                     {fb.username}
                   </CardTitle>
                 </div>
+                <div className="flex items-center gap-1 mb-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={
+                        i < fb.rating ? "text-[#FF479C]" : "text-[#3A3A3A]"
+                      }
+                    >
+                      {i < fb.rating ? "★" : "☆"}
+                    </span>
+                  ))}
+                  <span className="text-xs ml-2 text-[#FF479C]">
+                    ({fb.rating}/5)
+                  </span>
+                </div>
                 <CardDescription className="text-[#767676]">
-                  <div className="flex items-center gap-1 mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} className={i < fb.rating ? "text-[#FF479C]" : "text-[#3A3A3A]"}>
-                        {i < fb.rating ? "★" : "☆"}
-                      </span>
-                    ))}
-                    <span className="text-xs ml-2 text-[#FF479C]">({fb.rating}/5)</span>
-                  </div>
+                  Rating out of 5
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -144,7 +168,10 @@ const FeedbackHistoryPage: React.FC = () => {
         </div>
       )}
 
-      <Dialog open={!!selectedId} onOpenChange={(open) => !open && setSelectedId(null)}>
+      <Dialog
+        open={!!selectedId}
+        onOpenChange={(open) => !open && setSelectedId(null)}
+      >
         <DialogContent className="bg-[rgba(0,0,0,0.95)] border border-[#3A3A3A] text-white">
           <DialogModalHeader>
             <DialogModalTitle className="text-xl font-bold text-white">
@@ -154,7 +181,9 @@ const FeedbackHistoryPage: React.FC = () => {
           {detailLoading ? (
             <div className="text-center py-8">Loading details...</div>
           ) : detailError ? (
-            <div className="text-red-500 text-center py-8">Error: {detailError}</div>
+            <div className="text-red-500 text-center py-8">
+              Error: {detailError}
+            </div>
           ) : detail ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-4 border-b border-[#3A3A3A]">
@@ -164,29 +193,38 @@ const FeedbackHistoryPage: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className={i < detail.rating ? "text-[#FF479C]" : "text-[#3A3A3A]"}>
+                    <span
+                      key={i}
+                      className={
+                        i < detail.rating ? "text-[#FF479C]" : "text-[#3A3A3A]"
+                      }
+                    >
                       {i < detail.rating ? "★" : "☆"}
                     </span>
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 text-sm text-[#767676]">
                 <Calendar className="w-4 h-4" />
                 <span>{new Date(detail.createdAt).toLocaleString()}</span>
               </div>
-              
+
               <div className="bg-[#1A1A1A] border border-[#3A3A3A] rounded-lg p-4">
                 <div className="text-sm text-[#767676] mb-2">Comment:</div>
-                <div className="text-white whitespace-pre-line">{detail.comment || "No comment provided."}</div>
+                <div className="text-white whitespace-pre-line">
+                  {detail.comment || "No comment provided."}
+                </div>
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-[#767676]">No details found.</div>
+            <div className="text-center py-8 text-[#767676]">
+              No details found.
+            </div>
           )}
           <div className="flex justify-end pt-4 border-t border-[#3A3A3A]">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setSelectedId(null)}
               className="border-[#3A3A3A] text-white hover:bg-[#3A3A3A] hover:text-white"
             >

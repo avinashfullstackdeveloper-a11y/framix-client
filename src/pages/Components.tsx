@@ -90,14 +90,36 @@ const Components = () => {
     }
   }, [user, authLoading, toast, toastShown]);
 
+  // Try to load components from localStorage first
   const fetchComponents = () => {
     setLoading(true);
+    const cached = localStorage.getItem("componentListCache");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setComponents(parsed);
+        setLoading(false);
+        // Also fetch in background to refresh cache
+        fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            setComponents(data);
+            localStorage.setItem("componentListCache", JSON.stringify(data));
+          });
+        return;
+      } catch {
+        // Ignore parse errors, fallback to fetch
+      }
+    }
     fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
+        localStorage.setItem("componentListCache", JSON.stringify(data));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -176,7 +198,7 @@ const Components = () => {
   }, [components, activeFilter]);
 
   // OPTIMIZATION: Pagination logic - 19 components per page (excluding ads)
-  const itemsPerPage = 19;
+  const itemsPerPage = 8;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
