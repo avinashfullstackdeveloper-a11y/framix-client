@@ -111,28 +111,13 @@ const Footer = () => {
                 </h3>
                 <ul className="space-y-4">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/components"
                       className="text-base text-gray-400 hover:text-white"
+                      onClick={() => window.scrollTo(0, 0)}
                     >
                       Components
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-base text-gray-400 hover:text-white"
-                    >
-                      Templates
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="text-base text-gray-400 hover:text-white"
-                    >
-                      UI Kits
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -143,12 +128,13 @@ const Footer = () => {
                 </h3>
                 <ul className="space-y-4">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/community"
                       className="text-base text-gray-400 hover:text-white"
+                      onClick={() => window.scrollTo(0, 0)}
                     >
                       Community
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
