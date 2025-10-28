@@ -647,8 +647,8 @@ const CommunityList = () => {
       <div className="text-center mb-16">
         <h1 className="text-5xl font-bold mb-6">
           Discover
-          <span className="neon-hero neon-hero-text">
-            <span className="text-[#FF479C] neon-hero-glow"> Incredible</span>
+          <span>
+            <span className="text-[#FF479C]"> Incredible</span>
           </span>
           <br />
           <span>Components</span> from Creators
