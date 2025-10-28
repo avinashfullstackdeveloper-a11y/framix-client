@@ -12,6 +12,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* User name hover effect for Community cards */
+.username-hover-effect {
+  transition: color 0.15s, font-weight 0.15s, transform 0.15s;
+}
+.group:hover .username-hover-effect {
+  text-decoration: none !important;
+  color: #FF479C;
+  font-weight: 600;
+  transform: scale(1.04);
+}
+/* Badge hover effect for Community cards */
+.badge-hover-effect {
+  transition: transform 0.18s cubic-bezier(0.4,0,0.2,1), box-shadow 0.18s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+}
+.group:hover .badge-hover-effect,
+.badge-hover-effect:hover {
+  transform: scale(1.09);
+  box-shadow: 0 2px 12px 0 rgba(255,71,156,0.10);
+  z-index: 1;
+}
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.

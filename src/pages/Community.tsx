@@ -184,7 +184,7 @@ const CommunityList = () => {
           className="font-medium"
           style={{
             backgroundColor: bgColor,
-            color: textColor
+            color: textColor,
           }}
         >
           {initials}
@@ -697,137 +697,148 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {loading ? (
-            // Skeleton loader for Featured Components (4 cards)
-            Array.from({ length: 4 }).map((_, index) => (
-              <Card key={`featured-skeleton-${index}`} className="bg-gradient-card border-border">
-                <CardContent className="p-0">
-                  <div className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
-                    <Skeleton className="h-full w-full" />
-                    <div className="absolute top-3 right-3 z-10">
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <Skeleton className="h-4 w-20 mb-1" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-4 w-8" />
-                        <Skeleton className="h-4 w-8" />
-                        <Skeleton className="h-4 w-8" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            featuredComponentsList.map((component, index) => {
-            return (
-              <Link
-                to={`/components/${component.type || "component"}/${
-                  component._id || index
-                }`}
-                key={component._id || index}
-              >
-                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+          {loading
+            ? // Skeleton loader for Featured Components (4 cards)
+              Array.from({ length: 4 }).map((_, index) => (
+                <Card
+                  key={`featured-skeleton-${index}`}
+                  className="bg-gradient-card border-border"
+                >
                   <CardContent className="p-0">
                     <div
                       className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
-                      <LivePreview component={component} />
+                      <Skeleton className="h-full w-full" />
                       <div className="absolute top-3 right-3 z-10">
-                        <Badge
-                          variant="secondary"
-                          className="bg-black/50 text-white backdrop-blur-sm"
-                        >
-                          {(component.type || component.category)
-                            ?.replace(/component/gi, "")
-                            .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </Badge>
+                        <Skeleton className="h-6 w-16 rounded-full" />
                       </div>
                     </div>
                     <div className="p-4">
                       <div className="flex items-center justify-between gap-2">
-                        <div
-                          className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const userId =
-                              component.createdBy?._id ||
-                              component.author?._id ||
-                              "";
-                            if (userId) {
-                              window.location.href = `/community/${userId}`;
-                            }
-                          }}
-                          title="View user profile"
-                        >
-                          <Avatar
-                            initials={
-                              component.createdBy?.name
-                                ?.charAt(0)
-                                .toUpperCase() ||
-                              component.author?.initials ||
-                              "U"
-                            }
-                            src={
-                              component.createdBy?.avatar ||
-                              component.author?.avatar
-                            }
-                            size="sm"
-                            className="flex-shrink-0"
-                            identifier={
-                              component.createdBy?.email ||
-                              component.createdBy?.username ||
-                              component.createdBy?.name ||
-                              component.author?.name
-                            }
-                          />
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
                           <div className="min-w-0 flex-1">
-                            <div className="text-sm font-medium group-hover:underline truncate">
-                              {component.createdBy?.name ||
-                                component.author?.name ||
-                                "Anonymous"}
-                            </div>
-                            <div className="text-xs text-muted-foreground truncate">
-                              {component.createdBy?.username ||
-                                component.author?.username ||
-                                ""}
-                            </div>
+                            <Skeleton className="h-4 w-20 mb-1" />
+                            <Skeleton className="h-3 w-16" />
                           </div>
                         </div>
-                        <InteractionButtons
-                          likes={
-                            component.likeCount ||
-                            component.likedBy?.length ||
-                            0
-                          }
-                          comments={
-                            component.commentCount ||
-                            (Array.isArray(component.comments)
-                              ? component.comments.length
-                              : 0)
-                          }
-                          views={component.views || 0}
-                        />
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-4 w-8" />
+                          <Skeleton className="h-4 w-8" />
+                          <Skeleton className="h-4 w-8" />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
-            );
-            })
-          )}
+              ))
+            : featuredComponentsList.map((component, index) => {
+                return (
+                  <Link
+                    to={`/components/${component.type || "component"}/${
+                      component._id || index
+                    }`}
+                    key={component._id || index}
+                  >
+                    <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                      <CardContent className="p-0">
+                        <div
+                          className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                          style={{ backgroundColor: "#F4F5F6" }}
+                        >
+                          <LivePreview component={component} />
+                          <div className="absolute top-3 right-3 z-10">
+                            <Badge
+                              variant="secondary"
+                              className="bg-black/50 text-white backdrop-blur-sm badge-hover-effect"
+                            >
+                              {(component.type || component.category)
+                                ?.replace(/component/gi, "")
+                                .trim()
+                                .replace(/^\w/, (c) => c.toUpperCase())}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <div
+                              className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const userId =
+                                  component.createdBy?._id ||
+                                  component.author?._id ||
+                                  "";
+                                if (userId) {
+                                  window.location.href = `/community/${userId}`;
+                                }
+                              }}
+                              title="View user profile"
+                            >
+                              <Avatar
+                                initials={
+                                  component.createdBy?.name
+                                    ?.charAt(0)
+                                    .toUpperCase() ||
+                                  component.author?.initials ||
+                                  "U"
+                                }
+                                src={
+                                  component.createdBy?.avatar ||
+                                  component.author?.avatar
+                                }
+                                size="sm"
+                                className="flex-shrink-0"
+                                identifier={
+                                  component.createdBy?.email ||
+                                  component.createdBy?.username ||
+                                  component.createdBy?.name ||
+                                  component.author?.name
+                                }
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-medium truncate username-hover-effect">
+                                  {(() => {
+                                    const name =
+                                      component.createdBy?.name ||
+                                      component.author?.name;
+                                    if (!name) return "Anonymous";
+                                    return (
+                                      name.charAt(0).toUpperCase() +
+                                      name.slice(1)
+                                    );
+                                  })()}
+                                </div>
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {component.createdBy?.username ||
+                                    component.author?.username ||
+                                    ""}
+                                </div>
+                              </div>
+                            </div>
+                            <InteractionButtons
+                              likes={
+                                component.likeCount ||
+                                component.likedBy?.length ||
+                                0
+                              }
+                              comments={
+                                component.commentCount ||
+                                (Array.isArray(component.comments)
+                                  ? component.comments.length
+                                  : 0)
+                              }
+                              views={component.views || 0}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
         </div>
       </div>
 
@@ -1001,137 +1012,148 @@ const CommunityList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? (
-            // Skeleton loader for All Components (6 cards)
-            Array.from({ length: 6 }).map((_, index) => (
-              <Card key={`all-skeleton-${index}`} className="bg-gradient-card border-border">
-                <CardContent className="p-0">
-                  <div className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
-                    <Skeleton className="h-full w-full" />
-                    <div className="absolute top-3 right-3 z-10">
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <Skeleton className="h-4 w-20 mb-1" />
-                          <Skeleton className="h-3 w-16" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="h-4 w-8" />
-                        <Skeleton className="h-4 w-8" />
-                        <Skeleton className="h-4 w-8" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            paginatedComponents.map((component, index) => {
-            return (
-              <Link
-                to={`/components/${component.type || "component"}/${
-                  component._id || index
-                }`}
-                key={component._id || index}
-              >
-                <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+          {loading
+            ? // Skeleton loader for All Components (6 cards)
+              Array.from({ length: 6 }).map((_, index) => (
+                <Card
+                  key={`all-skeleton-${index}`}
+                  className="bg-gradient-card border-border"
+                >
                   <CardContent className="p-0">
                     <div
                       className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
-                      <LivePreview component={component} />
+                      <Skeleton className="h-full w-full" />
                       <div className="absolute top-3 right-3 z-10">
-                        <Badge
-                          variant="secondary"
-                          className="bg-black/50 text-white backdrop-blur-sm"
-                        >
-                          {(component.type || component.category)
-                            ?.replace(/component/gi, "")
-                            .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </Badge>
+                        <Skeleton className="h-6 w-16 rounded-full" />
                       </div>
                     </div>
                     <div className="p-4">
                       <div className="flex items-center justify-between gap-2">
-                        <div
-                          className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const userId =
-                              component.createdBy?._id ||
-                              component.author?._id ||
-                              "";
-                            if (userId) {
-                              window.location.href = `/community/${userId}`;
-                            }
-                          }}
-                          title="View user profile"
-                        >
-                          <Avatar
-                            initials={
-                              component.createdBy?.name
-                                ?.charAt(0)
-                                .toUpperCase() ||
-                              component.author?.initials ||
-                              "U"
-                            }
-                            src={
-                              component.createdBy?.avatar ||
-                              component.author?.avatar
-                            }
-                            size="sm"
-                            className="flex-shrink-0"
-                            identifier={
-                              component.createdBy?.email ||
-                              component.createdBy?.username ||
-                              component.createdBy?.name ||
-                              component.author?.name
-                            }
-                          />
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
                           <div className="min-w-0 flex-1">
-                            <div className="text-sm font-medium group-hover:underline truncate">
-                              {component.createdBy?.name ||
-                                component.author?.name ||
-                                "Anonymous"}
-                            </div>
-                            <div className="text-xs text-muted-foreground truncate">
-                              {component.createdBy?.username ||
-                                component.author?.username ||
-                                ""}
-                            </div>
+                            <Skeleton className="h-4 w-20 mb-1" />
+                            <Skeleton className="h-3 w-16" />
                           </div>
                         </div>
-                        <InteractionButtons
-                          likes={
-                            component.likeCount ||
-                            component.likedBy?.length ||
-                            0
-                          }
-                          comments={
-                            component.commentCount ||
-                            (Array.isArray(component.comments)
-                              ? component.comments.length
-                              : 0)
-                          }
-                          views={component.views || 0}
-                        />
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-4 w-8" />
+                          <Skeleton className="h-4 w-8" />
+                          <Skeleton className="h-4 w-8" />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
-            );
-            })
-          )}
+              ))
+            : paginatedComponents.map((component, index) => {
+                return (
+                  <Link
+                    to={`/components/${component.type || "component"}/${
+                      component._id || index
+                    }`}
+                    key={component._id || index}
+                  >
+                    <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
+                      <CardContent className="p-0">
+                        <div
+                          className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                          style={{ backgroundColor: "#F4F5F6" }}
+                        >
+                          <LivePreview component={component} />
+                          <div className="absolute top-3 right-3 z-10">
+                            <Badge
+                              variant="secondary"
+                              className="bg-black/50 text-white backdrop-blur-sm badge-hover-effect"
+                            >
+                              {(component.type || component.category)
+                                ?.replace(/component/gi, "")
+                                .trim()
+                                .replace(/^\w/, (c) => c.toUpperCase())}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <div
+                              className="flex items-center gap-2 cursor-pointer group min-w-0 flex-1"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const userId =
+                                  component.createdBy?._id ||
+                                  component.author?._id ||
+                                  "";
+                                if (userId) {
+                                  window.location.href = `/community/${userId}`;
+                                }
+                              }}
+                              title="View user profile"
+                            >
+                              <Avatar
+                                initials={
+                                  component.createdBy?.name
+                                    ?.charAt(0)
+                                    .toUpperCase() ||
+                                  component.author?.initials ||
+                                  "U"
+                                }
+                                src={
+                                  component.createdBy?.avatar ||
+                                  component.author?.avatar
+                                }
+                                size="sm"
+                                className="flex-shrink-0"
+                                identifier={
+                                  component.createdBy?.email ||
+                                  component.createdBy?.username ||
+                                  component.createdBy?.name ||
+                                  component.author?.name
+                                }
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-medium truncate username-hover-effect">
+                                  {(() => {
+                                    const name =
+                                      component.createdBy?.name ||
+                                      component.author?.name;
+                                    if (!name) return "Anonymous";
+                                    return (
+                                      name.charAt(0).toUpperCase() +
+                                      name.slice(1)
+                                    );
+                                  })()}
+                                </div>
+                                <div className="text-xs text-muted-foreground truncate">
+                                  {component.createdBy?.username ||
+                                    component.author?.username ||
+                                    ""}
+                                </div>
+                              </div>
+                            </div>
+                            <InteractionButtons
+                              likes={
+                                component.likeCount ||
+                                component.likedBy?.length ||
+                                0
+                              }
+                              comments={
+                                component.commentCount ||
+                                (Array.isArray(component.comments)
+                                  ? component.comments.length
+                                  : 0)
+                              }
+                              views={component.views || 0}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
         </div>
 
         {/* Pagination Controls */}
@@ -1171,7 +1193,7 @@ const CommunityList = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="text-center py-16 bg-gradient-card rounded-2xl border border-border">
+      <div className="text-center py-16 bg-black rounded-2xl border border-border">
         <h2 className="text-3xl font-bold mb-4">Share your creations</h2>
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
           Join thousands of creators sharing their best work with the community
