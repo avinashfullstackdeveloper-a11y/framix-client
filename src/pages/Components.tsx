@@ -107,11 +107,28 @@ const Components = () => {
           .then((res) => res.json())
           .then((data) => {
             setComponents(data);
-            localStorage.setItem("componentListCache", JSON.stringify(data));
-          });
+            // Cache only lightweight metadata (no code fields) to avoid quota issues
+            try {
+              const lightweightData = data.map((item: ComponentItem) => ({
+                _id: item._id,
+                title: item.title,
+                type: item.type,
+                language: item.language,
+                badge: item.badge,
+                views: item.views,
+              }));
+              localStorage.setItem("componentListCache", JSON.stringify(lightweightData));
+            } catch (storageError) {
+              // If still too large, clear the cache
+              console.warn('Cache size still too large, clearing cache');
+              localStorage.removeItem("componentListCache");
+            }
+          })
+          .catch((err) => console.error('Background refresh failed:', err));
         return;
       } catch {
         // Ignore parse errors, fallback to fetch
+        localStorage.removeItem("componentListCache");
       }
     }
     fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
@@ -120,7 +137,21 @@ const Components = () => {
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
-        localStorage.setItem("componentListCache", JSON.stringify(data));
+        // Cache only lightweight metadata (no code fields) to avoid quota issues
+        try {
+          const lightweightData = data.map((item: ComponentItem) => ({
+            _id: item._id,
+            title: item.title,
+            type: item.type,
+            language: item.language,
+            badge: item.badge,
+            views: item.views,
+          }));
+          localStorage.setItem("componentListCache", JSON.stringify(lightweightData));
+        } catch (storageError) {
+          // If still too large, skip caching
+          console.warn('Unable to cache components: storage quota exceeded');
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -633,7 +664,10 @@ const Components = () => {
           <>
             {Array.from({ length: 9 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="w-full">
-                <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]" style={{ backgroundColor: "#F4F5F6" }}>
+                <div
+                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]"
+                  style={{ backgroundColor: "#F4F5F6" }}
+                >
                   <div className="flex h-full w-full items-center justify-center">
                     <Skeleton className="h-full w-full rounded-xl" />
                   </div>
