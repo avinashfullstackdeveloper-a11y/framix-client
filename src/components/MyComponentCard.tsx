@@ -149,15 +149,6 @@ const MyComponentCard: React.FC<{ submission: MyComponentSubmission }> = ({
       {/* Card UI */}
       <ComponentShowcaseCard componentItem={componentItem} />
       {/* Overlay badges at bottom left (if not handled by ComponentShowcaseCard) */}
-      <div className="absolute h-10 sm:h-11 z-30 left-4 bottom-2 flex gap-2">
-        <Badge variant="outline" className="text-black border-black">
-          {submission.componentType
-            ?.replace(/component/gi, "")
-            .trim()
-            .replace(/^\w/, (c) => c.toUpperCase())}
-        </Badge>
-        <Badge variant="outline" className="text-black border-black">{submission.technology}</Badge>
-      </div>
     </div>
   );
 };
