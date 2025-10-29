@@ -220,8 +220,36 @@ const Components = () => {
       "Radio buttons": ["radio", "radio buttons", "radiobuttons"],
       Tooltips: ["tooltip", "tooltips"],
     };
+    if (activeFilter === "All") {
+      // Shuffle and mix components so each card is a different type if possible
+      // Group by type
+      const typeGroups: Record<string, ComponentItem[]> = {};
+      components.forEach((item) => {
+        const type = item.type?.toLowerCase() || "other";
+        if (!typeGroups[type]) typeGroups[type] = [];
+        typeGroups[type].push(item);
+      });
+      // Get all unique types
+      const allTypes = Object.keys(typeGroups);
+      // Shuffle each group
+      allTypes.forEach((type) => {
+        typeGroups[type].sort(() => Math.random() - 0.5);
+      });
+      // Interleave components from each type
+      const mixed: ComponentItem[] = [];
+      let added = true;
+      while (added) {
+        added = false;
+        for (const type of allTypes) {
+          if (typeGroups[type].length) {
+            mixed.push(typeGroups[type].pop()!);
+            added = true;
+          }
+        }
+      }
+      return mixed;
+    }
     return components.filter((item: ComponentItem) => {
-      if (activeFilter === "All") return true;
       const type = item.type?.toLowerCase() || "";
       const filterTypes = filterTypeMap[activeFilter];
       if (filterTypes) {
