@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
+import { Link, Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -14,13 +14,35 @@ import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CommunityList = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Always derive from URL
+  const getPageFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const page = parseInt(params.get("page") || "1", 10);
+    return page > 0 ? page : 1;
+  };
+  const getCategoryFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const cat = params.get("category");
+    return cat ? cat : "All";
+  };
+  const getSearchFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get("search") || "";
+  };
+
+  const currentPage = getPageFromUrl();
   const [showTypeFilter, setShowTypeFilter] = useState(false);
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [popupOpen, setPopupOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  // Always derive from URL for filters/search
+  const selectedCategory = getCategoryFromUrl();
+  const searchQuery = getSearchFromUrl();
+
   // OPTIMIZATION: Lazy load fallback data only when needed (API fails)
   const [fallbackData, setFallbackData] = useState<{
     featured: any[];
@@ -156,13 +178,19 @@ const CommunityList = () => {
     });
   }, [components, fallbackData, selectedCategory, searchQuery]);
 
-  // Reset to page 1 when filters or search query changes
+  // No effect needed for resetting page, since all state is from URL
+
+  // Sync currentPage with URL query param on mount and when location changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
+    const page = getPageFromUrl();
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
+    // eslint-disable-next-line
+  }, [location.search]);
 
   // Pagination calculations
-  const itemsPerPage = 21;
+  const itemsPerPage = 6;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -985,7 +1013,10 @@ const CommunityList = () => {
                       : "bg-secondary text-primary border-border hover:bg-primary/10"
                   }`}
                   onClick={() => {
-                    setSelectedCategory("All");
+                    const params = new URLSearchParams(location.search);
+                    params.set("category", "All");
+                    params.set("page", "1");
+                    navigate({ search: params.toString() });
                     setShowTypeFilter(false);
                   }}
                 >
@@ -1042,7 +1073,12 @@ const CommunityList = () => {
               type="search"
               placeholder="Search components..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const params = new URLSearchParams(location.search);
+                params.set("search", e.target.value);
+                params.set("page", "1");
+                navigate({ search: params.toString() });
+              }}
               className="w-full bg-secondary border border-border rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
@@ -1098,7 +1134,7 @@ const CommunityList = () => {
                   <Link
                     to={`/components/${component.type || "component"}/${
                       component._id || index
-                    }`}
+                    }?page=${currentPage}`}
                     key={component._id || index}
                   >
                     <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
@@ -1206,7 +1242,12 @@ const CommunityList = () => {
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => {
+                const newPage = Math.max(currentPage - 1, 1);
+                const params = new URLSearchParams(location.search);
+                params.set("page", newPage.toString());
+                navigate({ search: params.toString() });
+              }}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === 1
@@ -1222,9 +1263,12 @@ const CommunityList = () => {
             </span>
 
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => {
+                const newPage = Math.min(currentPage + 1, totalPages);
+                const params = new URLSearchParams(location.search);
+                params.set("page", newPage.toString());
+                navigate({ search: params.toString() });
+              }}
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === totalPages

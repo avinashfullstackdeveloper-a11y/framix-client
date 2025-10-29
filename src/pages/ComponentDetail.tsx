@@ -556,7 +556,15 @@ const ComponentDetail: React.FC = () => {
         <div className="flex items-center justify-between mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              const params = new URLSearchParams(window.location.search);
+              const page = params.get("page");
+              if (page) {
+                navigate(`/community?page=${page}`);
+              } else {
+                navigate(-1);
+              }
+            }}
             className="flex items-center gap-2"
           >
             <svg
