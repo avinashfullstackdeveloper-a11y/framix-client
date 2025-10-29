@@ -224,7 +224,7 @@ const Components = () => {
       // Shuffle and mix components so each card is a different type if possible
       // Group by type
       const typeGroups: Record<string, ComponentItem[]> = {};
-      components.forEach((item) => {
+      (Array.isArray(components) ? components : []).forEach((item) => {
         const type = item.type?.toLowerCase() || "other";
         if (!typeGroups[type]) typeGroups[type] = [];
         typeGroups[type].push(item);
