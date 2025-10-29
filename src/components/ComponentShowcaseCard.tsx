@@ -49,7 +49,52 @@ const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
     const previewContent = useMemo(() => {
       if (!isVisible) return null;
 
-      // Tailwind preview
+      // Always prefer htmlCode + cssCode if present
+      if (componentItem.htmlCode && componentItem.cssCode) {
+        const srcDoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body, html {
+                  width: 100%;
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: transparent;
+                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+                  overflow: hidden;
+                }
+                ${componentItem.cssCode}
+              </style>
+            </head>
+            <body>
+              ${componentItem.htmlCode}
+            </body>
+          </html>
+        `;
+        return (
+          <iframe
+            title="Preview"
+            srcDoc={srcDoc}
+            className="w-full h-full rounded-lg border-0"
+            style={{
+              margin: 0,
+              padding: 0,
+              background: "transparent",
+              width: "100%",
+              height: "100%",
+            }}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        );
+      }
+
+      // Tailwind preview (with fallback to code/tailwind)
       if (
         componentItem.language &&
         (componentItem.language.toLowerCase() === "tailwind" ||
@@ -76,6 +121,7 @@ const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
                   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
                   overflow: hidden;
                 }
+                ${componentItem.cssCode || ""}
               </style>
             </head>
             <body>
@@ -147,6 +193,7 @@ const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
                   background: transparent;
                   overflow: hidden;
                 }
+                ${componentItem.cssCode || ""}
               </style>
             </head>
             <body>
@@ -231,55 +278,6 @@ const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
         );
       }
 
-      // CSS + HTML combined preview
-      if (
-        componentItem.language &&
-        componentItem.language.toLowerCase() === "css" &&
-        componentItem.htmlCode &&
-        componentItem.cssCode
-      ) {
-        const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-                ${componentItem.cssCode}
-              </style>
-            </head>
-            <body>
-              ${componentItem.htmlCode}
-            </body>
-          </html>
-        `;
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }
-
       // Fallback: HTML/CSS/JS preview
       const srcDoc = `<!DOCTYPE html>
         <html>
@@ -355,7 +353,9 @@ const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
           className="w-full h-full flex items-center justify-center"
           style={{ minHeight: "200px" }}
         >
-          <div className="text-muted-foreground text-sm">Loading preview...</div>
+          <div className="text-muted-foreground text-sm">
+            Loading preview...
+          </div>
         </div>
       );
     }
@@ -382,22 +382,20 @@ const ComponentShowcaseCard: React.FC<ComponentShowcaseCardProps> = ({
           className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
           style={{ backgroundColor: "#F4F5F6" }}
         >
-          {componentItem.language && (
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-                transform: "scale(0.6)",
-                transformOrigin: "center",
-              }}
-            >
-              <OptimizedPreview componentItem={componentItem} />
-            </div>
-          )}
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              transform: "scale(0.6)",
+              transformOrigin: "center",
+            }}
+          >
+            <OptimizedPreview componentItem={componentItem} />
+          </div>
         </div>
         <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
           <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
