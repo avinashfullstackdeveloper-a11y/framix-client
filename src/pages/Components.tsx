@@ -207,33 +207,35 @@ const Components = () => {
 
   // OPTIMIZATION: Memoize filtered components to prevent recalculation on every render
   const filteredComponents = useMemo(() => {
+    // Map filter tab to type values in DB
+    const filterTypeMap: Record<string, string[]> = {
+      Button: ["button", "buttons"],
+      "Toggle switch": ["toggle", "toggle switch", "toggleswitch"],
+      Checkbox: ["checkbox", "checkboxes"],
+      Card: ["card", "cards"],
+      Loader: ["loader", "loaders"],
+      Input: ["input", "inputs"],
+      Form: ["form", "forms"],
+      Pattern: ["pattern", "patterns"],
+      "Radio buttons": ["radio", "radio buttons", "radiobuttons"],
+      Tooltips: ["tooltip", "tooltips"],
+    };
     return components.filter((item: ComponentItem) => {
       if (activeFilter === "All") return true;
-      // Map filter tab to type/title
-      switch (activeFilter) {
-        case "Button":
-          return item.title?.toLowerCase().includes("button");
-        case "Toggle switch":
-          return item.title?.toLowerCase().includes("toggle");
-        case "Checkbox":
-          return item.title?.toLowerCase().includes("checkbox");
-        case "Card":
-          return item.title?.toLowerCase().includes("card");
-        case "Loader":
-          return item.title?.toLowerCase().includes("loader");
-        case "Input":
-          return item.title?.toLowerCase().includes("input");
-        case "Form":
-          return item.title?.toLowerCase().includes("form");
-        case "Pattern":
-          return item.title?.toLowerCase().includes("pattern");
-        case "Radio buttons":
-          return item.title?.toLowerCase().includes("radio");
-        case "Tooltips":
-          return item.title?.toLowerCase().includes("tooltip");
-        default:
+      const type = item.type?.toLowerCase() || "";
+      const filterTypes = filterTypeMap[activeFilter];
+      if (filterTypes) {
+        // Match type field
+        if (filterTypes.some((ft) => type.includes(ft))) return true;
+        // Fallback: also check title for legacy/edge cases
+        if (
+          item.title &&
+          filterTypes.some((ft) => item.title.toLowerCase().includes(ft))
+        )
           return true;
+        return false;
       }
+      return true;
     });
   }, [components, activeFilter]);
 
