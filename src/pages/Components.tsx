@@ -39,8 +39,20 @@ const Components = () => {
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState(filterTabs[0]);
-  const [currentPage, setCurrentPage] = useState(1);
+  // Always derive activeFilter from URL if present
+  const getFilterFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const filter = params.get("filter");
+    return filter && filterTabs.includes(filter) ? filter : filterTabs[0];
+  };
+  const [activeFilter, setActiveFilter] = useState(getFilterFromUrl());
+  // Always derive currentPage from URL
+  const getPageFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const page = parseInt(params.get("page") || "1", 10);
+    return page > 0 ? page : 1;
+  };
+  const [currentPage, setCurrentPage] = useState(getPageFromUrl());
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -101,17 +113,19 @@ const Components = () => {
         setComponents(parsed);
         setLoading(false);
         // Background refresh for latest metadata
-        fetch(`${import.meta.env.VITE_API_URL}/api/components?fields=_id,title,type,language,badge,views`, {
-          credentials: "include",
-        })
+        fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/components?publishSection=component&fields=_id,title,type,language,badge,views`,
+          {
+            credentials: "include",
+          }
+        )
           .then((res) => res.json())
           .then((data) => {
             setComponents(data);
             try {
-              localStorage.setItem(
-                "componentListCache",
-                JSON.stringify(data)
-              );
+              localStorage.setItem("componentListCache", JSON.stringify(data));
             } catch (storageError) {
               localStorage.removeItem("componentListCache");
             }
@@ -122,17 +136,19 @@ const Components = () => {
         localStorage.removeItem("componentListCache");
       }
     }
-    fetch(`${import.meta.env.VITE_API_URL}/api/components?fields=_id,title,type,language,badge,views`, {
-      credentials: "include",
-    })
+    fetch(
+      `${
+        import.meta.env.VITE_API_URL
+      }/api/components?publishSection=component&fields=_id,title,type,language,badge,views`,
+      {
+        credentials: "include",
+      }
+    )
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
         try {
-          localStorage.setItem(
-            "componentListCache",
-            JSON.stringify(data)
-          );
+          localStorage.setItem("componentListCache", JSON.stringify(data));
         } catch (storageError) {
           localStorage.removeItem("componentListCache");
         }
@@ -166,10 +182,18 @@ const Components = () => {
     fetchComponents();
   }, []);
 
-  // OPTIMIZATION: Reset to page 1 when filter changes
+  // Sync currentPage and activeFilter with URL query param on mount and when URL changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [activeFilter]);
+    const page = getPageFromUrl();
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
+    const filter = getFilterFromUrl();
+    if (filter !== activeFilter) {
+      setActiveFilter(filter);
+    }
+    // eslint-disable-next-line
+  }, [window.location.search]);
 
   // OPTIMIZATION: Scroll to top of components grid when page changes
   useEffect(() => {
@@ -284,7 +308,13 @@ const Components = () => {
             <button
               key={filter}
               type="button"
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => {
+                setActiveFilter(filter);
+                const params = new URLSearchParams(window.location.search);
+                params.set("page", "1");
+                params.set("filter", filter);
+                navigate({ search: params.toString() });
+              }}
               className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
                 activeFilter === filter
                   ? "bg-[#FF479C] border-[#FF479C] text-[#282828]"
@@ -356,14 +386,19 @@ const Components = () => {
               <ComponentShowcaseCard
                 key={componentItem._id}
                 componentItem={componentItem}
-                onClick={() =>
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  params.set("page", String(currentPage));
+                  params.set("filter", activeFilter);
                   navigate(
                     `/components/${componentItem.type
                       ?.replace(/component/gi, "")
                       .trim()
-                      .replace(/^\w/, (c) => c.toUpperCase())}/${componentItem._id}`
-                  )
-                }
+                      .replace(/^[\w]/, (c) => c.toUpperCase())}/${
+                      componentItem._id
+                    }?${params.toString()}`
+                  );
+                }}
               />
             );
           })
@@ -374,7 +409,12 @@ const Components = () => {
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-8 sm:mt-12">
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => {
+              const newPage = Math.max(currentPage - 1, 1);
+              const params = new URLSearchParams(window.location.search);
+              params.set("page", newPage.toString());
+              navigate({ search: params.toString() });
+            }}
             disabled={currentPage === 1}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
@@ -390,9 +430,12 @@ const Components = () => {
           </span>
 
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            onClick={() => {
+              const newPage = Math.min(currentPage + 1, totalPages);
+              const params = new URLSearchParams(window.location.search);
+              params.set("page", newPage.toString());
+              navigate({ search: params.toString() });
+            }}
             disabled={currentPage === totalPages}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages

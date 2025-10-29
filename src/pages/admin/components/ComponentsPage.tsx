@@ -30,6 +30,7 @@ const ComponentsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = window.location;
   const { toast } = useToast();
 
   // Ref for scrolling to components grid on page change
@@ -72,6 +73,11 @@ const ComponentsPage: React.FC = () => {
   };
 
   useEffect(() => {
+    const savedPage = parseInt(
+      new URLSearchParams(location.search).get("page") || "1",
+      10
+    );
+    setCurrentPage(savedPage);
     fetchComponents();
   }, []);
 
@@ -504,7 +510,11 @@ const ComponentsPage: React.FC = () => {
             <ComponentShowcaseCard
               key={item._id}
               componentItem={item}
-              onClick={() => navigate(`/components/${item.type}/${item._id}`)}
+              onClick={() => {
+                navigate(
+                  `/components/${item.type}/${item._id}?page=${currentPage}`
+                );
+              }}
               onDelete={user?.role === "admin" ? handleDelete : undefined}
             />
           ))
@@ -515,9 +525,11 @@ const ComponentsPage: React.FC = () => {
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-8 sm:mt-12">
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.max(prev - 1, 1))
-            }
+            onClick={() => {
+              const newPage = Math.max(currentPage - 1, 1);
+              setCurrentPage(newPage);
+              navigate(`?page=${newPage}`);
+            }}
             disabled={currentPage === 1}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
@@ -533,9 +545,11 @@ const ComponentsPage: React.FC = () => {
           </span>
 
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            onClick={() => {
+              const newPage = Math.min(currentPage + 1, totalPages);
+              setCurrentPage(newPage);
+              navigate(`?page=${newPage}`);
+            }}
             disabled={currentPage === totalPages}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages

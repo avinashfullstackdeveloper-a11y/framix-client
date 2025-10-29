@@ -34,10 +34,17 @@ interface Submission {
 const AdminQueue: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
-  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [filter, setFilter] = useState<
+    "all" | "pending" | "approved" | "rejected"
+  >("pending");
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<Submission | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
+
   const [processing, setProcessing] = useState(false);
+  const [publishOption, setPublishOption] = useState<
+    "component" | "community" | ""
+  >("");
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -59,13 +66,17 @@ const AdminQueue: React.FC = () => {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      const endpoint = filter === "all"
-        ? "/api/submissions/all"
-        : `/api/submissions/all?status=${filter}`;
+      const endpoint =
+        filter === "all"
+          ? "/api/submissions/all"
+          : `/api/submissions/all?status=${filter}`;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}${endpoint}`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${endpoint}`,
+        {
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch submissions");
@@ -76,7 +87,8 @@ const AdminQueue: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to load submissions",
+        description:
+          error instanceof Error ? error.message : "Failed to load submissions",
         variant: "destructive",
       });
     } finally {
@@ -90,16 +102,29 @@ const AdminQueue: React.FC = () => {
 
   // Handle approve
   const handleApprove = async (submissionId: string) => {
+    if (!publishOption) {
+      toast({
+        title: "Select Publish Option",
+        description: "Please select where to publish this component.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       setProcessing(true);
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/submissions/${submissionId}/approve`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ reviewNotes }),
-      });
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000"
+        }/api/submissions/${submissionId}/approve`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ reviewNotes, publishOption }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -108,17 +133,23 @@ const AdminQueue: React.FC = () => {
 
       toast({
         title: "Success",
-        description: "Submission approved and component published!",
+        description: `Submission approved and published to ${
+          publishOption === "component" ? "Component" : "Community"
+        }!`,
         variant: "default",
       });
 
       setSelectedSubmission(null);
       setReviewNotes("");
+      setPublishOption("");
       fetchSubmissions();
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to approve submission",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to approve submission",
         variant: "destructive",
       });
     } finally {
@@ -130,14 +161,19 @@ const AdminQueue: React.FC = () => {
   const handleReject = async (submissionId: string) => {
     try {
       setProcessing(true);
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/submissions/${submissionId}/reject`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ reviewNotes }),
-      });
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000"
+        }/api/submissions/${submissionId}/reject`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ reviewNotes }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -156,7 +192,10 @@ const AdminQueue: React.FC = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to reject submission",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to reject submission",
         variant: "destructive",
       });
     } finally {
@@ -271,7 +310,9 @@ const AdminQueue: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Component Submission Queue</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            Component Submission Queue
+          </h1>
           <p className="text-muted-foreground">
             Review and approve component submissions from the community
           </p>
@@ -310,9 +351,12 @@ const AdminQueue: React.FC = () => {
           <Card>
             <CardContent className="p-12 text-center">
               <div className="text-4xl mb-4">📭</div>
-              <h3 className="text-xl font-semibold mb-2">No submissions found</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                No submissions found
+              </h3>
               <p className="text-muted-foreground">
-                There are no {filter !== "all" ? filter : ""} submissions at the moment.
+                There are no {filter !== "all" ? filter : ""} submissions at the
+                moment.
               </p>
             </CardContent>
           </Card>
@@ -345,9 +389,13 @@ const AdminQueue: React.FC = () => {
 
                   {/* Details */}
                   <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-2">{submission.title}</h3>
+                    <h3 className="font-semibold text-lg mb-2">
+                      {submission.title}
+                    </h3>
                     <div className="flex gap-2 mb-3">
-                      <Badge variant="outline">{submission.componentType}</Badge>
+                      <Badge variant="outline">
+                        {submission.componentType}
+                      </Badge>
                       <Badge variant="outline">{submission.technology}</Badge>
                     </div>
 
@@ -371,7 +419,8 @@ const AdminQueue: React.FC = () => {
                       {getCreatorStatusLabel(submission.creatorStatus)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Submitted: {new Date(submission.createdAt).toLocaleDateString()}
+                      Submitted:{" "}
+                      {new Date(submission.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </CardContent>
@@ -387,7 +436,9 @@ const AdminQueue: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold mb-2">{selectedSubmission.title}</h2>
+                    <h2 className="text-2xl font-bold mb-2">
+                      {selectedSubmission.title}
+                    </h2>
                     <div className="flex gap-2">
                       <Badge>{selectedSubmission.componentType}</Badge>
                       <Badge>{selectedSubmission.technology}</Badge>
@@ -422,7 +473,9 @@ const AdminQueue: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
                       {selectedSubmission.createdBy?.name
-                        ? selectedSubmission.createdBy.name.charAt(0).toUpperCase()
+                        ? selectedSubmission.createdBy.name
+                            .charAt(0)
+                            .toUpperCase()
                         : "?"}
                     </div>
                     <div>
@@ -439,7 +492,8 @@ const AdminQueue: React.FC = () => {
                     {getCreatorStatusLabel(selectedSubmission.creatorStatus)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Submitted on: {new Date(selectedSubmission.createdAt).toLocaleString()}
+                    Submitted on:{" "}
+                    {new Date(selectedSubmission.createdAt).toLocaleString()}
                   </p>
                 </div>
 
@@ -451,40 +505,78 @@ const AdminQueue: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Review Notes */}
+                {/* Review Notes & Publish Option */}
                 {selectedSubmission.status === "pending" && (
-                  <div className="mb-6">
-                    <label className="block font-semibold mb-2">Review Notes (Optional)</label>
-                    <textarea
-                      className="w-full p-3 border rounded-lg resize-none"
-                      rows={3}
-                      placeholder="Add any notes about this submission..."
-                      value={reviewNotes}
-                      onChange={(e) => setReviewNotes(e.target.value)}
-                    />
-                  </div>
+                  <>
+                    <div className="mb-6">
+                      <label className="block font-semibold mb-2">
+                        Review Notes (Optional)
+                      </label>
+                      <textarea
+                        className="w-full p-3 border rounded-lg resize-none"
+                        rows={3}
+                        placeholder="Add any notes about this submission..."
+                        value={reviewNotes}
+                        onChange={(e) => setReviewNotes(e.target.value)}
+                      />
+                    </div>
+                    <div className="mb-6">
+                      <label className="block font-semibold mb-2">
+                        Publish Option <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="publishOption"
+                            value="component"
+                            checked={publishOption === "component"}
+                            onChange={() => setPublishOption("component")}
+                            disabled={processing}
+                          />
+                          <span>Publish to Component</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="publishOption"
+                            value="community"
+                            checked={publishOption === "community"}
+                            onChange={() => setPublishOption("community")}
+                            disabled={processing}
+                          />
+                          <span>Publish to Community</span>
+                        </label>
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 {/* Existing Review Info */}
-                {selectedSubmission.status !== "pending" && selectedSubmission.reviewedBy && (
-                  <div className="mb-6 p-4 bg-muted rounded-lg">
-                    <h3 className="font-semibold mb-2">Review Information</h3>
-                    <p className="text-sm">
-                      <strong>Reviewed By:</strong> {selectedSubmission.reviewedBy.name}
-                    </p>
-                    <p className="text-sm">
-                      <strong>Reviewed At:</strong>{" "}
-                      {selectedSubmission.reviewedAt
-                        ? new Date(selectedSubmission.reviewedAt).toLocaleString()
-                        : "N/A"}
-                    </p>
-                    {selectedSubmission.reviewNotes && (
-                      <p className="text-sm mt-2">
-                        <strong>Notes:</strong> {selectedSubmission.reviewNotes}
+                {selectedSubmission.status !== "pending" &&
+                  selectedSubmission.reviewedBy && (
+                    <div className="mb-6 p-4 bg-muted rounded-lg">
+                      <h3 className="font-semibold mb-2">Review Information</h3>
+                      <p className="text-sm">
+                        <strong>Reviewed By:</strong>{" "}
+                        {selectedSubmission.reviewedBy.name}
                       </p>
-                    )}
-                  </div>
-                )}
+                      <p className="text-sm">
+                        <strong>Reviewed At:</strong>{" "}
+                        {selectedSubmission.reviewedAt
+                          ? new Date(
+                              selectedSubmission.reviewedAt
+                            ).toLocaleString()
+                          : "N/A"}
+                      </p>
+                      {selectedSubmission.reviewNotes && (
+                        <p className="text-sm mt-2">
+                          <strong>Notes:</strong>{" "}
+                          {selectedSubmission.reviewNotes}
+                        </p>
+                      )}
+                    </div>
+                  )}
 
                 {/* Actions */}
                 {selectedSubmission.status === "pending" && (
