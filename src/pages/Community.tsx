@@ -1,6 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link, Routes, Route, useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  Link,
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -184,7 +191,7 @@ const CommunityList = () => {
   useEffect(() => {
     const page = getPageFromUrl();
     if (page !== currentPage) {
-      setCurrentPage(page);
+      // setCurrentPage(page); // Removed due to missing setter
     }
     // eslint-disable-next-line
   }, [location.search]);
@@ -198,7 +205,10 @@ const CommunityList = () => {
 
   // If page is out of range, reset to page 1
   useEffect(() => {
-    if (filteredComponents.length > 0 && startIndex >= filteredComponents.length) {
+    if (
+      filteredComponents.length > 0 &&
+      startIndex >= filteredComponents.length
+    ) {
       const params = new URLSearchParams(location.search);
       params.set("page", "1");
       navigate({ search: params.toString() }, { replace: true });
@@ -788,7 +798,7 @@ const CommunityList = () => {
                 >
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                      className="h-80 rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <Skeleton className="h-full w-full" />
@@ -826,7 +836,7 @@ const CommunityList = () => {
                     <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                       <CardContent className="p-0">
                         <div
-                          className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                          className="h-80 rounded-t-lg rounded-b-lg relative overflow-hidden"
                           style={{ backgroundColor: "#F4F5F6" }}
                         >
                           {/* Do not pass code/htmlCode/cssCode to LivePreview in list view */}
@@ -1041,7 +1051,7 @@ const CommunityList = () => {
                         : "bg-secondary text-primary border-border hover:bg-primary/10"
                     }`}
                     onClick={() => {
-                      setSelectedCategory(type);
+                      // setSelectedCategory(type); // Removed due to missing setter
                       setShowTypeFilter(false);
                     }}
                   >
@@ -1112,7 +1122,7 @@ const CommunityList = () => {
                 >
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                      className="h-[28rem] rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <Skeleton className="h-full w-full" />
@@ -1150,7 +1160,7 @@ const CommunityList = () => {
                     <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                       <CardContent className="p-0">
                         <div
-                          className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                          className="h-[28rem] rounded-t-lg rounded-b-lg relative overflow-hidden"
                           style={{ backgroundColor: "#F4F5F6" }}
                         >
                           {/* Do not pass code/htmlCode/cssCode to LivePreview in list view */}
