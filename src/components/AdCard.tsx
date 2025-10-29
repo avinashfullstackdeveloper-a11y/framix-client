@@ -60,13 +60,17 @@ const AdCard: React.FC<AdCardProps> = ({ adKey, adType }) => {
 
   return (
     <div className="w-full">
-      <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-between items-center border overflow-hidden relative transition-all duration-300 ease-in-out hover:border-[#FF479C]/40 hover:shadow-[0_0_15px_rgba(255,154,201,0.15)] rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]"
+      <div className="flex w-full h-80 sm:h-96 lg:h-[26rem] flex-col justify-between items-center border overflow-hidden relative transition-all duration-300 ease-in-out hover:border-[#FF479C]/40 hover:shadow-[0_0_15px_rgba(255,154,201,0.15)] rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]"
         style={{ backgroundColor: '#1a1a1a' }}
       >
         {/* Ad Container */}
         <div
           ref={adContainerRef}
           className="w-full flex-1 flex items-center justify-center"
+          style={{
+            transform: "scale(1.2)",
+            transformOrigin: "center",
+          }}
         >
           {/* Adsterra ad will be injected here */}
         </div>

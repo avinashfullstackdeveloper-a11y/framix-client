@@ -377,7 +377,7 @@ const ComponentShowcaseCard: React.FC<ComponentShowcaseCardProps> = ({
       className="cursor-pointer w-full"
     >
       <div
-        className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
+        className="flex w-full h-80 sm:h-96 lg:h-[26rem] flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
         style={{ backgroundColor: "#F4F5F6" }}
       >
         <div
@@ -392,7 +392,7 @@ const ComponentShowcaseCard: React.FC<ComponentShowcaseCardProps> = ({
               alignItems: "center",
               justifyContent: "center",
               overflow: "hidden",
-              transform: "scale(0.6)",
+              transform: "scale(0.85)",
               transformOrigin: "center",
             }}
           >
