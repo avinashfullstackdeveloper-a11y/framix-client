@@ -246,6 +246,12 @@ const ComponentDetail: React.FC = () => {
     }
     setSavingFavourite(true);
     try {
+      // Always send string id for favourite API
+      let componentId = id;
+      if (typeof component === "object") {
+        // Prefer _id, then id, then fallback to id from params
+        componentId = (component as any)._id || (component as any).id || id;
+      }
       if (!isFavourited) {
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/api/favourites`,
@@ -256,7 +262,7 @@ const ComponentDetail: React.FC = () => {
               Authorization: `Bearer ${token}`,
             },
             credentials: "include",
-            body: JSON.stringify({ component: id }),
+            body: JSON.stringify({ component: componentId }),
           }
         );
         if (!res.ok) {
@@ -271,7 +277,7 @@ const ComponentDetail: React.FC = () => {
         });
       } else {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/favourites/${id}`,
+          `${import.meta.env.VITE_API_URL}/api/favourites/${componentId}`,
           {
             method: "DELETE",
             headers: {
@@ -692,8 +698,8 @@ const ComponentDetail: React.FC = () => {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">
-                  {(component.isScraped || component.isAnonymous)
-                    ? (component.language || component.type)
+                  {component.isScraped || component.isAnonymous
+                    ? component.language || component.type
                     : `${component.name}.${getLanguageForEditor()}`}
                 </CardTitle>
                 <div className="flex gap-2">
