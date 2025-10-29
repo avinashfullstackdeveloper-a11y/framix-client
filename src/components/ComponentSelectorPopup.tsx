@@ -196,6 +196,7 @@ const TechnologySelector: React.FC<TechnologySelectorProps> = ({
       <div className="self-stretch flex min-h-[47px] items-stretch gap-2 sm:gap-3 w-full sm:w-[285px] my-auto">
         <div className="flex items-stretch gap-2 sm:gap-3 justify-center h-full w-full">
           <button
+            type="button"
             onClick={() => onTechnologyChange("css")}
             className={`
               flex items-center gap-2 whitespace-nowrap justify-center h-full px-4 sm:px-5 py-[9px] rounded-[10px] border-solid border-2 transition-all duration-200 w-full sm:w-auto
@@ -211,6 +212,7 @@ const TechnologySelector: React.FC<TechnologySelectorProps> = ({
           </button>
 
           <button
+            type="button"
             onClick={() => onTechnologyChange("tailwind")}
             className={`
               flex items-center gap-2 justify-center h-full px-4 sm:px-3.5 py-[9px] rounded-[10px] border-solid border-2 transition-all duration-200 w-full sm:w-auto
