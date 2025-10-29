@@ -1,7 +1,7 @@
 // Admin ComponentsPage: Lists all components with delete access for admin.
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import ComponentShowcaseCard from "@/components/ComponentShowcaseCard";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -501,108 +501,12 @@ const ComponentsPage: React.FC = () => {
           </div>
         ) : (
           paginatedComponents.map((item) => (
-            <div
+            <ComponentShowcaseCard
               key={item._id}
+              componentItem={item}
               onClick={() => navigate(`/components/${item.type}/${item._id}`)}
-              className="cursor-pointer w-full"
-            >
-              <div
-                className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
-                style={{ backgroundColor: "#2d3135" }}
-              >
-                {/* Views moved to top left, not close to the border */}
-                <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
-                      stroke="white"
-                      strokeOpacity="0.6"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="3"
-                      stroke="white"
-                      strokeOpacity="0.6"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
-                  <span className="text-white text-xs font-light">
-                    {item.views || 0} views
-                  </span>
-                </div>
-                {/* Component Preview */}
-                <div
-                  className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
-                  style={{ backgroundColor: "#2d3135" }}
-                >
-                  {/* OPTIMIZATION: Use OptimizedPreview component with lazy loading */}
-                  {item.language && (
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        overflow: "hidden",
-                        transform: "scale(0.6)",
-                        transformOrigin: "center",
-                      }}
-                    >
-                      <OptimizedPreview componentItem={item} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Component Info */}
-                <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-                  <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
-                    <h3 className="flex-[1_0_0] text-white text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                      {/* Show cleaned type only, not title */}
-                      <span className="block text-base sm:text-lg font-semibold">
-                        {item.type
-                          ?.replace(/component/gi, "")
-                          .trim()
-                          .replace(/^\w/, (c) => c.toUpperCase())}
-                      </span>
-                    </h3>
-                    <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                      <span
-                        className={`text-xs sm:text-sm font-normal ${
-                          item.badge === "Pro" ? "text-[#FF479C]" : "text-white"
-                        }`}
-                      >
-                        {item.badge || "Free"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Admin Delete Button */}
-                {user?.role === "admin" && (
-                  <button
-                    className="absolute top-3 right-3 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 hover:border-red-500/50 rounded-lg text-xs font-medium transition-all duration-300 z-20 flex items-center gap-1 group/delete"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(item._id);
-                    }}
-                  >
-                    <Trash2 className="w-3 h-3 group-hover/delete:scale-110 transition-transform" />
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
+              onDelete={user?.role === "admin" ? handleDelete : undefined}
+            />
           ))
         )}
       </div>

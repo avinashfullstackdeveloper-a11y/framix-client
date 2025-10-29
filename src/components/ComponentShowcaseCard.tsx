@@ -18,6 +18,7 @@ export type ComponentItem = {
 type ComponentShowcaseCardProps = {
   componentItem: ComponentItem;
   onClick?: (item: ComponentItem) => void;
+  onDelete?: (id: string) => void;
 };
 
 const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
@@ -367,6 +368,7 @@ const OptimizedPreview: React.FC<{ componentItem: ComponentItem }> = React.memo(
 const ComponentShowcaseCard: React.FC<ComponentShowcaseCardProps> = ({
   componentItem,
   onClick,
+  onDelete,
 }) => {
   return (
     <div
@@ -420,6 +422,17 @@ const ComponentShowcaseCard: React.FC<ComponentShowcaseCardProps> = ({
             </div>
           </div>
         </div>
+        {onDelete && (
+          <button
+            className="absolute top-3 right-3 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 hover:border-red-500/50 rounded-lg text-xs font-medium transition-all duration-300 z-20 flex items-center gap-1 group/delete"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(componentItem._id);
+            }}
+          >
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );
