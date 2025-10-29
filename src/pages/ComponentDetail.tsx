@@ -33,7 +33,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
-import { normalizeComponentData, NormalizedComponent } from "@/lib/normalizeComponent";
+import {
+  normalizeComponentData,
+  NormalizedComponent,
+} from "@/lib/normalizeComponent";
 
 type ComponentData = NormalizedComponent;
 
@@ -129,7 +132,8 @@ const ComponentDetail: React.FC = () => {
 
         // Determine technology type
         let tech: "css" | "tailwind" = "css";
-        if (normalized.language === "tailwind" || normalized.tailwind) tech = "tailwind";
+        if (normalized.language === "tailwind" || normalized.tailwind)
+          tech = "tailwind";
         setTechnology(tech);
 
         if (tech === "css") {
@@ -141,7 +145,11 @@ const ComponentDetail: React.FC = () => {
           setPreviewHtmlCode(htmlValue);
           setActiveTab("html");
         } else if (tech === "tailwind") {
-          const tailwindValue = normalized.tailwindCode || normalized.tailwind || normalized.code || "";
+          const tailwindValue =
+            normalized.tailwindCode ||
+            normalized.tailwind ||
+            normalized.code ||
+            "";
           setTailwindCode(tailwindValue);
         }
 
@@ -464,10 +472,13 @@ const ComponentDetail: React.FC = () => {
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 {(() => {
-                  const initials = component.createdBy?.name?.charAt(0).toUpperCase() || "U";
+                  const initials =
+                    component.createdBy?.name?.charAt(0).toUpperCase() || "U";
                   const avatarUrl = component.createdBy?.avatar;
                   const bgColor = generateColorFromString(
-                    component.createdBy?.email || component.createdBy?.name || initials
+                    component.createdBy?.email ||
+                      component.createdBy?.name ||
+                      initials
                   );
                   const textColor = getContrastTextColor(bgColor);
                   return (
@@ -560,14 +571,20 @@ const ComponentDetail: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <Badge variant="secondary" className="text-sm font-medium">
-              {component.language}
+              {/* Only show type, not title or user info, for anonymous/scraped */}
+              {component.isScraped || component.isAnonymous
+                ? component.language || component.type
+                : component.language}
             </Badge>
           </div>
         </div>
 
         {/* Component Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">{component.name}</h1>
+          {/* Hide title for anonymous/scraped components */}
+          {!(component.isScraped || component.isAnonymous) && (
+            <h1 className="text-4xl font-bold mb-4">{component.name}</h1>
+          )}
           {component.description && (
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
               {component.description}
@@ -675,7 +692,9 @@ const ComponentDetail: React.FC = () => {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">
-                  {component.name}.{getLanguageForEditor()}
+                  {(component.isScraped || component.isAnonymous)
+                    ? (component.language || component.type)
+                    : `${component.name}.${getLanguageForEditor()}`}
                 </CardTitle>
                 <div className="flex gap-2">
                   <Button
@@ -964,7 +983,9 @@ const ComponentDetail: React.FC = () => {
               {(() => {
                 const initials = user?.name?.charAt(0).toUpperCase() || "U";
                 const avatarUrl = user?.avatar;
-                const bgColor = generateColorFromString(user?.email || user?.name || initials);
+                const bgColor = generateColorFromString(
+                  user?.email || user?.name || initials
+                );
                 const textColor = getContrastTextColor(bgColor);
                 return (
                   <ShadAvatar className="w-10 h-10 font-semibold flex-shrink-0">
@@ -1297,7 +1318,9 @@ const ComponentDetail: React.FC = () => {
                                   "U";
                                 const avatarUrl = reply.user?.avatar;
                                 const bgColor = generateColorFromString(
-                                  reply.user?.name || reply.user?._id || initials
+                                  reply.user?.name ||
+                                    reply.user?._id ||
+                                    initials
                                 );
                                 const textColor = getContrastTextColor(bgColor);
                                 return (

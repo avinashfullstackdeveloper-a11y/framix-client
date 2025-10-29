@@ -35,6 +35,9 @@ export interface NormalizedComponent {
   commentCount?: number;
   comments?: Array<{ id: string; text: string }>;
   views?: number;
+  /** True if this component is scraped/anonymous (not user-uploaded) */
+  isScraped?: boolean;
+  isAnonymous?: boolean;
 }
 
 type RawComponent = Record<string, any>;
@@ -212,6 +215,17 @@ export function normalizeComponentData(raw: RawComponent): NormalizedComponent {
     (raw.component && raw.component.react) ||
     "";
 
+  // Determine if scraped/anonymous (not user-uploaded)
+  const isScraped =
+    (!createdBy || !createdBy._id) ||
+    (typeof raw.isScraped === "boolean" ? raw.isScraped : false) ||
+    (typeof raw.scraped === "boolean" ? raw.scraped : false) ||
+    (typeof raw.isAnonymous === "boolean" ? raw.isAnonymous : false);
+
+  const isAnonymous =
+    isScraped ||
+    (typeof raw.isAnonymous === "boolean" ? raw.isAnonymous : false);
+
   return {
     id,
     name,
@@ -238,5 +252,7 @@ export function normalizeComponentData(raw: RawComponent): NormalizedComponent {
     commentCount,
     comments,
     views,
+    isScraped,
+    isAnonymous,
   };
 }
