@@ -9,33 +9,9 @@ import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/
 import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 import ComponentShowcaseCard from "@/components/ComponentShowcaseCard";
 
-type FavouriteComponent = {
-  id: string;
-  title: string;
-  type: string;
-  language: string;
-  code: string;
-  preview?: string;
-  createdBy?: {
-    _id?: string;
-    id?: string;
-    name?: string;
-    username?: string;
-    avatar?: string;
-    profilePicture?: string;
-    picture?: string;
-    image?: string;
-  };
-  htmlCode?: string;
-  cssCode?: string;
-  tailwindCode?: string;
-  technology?: string;
-  likeCount?: number;
-  likedBy?: string[];
-  commentCount?: number;
-  comments?: Array<{ id: string; text: string }>;
-  views?: number;
-};
+import { normalizeComponentData, NormalizedComponent } from "@/lib/normalizeComponent";
+
+type FavouriteComponent = NormalizedComponent;
 
 type ComponentPreview = {
   code?: string;
@@ -471,12 +447,20 @@ const Favourite: React.FC = () => {
       setError(null);
       try {
         const data = await apiRequest<
-          Array<{
-            component: Partial<FavouriteComponent> & {
-              _id?: string;
-              id?: string;
-            };
-          }>
+          Array<
+            | {
+                component: Partial<FavouriteComponent> & {
+                  _id?: string;
+                  id?: string;
+                };
+              }
+            | {
+                scrapedComponent?: any;
+                isAnonymous?: boolean;
+                _id?: string;
+                id?: string;
+              }
+          >
         >("/api/favourites", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -486,38 +470,25 @@ const Favourite: React.FC = () => {
         // Map backend favourites to FavouriteComponent[]
         const mapped: FavouriteComponent[] = Array.isArray(data)
           ? data.map((fav) => {
-              const component = fav.component;
-              const createdBy = component?.createdBy;
-              
-              return {
-                id: String(component?._id || component?.id || ""),
-                title: component?.title || "Untitled",
-                type: component?.type || "",
-                language: component?.language || "",
-                code: component?.code || "",
-                preview: component?.preview || "",
-                createdBy: createdBy
-                  ? {
-                      _id: createdBy._id || createdBy.id,
-                      id: createdBy.id || createdBy._id,
-                      name: createdBy.name,
-                      username: createdBy.username,
-                      avatar: createdBy.profilePicture || createdBy.avatar || "",
-                    }
-                  : undefined,
-                htmlCode: component?.htmlCode || "",
-                cssCode: component?.cssCode || "",
-                tailwindCode: component?.tailwindCode || "",
-                technology: component?.technology || "",
-                likeCount: component?.likeCount || 0,
-                likedBy: component?.likedBy || [],
-                commentCount: component?.commentCount || 0,
-                comments: component?.comments || [],
-                views: component?.views || 0,
-              };
+              // Type guard for anonymous/scraped favourite
+              if (
+                typeof fav === "object" &&
+                fav !== null &&
+                "scrapedComponent" in fav &&
+                fav.scrapedComponent
+              ) {
+                return normalizeComponentData({
+                  ...(fav.scrapedComponent || {}),
+                  id: fav.scrapedComponent?._id || fav._id || fav.id,
+                  isAnonymous: true,
+                });
+              }
+              // Otherwise, use the referenced component
+              // @ts-expect-error: backend may return either shape
+              return normalizeComponentData(fav.component || fav);
             })
           : [];
-        
+
         setFavourites(mapped);
       } catch (err) {
         setError((err as Error).message || "Unknown error");
@@ -655,28 +626,15 @@ const Favourite: React.FC = () => {
         {!loading && !error && favourites.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favourites.map((component) => {
-              // Debug log: show the raw component and mapped props
-              // eslint-disable-next-line no-console
-              console.log("Favourite raw:", component);
-              // eslint-disable-next-line no-console
-              console.log("Mapped for card:", {
-                _id: component.id,
-                title: component.title,
-                type: component.type,
-                code: component.code,
-                language: component.language,
-                htmlCode: component.htmlCode,
-                cssCode: component.cssCode,
-                tailwind: component.tailwindCode,
-                views: component.views,
-              });
+              // Anonymous/scraped favourites: show as anonymous, no detail link
+              const isAnonymous = !!(component as { isAnonymous?: boolean }).isAnonymous;
               return (
                 <div key={component.id} className="relative">
                   <ComponentShowcaseCard
                     componentItem={{
                       _id: component.id,
-                      title: component.title,
-                      type: component.type,
+                      title: component.title || "Anonymous Component",
+                      type: component.type || "scraped",
                       code: component.code,
                       language: component.language,
                       htmlCode: component.htmlCode,
@@ -684,10 +642,19 @@ const Favourite: React.FC = () => {
                       tailwind: component.tailwindCode,
                       views: component.views,
                     }}
-                    onClick={() => {
-                      window.location.href = `/components/${component.type}/${component.id}`;
-                    }}
+                    onClick={
+                      isAnonymous
+                        ? undefined // No detail page for anonymous
+                        : () => {
+                            window.location.href = `/components/${component.type}/${component.id}`;
+                          }
+                    }
                   />
+                  {isAnonymous && (
+                    <span className="absolute top-3 left-3 z-20 px-2 py-1 bg-gray-700 text-xs text-white rounded">
+                      Anonymous
+                    </span>
+                  )}
                   {/* Remove from Favourites Button */}
                   <button
                     disabled={removingId === component.id}

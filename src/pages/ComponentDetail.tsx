@@ -33,26 +33,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 
-type ComponentData = {
-  id: string;
-  name: string;
-  code: string;
-  language: string;
-  description?: string;
-  tags?: string[];
-  html?: string;
-  css?: string;
-  js?: string;
-  react?: string;
-  tailwind?: string;
-  createdBy?: {
-    _id?: string;
-    name?: string;
-    email?: string;
-    avatar?: string;
-  };
-  creatorStatus?: "original" | "found" | "modified";
-};
+import { normalizeComponentData, NormalizedComponent } from "@/lib/normalizeComponent";
+
+type ComponentData = NormalizedComponent;
 
 // Helper function to determine if color is light or dark
 const isLightColor = (hexColor: string): boolean => {
@@ -141,55 +124,26 @@ const ComponentDetail: React.FC = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-      setComponent(data);
+        const normalized = normalizeComponentData(data);
+        setComponent(normalized);
 
-      // Determine technology type
-      let tech: "css" | "tailwind" = "css";
-      if (data.language === "tailwind" || data.tailwind) tech = "tailwind";
-      setTechnology(tech);
+        // Determine technology type
+        let tech: "css" | "tailwind" = "css";
+        if (normalized.language === "tailwind" || normalized.tailwind) tech = "tailwind";
+        setTechnology(tech);
 
-      if (tech === "css") {
-        let htmlValue = "";
-        let cssValue = "";
+        if (tech === "css") {
+          const htmlValue = normalized.html || normalized.htmlCode || "";
+          const cssValue = normalized.css || normalized.cssCode || "";
 
-        // Priority 1: Check for separate html/css fields (new format from admin upload)
-        if (data.html !== undefined && data.html !== null) {
-          htmlValue = data.html;
+          setHtmlCode(htmlValue);
+          setCssCode(cssValue);
+          setPreviewHtmlCode(htmlValue);
+          setActiveTab("html");
+        } else if (tech === "tailwind") {
+          const tailwindValue = normalized.tailwindCode || normalized.tailwind || normalized.code || "";
+          setTailwindCode(tailwindValue);
         }
-        if (data.css !== undefined && data.css !== null) {
-          cssValue = data.css;
-        }
-
-        // Priority 2: Check for legacy htmlCode/cssCode fields
-        if (!htmlValue && data.htmlCode !== undefined) {
-          htmlValue = data.htmlCode;
-        }
-        if (!cssValue && data.cssCode !== undefined) {
-          cssValue = data.cssCode;
-        }
-
-        // Priority 3: Fallback to combined 'code' field only if no separate fields exist
-        if (!htmlValue && !cssValue && data.code) {
-          if (data.language === "html" || data.language === "multi") {
-            htmlValue = data.code;
-          } else if (data.language === "css") {
-            cssValue = data.code;
-          }
-        }
-
-        setHtmlCode(htmlValue);
-        setCssCode(cssValue);
-        setPreviewHtmlCode(htmlValue);
-        setActiveTab("html");
-      } else if (tech === "tailwind") {
-        let tailwindValue = "";
-        if (data.tailwindCode !== undefined)
-          tailwindValue = data.tailwindCode;
-        else if (data.tailwind !== undefined) tailwindValue = data.tailwind;
-        if (!tailwindValue && data.code && data.language === "tailwind")
-          tailwindValue = data.code;
-        setTailwindCode(tailwindValue);
-      }
 
         setLoading(false);
       })
