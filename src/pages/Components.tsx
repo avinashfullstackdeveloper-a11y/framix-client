@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
+import ComponentShowcaseCard from "../components/ComponentShowcaseCard";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -27,27 +28,38 @@ const Components = () => {
     "Radio buttons",
     "Tooltips",
   ];
+  // Only lightweight fields are present in the list/grid
   type ComponentItem = {
     _id: string;
     title: string;
     type: string;
-    code?: string;
     language?: string;
     badge?: "Free" | "Pro";
-    stats?: string;
-    htmlCode?: string;
-    cssCode?: string;
-    tailwind?: string;
     views?: number;
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState(filterTabs[0]);
-  const [currentPage, setCurrentPage] = useState(1);
+  // Always derive activeFilter from URL if present
+  const getFilterFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const filter = params.get("filter");
+    return filter && filterTabs.includes(filter) ? filter : filterTabs[0];
+  };
+  const [activeFilter, setActiveFilter] = useState(getFilterFromUrl());
+  // Always derive currentPage from URL
+  const getPageFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const page = parseInt(params.get("page") || "1", 10);
+    return page > 0 ? page : 1;
+  };
+  const [currentPage, setCurrentPage] = useState(getPageFromUrl());
   const navigate = useNavigate();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [toastShown, setToastShown] = useState(false);
+
+  // NOTE: Full component details (code, htmlCode, cssCode, etc.) are NOT fetched here.
+  // Fetch full details in the detail page only.
 
   // Ref for scrolling to components grid on page change
   const componentsGridRef = useRef<HTMLDivElement>(null);
@@ -91,7 +103,7 @@ const Components = () => {
     }
   }, [user, authLoading, toast, toastShown]);
 
-  // Try to load components from localStorage first
+  // Fetch only lightweight metadata for components list/grid
   const fetchComponents = () => {
     setLoading(true);
     const cached = localStorage.getItem("componentListCache");
@@ -100,27 +112,46 @@ const Components = () => {
         const parsed = JSON.parse(cached);
         setComponents(parsed);
         setLoading(false);
-        // Also fetch in background to refresh cache
-        fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
-          credentials: "include",
-        })
+        // Background refresh for latest metadata
+        fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/components?publishSection=component&fields=_id,title,type,language,badge,views`,
+          {
+            credentials: "include",
+          }
+        )
           .then((res) => res.json())
           .then((data) => {
             setComponents(data);
-            localStorage.setItem("componentListCache", JSON.stringify(data));
-          });
+            try {
+              localStorage.setItem("componentListCache", JSON.stringify(data));
+            } catch (storageError) {
+              localStorage.removeItem("componentListCache");
+            }
+          })
+          .catch((err) => console.error("Background refresh failed:", err));
         return;
       } catch {
-        // Ignore parse errors, fallback to fetch
+        localStorage.removeItem("componentListCache");
       }
     }
-    fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
-      credentials: "include",
-    })
+    fetch(
+      `${
+        import.meta.env.VITE_API_URL
+      }/api/components?publishSection=component&fields=_id,title,type,language,badge,views`,
+      {
+        credentials: "include",
+      }
+    )
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
-        localStorage.setItem("componentListCache", JSON.stringify(data));
+        try {
+          localStorage.setItem("componentListCache", JSON.stringify(data));
+        } catch (storageError) {
+          localStorage.removeItem("componentListCache");
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -151,10 +182,18 @@ const Components = () => {
     fetchComponents();
   }, []);
 
-  // OPTIMIZATION: Reset to page 1 when filter changes
+  // Sync currentPage and activeFilter with URL query param on mount and when URL changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [activeFilter]);
+    const page = getPageFromUrl();
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
+    const filter = getFilterFromUrl();
+    if (filter !== activeFilter) {
+      setActiveFilter(filter);
+    }
+    // eslint-disable-next-line
+  }, [window.location.search]);
 
   // OPTIMIZATION: Scroll to top of components grid when page changes
   useEffect(() => {
@@ -168,33 +207,35 @@ const Components = () => {
 
   // OPTIMIZATION: Memoize filtered components to prevent recalculation on every render
   const filteredComponents = useMemo(() => {
+    // Map filter tab to type values in DB
+    const filterTypeMap: Record<string, string[]> = {
+      Button: ["button", "buttons"],
+      "Toggle switch": ["toggle", "toggle switch", "toggleswitch"],
+      Checkbox: ["checkbox", "checkboxes"],
+      Card: ["card", "cards"],
+      Loader: ["loader", "loaders"],
+      Input: ["input", "inputs"],
+      Form: ["form", "forms"],
+      Pattern: ["pattern", "patterns"],
+      "Radio buttons": ["radio", "radio buttons", "radiobuttons"],
+      Tooltips: ["tooltip", "tooltips"],
+    };
     return components.filter((item: ComponentItem) => {
       if (activeFilter === "All") return true;
-      // Map filter tab to type/title
-      switch (activeFilter) {
-        case "Button":
-          return item.title?.toLowerCase().includes("button");
-        case "Toggle switch":
-          return item.title?.toLowerCase().includes("toggle");
-        case "Checkbox":
-          return item.title?.toLowerCase().includes("checkbox");
-        case "Card":
-          return item.title?.toLowerCase().includes("card");
-        case "Loader":
-          return item.title?.toLowerCase().includes("loader");
-        case "Input":
-          return item.title?.toLowerCase().includes("input");
-        case "Form":
-          return item.title?.toLowerCase().includes("form");
-        case "Pattern":
-          return item.title?.toLowerCase().includes("pattern");
-        case "Radio buttons":
-          return item.title?.toLowerCase().includes("radio");
-        case "Tooltips":
-          return item.title?.toLowerCase().includes("tooltip");
-        default:
+      const type = item.type?.toLowerCase() || "";
+      const filterTypes = filterTypeMap[activeFilter];
+      if (filterTypes) {
+        // Match type field
+        if (filterTypes.some((ft) => type.includes(ft))) return true;
+        // Fallback: also check title for legacy/edge cases
+        if (
+          item.title &&
+          filterTypes.some((ft) => item.title.toLowerCase().includes(ft))
+        )
           return true;
+        return false;
       }
+      return true;
     });
   }, [components, activeFilter]);
 
@@ -230,358 +271,19 @@ const Components = () => {
 
   // OPTIMIZATION: OptimizedPreview component with lazy loading via Intersection Observer
   // This prevents rendering iframes (and loading external CDNs) until they're visible
+  // OptimizedPreview is now a placeholder in the list/grid, as code is not available here.
   const OptimizedPreview = React.memo(
     ({ componentItem }: { componentItem: ComponentItem }) => {
-      const [isVisible, setIsVisible] = useState(false);
-      const containerRef = useRef<HTMLDivElement>(null);
-
-      // OPTIMIZATION: Intersection Observer to detect when component enters viewport
-      useEffect(() => {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setIsVisible(true);
-                // Once visible, stop observing to prevent unnecessary checks
-                observer.disconnect();
-              }
-            });
-          },
-          {
-            rootMargin: "50px", // Start loading 50px before entering viewport
-            threshold: 0.1,
-          }
-        );
-
-        if (containerRef.current) {
-          observer.observe(containerRef.current);
-        }
-
-        return () => observer.disconnect();
-      }, []);
-
-      // OPTIMIZATION: Memoize srcDoc generation to prevent recreation on every render
-      const previewContent = useMemo(() => {
-        if (!isVisible) return null;
-
-        // Tailwind preview (language or technology)
-        if (
-          componentItem.language &&
-          (componentItem.language.toLowerCase() === "tailwind" ||
-            componentItem.language.toLowerCase() === "tailwindcss") &&
-          (componentItem.code || componentItem.tailwind)
-        ) {
-          const tailwindHtml =
-            componentItem.code || componentItem.tailwind || "";
-          const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <script src="https://cdn.tailwindcss.com"></script>
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                  overflow: hidden;
-                }
-              </style>
-            </head>
-            <body>
-              ${tailwindHtml}
-            </body>
-          </html>
-        `;
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // Direct full HTML document preview (zoomed out)
-        if (
-          typeof componentItem.code === "string" &&
-          componentItem.code.trim().startsWith("<!DOCTYPE html")
-        ) {
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={componentItem.code}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // React preview (iframe Babel)
-        if (
-          componentItem.language &&
-          componentItem.language.toLowerCase() === "react"
-        ) {
-          const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-              <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-              <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-              </style>
-            </head>
-            <body>
-              <div id="root"></div>
-              <script type="text/babel">
-                try {
-                  ${componentItem.code}
-                  if (typeof Component !== "undefined") {
-                    ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
-                  }
-                } catch (e) {
-                  document.getElementById('root').innerHTML = '<pre style="color:red;">' + e.toString() + '</pre>';
-                }
-              </script>
-            </body>
-          </html>
-        `;
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // Multi preview
-        if (
-          componentItem.language &&
-          componentItem.language.toLowerCase() === "multi"
-        ) {
-          // Build srcDoc from separate fields if code field is missing
-          const srcDoc =
-            componentItem.code ||
-            `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-                ${componentItem.cssCode || ""}
-              </style>
-            </head>
-            <body>
-              ${componentItem.htmlCode || ""}
-            </body>
-          </html>
-        `;
-
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="border-0"
-              style={{
-                width: "100%",
-                height: "100%",
-                margin: 0,
-                padding: 0,
-                overflow: "hidden",
-                background: "transparent",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // CSS + HTML combined preview (if both present)
-        if (
-          componentItem.language &&
-          componentItem.language.toLowerCase() === "css" &&
-          componentItem.htmlCode &&
-          componentItem.cssCode
-        ) {
-          const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-                ${componentItem.cssCode}
-              </style>
-            </head>
-            <body>
-              ${componentItem.htmlCode}
-            </body>
-          </html>
-        `;
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // Fallback: HTML/CSS/JS preview
-        const srcDoc = `<!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-              }
-              body, html {
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-                background: transparent;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-              #preview-wrapper {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transform: scale(0.5);
-                transform-origin: center;
-              }
-              ${
-                componentItem.language &&
-                componentItem.language.toLowerCase() === "css"
-                  ? componentItem.code
-                  : ""
-              }
-            </style>
-          </head>
-          <body>
-            <div id="preview-wrapper">
-              ${
-                componentItem.language &&
-                componentItem.language.toLowerCase() === "html"
-                  ? componentItem.code
-                  : ""
-              }
-            </div>
-            <script>${
-              componentItem.language &&
-              componentItem.language.toLowerCase() === "javascript"
-                ? componentItem.code
-                : ""
-            }</script>
-          </body>
-        </html>`;
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }, [isVisible, componentItem]);
-
-      // OPTIMIZATION: Return placeholder until component is visible
-      if (!isVisible) {
-        return (
-          <div
-            ref={containerRef}
-            className="w-full h-full flex items-center justify-center"
-            style={{ minHeight: "200px" }}
-          >
-            <div className="text-muted-foreground text-sm">
-              Loading preview...
-            </div>
+      return (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{ minHeight: "200px" }}
+        >
+          <div className="text-muted-foreground text-sm">
+            Preview available on detail page
           </div>
-        );
-      }
-
-      return <>{previewContent}</>;
+        </div>
+      );
     }
   );
 
@@ -608,7 +310,13 @@ const Components = () => {
             <button
               key={filter}
               type="button"
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => {
+                setActiveFilter(filter);
+                const params = new URLSearchParams(window.location.search);
+                params.set("page", "1");
+                params.set("filter", filter);
+                navigate({ search: params.toString() });
+              }}
               className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
                 activeFilter === filter
                   ? "bg-[#FF479C] border-[#FF479C] text-[#282828]"
@@ -633,14 +341,28 @@ const Components = () => {
           <>
             {Array.from({ length: 9 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="w-full">
-                <div className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]" style={{ backgroundColor: "#F4F5F6" }}>
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Skeleton className="h-full w-full rounded-xl" />
+                <div
+                  className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                  style={{ backgroundColor: "#F4F5F6" }}
+                >
+                  <Skeleton className="h-full w-full" />
+                  <div className="absolute top-3 right-3 z-10">
+                    <Skeleton className="h-6 w-16 rounded-full" />
                   </div>
-                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5 w-full">
-                      <Skeleton className="h-5 w-24" />
-                      <Skeleton className="h-5 w-12" />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <Skeleton className="h-4 w-20 mb-1" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-4 w-8" />
+                      <Skeleton className="h-4 w-8" />
+                      <Skeleton className="h-4 w-8" />
                     </div>
                   </div>
                 </div>
@@ -663,75 +385,23 @@ const Components = () => {
             // Regular component item
             const componentItem = item as ComponentItem;
             return (
-              <div
+              <ComponentShowcaseCard
                 key={componentItem._id}
-                onClick={() =>
+                componentItem={componentItem}
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  params.set("page", String(currentPage));
+                  params.set("filter", activeFilter);
                   navigate(
                     `/components/${componentItem.type
                       ?.replace(/component/gi, "")
                       .trim()
-                      .replace(/^\w/, (c) => c.toUpperCase())}/${
+                      .replace(/^[\w]/, (c) => c.toUpperCase())}/${
                       componentItem._id
-                    }`
-                  )
-                }
-                className="cursor-pointer w-full"
-              >
-                <div
-                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
-                  style={{ backgroundColor: "#F4F5F6" }}
-                >
-                  {/* Views moved to top left, not close to the border */}
-                  {/* Views removed from component card */}
-                  <div
-                    className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
-                    style={{ backgroundColor: "#F4F5F6" }}
-                  >
-                    {/* OPTIMIZATION: Use OptimizedPreview component with lazy loading */}
-                    {componentItem.language && (
-                      <div
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          overflow: "hidden",
-                          transform: "scale(0.6)",
-                          transformOrigin: "center",
-                        }}
-                      >
-                        <OptimizedPreview componentItem={componentItem} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
-                      <h3 className="flex-[1_0_0] text-black text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                        {/* Show cleaned type only, not title */}
-                        <span className="block text-base sm:text-lg font-semibold text-black">
-                          {componentItem.type
-                            ?.replace(/component/gi, "")
-                            .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </span>
-                      </h3>
-                      <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                        <span
-                          className={`text-xs sm:text-sm font-normal ${
-                            componentItem.badge === "Pro"
-                              ? "text-[#FF479C]"
-                              : "text-black"
-                          }`}
-                        >
-                          {componentItem.badge || "Free"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Admin delete button removed */}
-                </div>
-              </div>
+                    }?${params.toString()}`
+                  );
+                }}
+              />
             );
           })
         )}
@@ -741,7 +411,12 @@ const Components = () => {
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-8 sm:mt-12">
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => {
+              const newPage = Math.max(currentPage - 1, 1);
+              const params = new URLSearchParams(window.location.search);
+              params.set("page", newPage.toString());
+              navigate({ search: params.toString() });
+            }}
             disabled={currentPage === 1}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === 1
@@ -757,9 +432,12 @@ const Components = () => {
           </span>
 
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            onClick={() => {
+              const newPage = Math.min(currentPage + 1, totalPages);
+              const params = new URLSearchParams(window.location.search);
+              params.set("page", newPage.toString());
+              navigate({ search: params.toString() });
+            }}
             disabled={currentPage === totalPages}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
               currentPage === totalPages

@@ -1,6 +1,6 @@
 // MyComponentCard.tsx
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import ComponentShowcaseCard, { ComponentItem } from "./ComponentShowcaseCard";
 import { Badge } from "@/components/ui/badge";
 
 export interface MyComponentSubmission {
@@ -108,57 +108,48 @@ function getStatusBadgeProps(
 const MyComponentCard: React.FC<{ submission: MyComponentSubmission }> = ({
   submission,
 }) => {
+  // Map MyComponentSubmission to ComponentItem
+  const componentItem: ComponentItem = {
+    _id: submission._id,
+    title: submission.title,
+    type: submission.componentType,
+    code:
+      submission.technology === "css"
+        ? undefined
+        : submission.technology === "tailwind"
+        ? submission.tailwindCode
+        : undefined,
+    language: submission.technology,
+    htmlCode: submission.htmlCode,
+    cssCode: submission.cssCode,
+    tailwind: submission.tailwindCode,
+    views: submission.views,
+    // badge, stats, etc. can be extended if needed
+  };
+
   const statusBadge = getStatusBadgeProps(submission.status);
 
   return (
-    <Card className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group" style={{ backgroundColor: "#F4F5F6" }}>
-      <CardContent className="p-0 w-full h-full">
-        {/* Views badge at top left */}
-        <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
-              stroke="white" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="12" cy="12" r="3" stroke="white" strokeOpacity="0.6" strokeWidth="1.5"/>
-          </svg>
-          <span className="text-white text-xs font-light">
-            {submission.views || 0} views
-          </span>
-        </div>
-        {/* Preview area */}
-        <div className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden" style={{ backgroundColor: "#F4F5F6" }}>
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-              transform: "scale(0.6)",
-              transformOrigin: "center",
-            }}
-          >
-            {renderPreview(submission)}
-          </div>
-          {/* Status badge at top right */}
-          <div className="absolute top-3 right-3">
-            <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
-          </div>
-        </div>
-        {/* Bottom overlay with title and badges */}
-        <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-          <div className="flex gap-2">
-            <Badge variant="outline" className="text-black border-black">
-              {submission.componentType
-                ?.replace(/component/gi, "")
-                .trim()
-                .replace(/^\w/, (c) => c.toUpperCase())}
-            </Badge>
-            <Badge variant="outline" className="text-black border-black">{submission.technology}</Badge>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="relative">
+      {/* Views badge at top left */}
+      <div className="absolute top-4 left-6 z-20 flex items-center gap-1.5 bg-[rgba(0,0,0,0.45)] px-2 py-1 rounded-full">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5z"
+            stroke="white" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx="12" cy="12" r="3" stroke="white" strokeOpacity="0.6" strokeWidth="1.5"/>
+        </svg>
+        <span className="text-white text-xs font-light">
+          {submission.views || 0} views
+        </span>
+      </div>
+      {/* Status badge at top right */}
+      <div className="absolute top-3 right-3 z-20">
+        <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
+      </div>
+      {/* Card UI */}
+      <ComponentShowcaseCard componentItem={componentItem} />
+      {/* Overlay badges at bottom left (if not handled by ComponentShowcaseCard) */}
+    </div>
   );
 };
 

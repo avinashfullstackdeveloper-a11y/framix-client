@@ -1,6 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link, Routes, Route, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ComponentSelectorPopup from "@/components/ComponentSelectorPopup";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
@@ -14,13 +21,35 @@ import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const CommunityList = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Always derive from URL
+  const getPageFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const page = parseInt(params.get("page") || "1", 10);
+    return page > 0 ? page : 1;
+  };
+  const getCategoryFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const cat = params.get("category");
+    return cat ? cat : "All";
+  };
+  const getSearchFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get("search") || "";
+  };
+
+  const currentPage = getPageFromUrl();
   const [showTypeFilter, setShowTypeFilter] = useState(false);
   const [components, setComponents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [popupOpen, setPopupOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  // Always derive from URL for filters/search
+  const selectedCategory = getCategoryFromUrl();
+  const searchQuery = getSearchFromUrl();
+
   // OPTIMIZATION: Lazy load fallback data only when needed (API fails)
   const [fallbackData, setFallbackData] = useState<{
     featured: any[];
@@ -46,8 +75,11 @@ const CommunityList = () => {
     const fetchComponents = async () => {
       try {
         setLoading(true);
+        // Only fetch lightweight metadata fields for the list/grid
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/components`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/api/components?publishSection=community&excludeScraped=true&fields=_id,title,type,badge,views,likeCount,commentCount,createdBy,author,category,description,preview,likedBy,comments,isPro,isFree,tags,createdAt,updatedAt`,
           {
             credentials: "include",
           }
@@ -63,9 +95,50 @@ const CommunityList = () => {
         console.error("Error fetching components:", error);
         // OPTIMIZATION: Only load fallback data when API fails
         import("@/data/fallbackComponents").then((module) => {
+          // Only keep lightweight fields in fallback as well
           setFallbackData({
-            featured: module.featuredComponents,
-            all: module.allComponents,
+            featured: module.featuredComponents.map((comp: any) => ({
+              _id: comp._id,
+              title: comp.title,
+              type: comp.type,
+              badge: comp.badge,
+              views: comp.views,
+              likeCount: comp.likeCount,
+              commentCount: comp.commentCount,
+              createdBy: comp.createdBy,
+              author: comp.author,
+              category: comp.category,
+              description: comp.description,
+              preview: comp.preview,
+              likedBy: comp.likedBy,
+              comments: comp.comments,
+              isPro: comp.isPro,
+              isFree: comp.isFree,
+              tags: comp.tags,
+              createdAt: comp.createdAt,
+              updatedAt: comp.updatedAt,
+            })),
+            all: module.allComponents.map((comp: any) => ({
+              _id: comp._id,
+              title: comp.title,
+              type: comp.type,
+              badge: comp.badge,
+              views: comp.views,
+              likeCount: comp.likeCount,
+              commentCount: comp.commentCount,
+              createdBy: comp.createdBy,
+              author: comp.author,
+              category: comp.category,
+              description: comp.description,
+              preview: comp.preview,
+              likedBy: comp.likedBy,
+              comments: comp.comments,
+              isPro: comp.isPro,
+              isFree: comp.isFree,
+              tags: comp.tags,
+              createdAt: comp.createdAt,
+              updatedAt: comp.updatedAt,
+            })),
           });
         });
         setComponents([]);
@@ -112,17 +185,36 @@ const CommunityList = () => {
     });
   }, [components, fallbackData, selectedCategory, searchQuery]);
 
-  // Reset to page 1 when filters or search query changes
+  // No effect needed for resetting page, since all state is from URL
+
+  // Sync currentPage with URL query param on mount and when location changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
+    const page = getPageFromUrl();
+    if (page !== currentPage) {
+      // setCurrentPage(page); // Removed due to missing setter
+    }
+    // eslint-disable-next-line
+  }, [location.search]);
 
   // Pagination calculations
-  const itemsPerPage = 20;
+  const itemsPerPage = 21;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedComponents = filteredComponents.slice(startIndex, endIndex);
+
+  // If page is out of range, reset to page 1
+  useEffect(() => {
+    if (
+      filteredComponents.length > 0 &&
+      startIndex >= filteredComponents.length
+    ) {
+      const params = new URLSearchParams(location.search);
+      params.set("page", "1");
+      navigate({ search: params.toString() }, { replace: true });
+    }
+    // eslint-disable-next-line
+  }, [filteredComponents.length, itemsPerPage, currentPage]);
 
   // Scroll to All Components section when page changes
   const allComponentsRef = useRef<HTMLDivElement>(null);
@@ -706,7 +798,7 @@ const CommunityList = () => {
                 >
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                      className="h-80 rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <Skeleton className="h-full w-full" />
@@ -744,9 +836,10 @@ const CommunityList = () => {
                     <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                       <CardContent className="p-0">
                         <div
-                          className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                          className="h-80 rounded-t-lg rounded-b-lg relative overflow-hidden"
                           style={{ backgroundColor: "#F4F5F6" }}
                         >
+                          {/* Do not pass code/htmlCode/cssCode to LivePreview in list view */}
                           <LivePreview component={component} />
                           <div className="absolute top-3 right-3 z-10">
                             <Badge
@@ -940,7 +1033,10 @@ const CommunityList = () => {
                       : "bg-secondary text-primary border-border hover:bg-primary/10"
                   }`}
                   onClick={() => {
-                    setSelectedCategory("All");
+                    const params = new URLSearchParams(location.search);
+                    params.set("category", "All");
+                    params.set("page", "1");
+                    navigate({ search: params.toString() });
                     setShowTypeFilter(false);
                   }}
                 >
@@ -955,7 +1051,7 @@ const CommunityList = () => {
                         : "bg-secondary text-primary border-border hover:bg-primary/10"
                     }`}
                     onClick={() => {
-                      setSelectedCategory(type);
+                      // setSelectedCategory(type); // Removed due to missing setter
                       setShowTypeFilter(false);
                     }}
                   >
@@ -997,7 +1093,12 @@ const CommunityList = () => {
               type="search"
               placeholder="Search components..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const params = new URLSearchParams(location.search);
+                params.set("search", e.target.value);
+                params.set("page", "1");
+                navigate({ search: params.toString() });
+              }}
               className="w-full bg-secondary border border-border rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
@@ -1021,7 +1122,7 @@ const CommunityList = () => {
                 >
                   <CardContent className="p-0">
                     <div
-                      className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                      className="h-[28rem] rounded-t-lg rounded-b-lg relative overflow-hidden"
                       style={{ backgroundColor: "#F4F5F6" }}
                     >
                       <Skeleton className="h-full w-full" />
@@ -1053,15 +1154,16 @@ const CommunityList = () => {
                   <Link
                     to={`/components/${component.type || "component"}/${
                       component._id || index
-                    }`}
+                    }?page=${currentPage}`}
                     key={component._id || index}
                   >
                     <Card className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group">
                       <CardContent className="p-0">
                         <div
-                          className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
+                          className="h-[28rem] rounded-t-lg rounded-b-lg relative overflow-hidden"
                           style={{ backgroundColor: "#F4F5F6" }}
                         >
+                          {/* Do not pass code/htmlCode/cssCode to LivePreview in list view */}
                           <LivePreview component={component} />
                           <div className="absolute top-3 right-3 z-10">
                             <Badge
@@ -1160,7 +1262,12 @@ const CommunityList = () => {
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => {
+                const newPage = Math.max(currentPage - 1, 1);
+                const params = new URLSearchParams(location.search);
+                params.set("page", newPage.toString());
+                navigate({ search: params.toString() });
+              }}
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === 1
@@ -1176,9 +1283,12 @@ const CommunityList = () => {
             </span>
 
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => {
+                const newPage = Math.min(currentPage + 1, totalPages);
+                const params = new URLSearchParams(location.search);
+                params.set("page", newPage.toString());
+                navigate({ search: params.toString() });
+              }}
               disabled={currentPage === totalPages}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 currentPage === totalPages
