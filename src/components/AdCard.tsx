@@ -2,9 +2,10 @@ import React, { useEffect, useRef } from "react";
 
 interface AdCardProps {
   adKey: string;
+  adType: "300x250" | "160x300";
 }
 
-const AdCard: React.FC<AdCardProps> = ({ adKey }) => {
+const AdCard: React.FC<AdCardProps> = ({ adKey, adType }) => {
   const adContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

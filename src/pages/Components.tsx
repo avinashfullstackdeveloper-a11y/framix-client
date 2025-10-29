@@ -117,14 +117,17 @@ const Components = () => {
                 badge: item.badge,
                 views: item.views,
               }));
-              localStorage.setItem("componentListCache", JSON.stringify(lightweightData));
+              localStorage.setItem(
+                "componentListCache",
+                JSON.stringify(lightweightData)
+              );
             } catch (storageError) {
               // If still too large, clear the cache
-              console.warn('Cache size still too large, clearing cache');
+              console.warn("Cache size still too large, clearing cache");
               localStorage.removeItem("componentListCache");
             }
           })
-          .catch((err) => console.error('Background refresh failed:', err));
+          .catch((err) => console.error("Background refresh failed:", err));
         return;
       } catch {
         // Ignore parse errors, fallback to fetch
@@ -147,10 +150,13 @@ const Components = () => {
             badge: item.badge,
             views: item.views,
           }));
-          localStorage.setItem("componentListCache", JSON.stringify(lightweightData));
+          localStorage.setItem(
+            "componentListCache",
+            JSON.stringify(lightweightData)
+          );
         } catch (storageError) {
           // If still too large, skip caching
-          console.warn('Unable to cache components: storage quota exceeded');
+          console.warn("Unable to cache components: storage quota exceeded");
         }
         setLoading(false);
       })
@@ -665,16 +671,27 @@ const Components = () => {
             {Array.from({ length: 9 }).map((_, index) => (
               <div key={`skeleton-${index}`} className="w-full">
                 <div
-                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A]"
+                  className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                   style={{ backgroundColor: "#F4F5F6" }}
                 >
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Skeleton className="h-full w-full rounded-xl" />
+                  <Skeleton className="h-full w-full" />
+                  <div className="absolute top-3 right-3 z-10">
+                    <Skeleton className="h-6 w-16 rounded-full" />
                   </div>
-                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5 w-full">
-                      <Skeleton className="h-5 w-24" />
-                      <Skeleton className="h-5 w-12" />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <Skeleton className="h-4 w-20 mb-1" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-4 w-8" />
+                      <Skeleton className="h-4 w-8" />
+                      <Skeleton className="h-4 w-8" />
                     </div>
                   </div>
                 </div>
