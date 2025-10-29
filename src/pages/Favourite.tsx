@@ -7,6 +7,7 @@ import { Heart, ExternalLink, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
 import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
+import ComponentShowcaseCard from "@/components/ComponentShowcaseCard";
 
 type FavouriteComponent = {
   id: string;
@@ -653,103 +654,60 @@ const Favourite: React.FC = () => {
         {/* Favourites Grid */}
         {!loading && !error && favourites.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {favourites.map((component) => (
-              <Card
-                key={component.id}
-                className="bg-gradient-card border-border hover:shadow-glow transition-all duration-300 cursor-pointer group"
-                onClick={() => {
-                  window.location.href = `/components/${component.type}/${component.id}`;
-                }}
-              >
-                <CardContent className="p-4">
-                  {/* Type Badge and Interaction Buttons */}
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="secondary" className="bg-secondary/50">
-                      {component.type
-                        ?.replace(/component/gi, "")
-                        .trim()
-                        .replace(/^\w/, (c) => c.toUpperCase())}
-                    </Badge>
-                    <InteractionButtons
-                      likes={component.likeCount || component.likedBy?.length || 0}
-                      comments={
-                        component.commentCount ||
-                        (Array.isArray(component.comments)
-                          ? component.comments.length
-                          : 0)
-                      }
-                      views={component.views || 0}
-                    />
-                  </div>
-
-                  {/* Preview Section */}
-                  <div
-                    className="h-96 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
-                    style={{ backgroundColor: "#9ca3af" }}
+            {favourites.map((component) => {
+              // Debug log: show the raw component and mapped props
+              // eslint-disable-next-line no-console
+              console.log("Favourite raw:", component);
+              // eslint-disable-next-line no-console
+              console.log("Mapped for card:", {
+                _id: component.id,
+                title: component.title,
+                type: component.type,
+                code: component.code,
+                language: component.language,
+                htmlCode: component.htmlCode,
+                cssCode: component.cssCode,
+                tailwind: component.tailwindCode,
+                views: component.views,
+              });
+              return (
+                <div key={component.id} className="relative">
+                  <ComponentShowcaseCard
+                    componentItem={{
+                      _id: component.id,
+                      title: component.title,
+                      type: component.type,
+                      code: component.code,
+                      language: component.language,
+                      htmlCode: component.htmlCode,
+                      cssCode: component.cssCode,
+                      tailwind: component.tailwindCode,
+                      views: component.views,
+                    }}
+                    onClick={() => {
+                      window.location.href = `/components/${component.type}/${component.id}`;
+                    }}
+                  />
+                  {/* Remove from Favourites Button */}
+                  <button
+                    disabled={removingId === component.id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRemoveFavourite(component.id);
+                    }}
+                    className="absolute top-3 right-3 z-20 p-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-red-500/30 flex-shrink-0"
+                    title="Remove from favourites"
                   >
-                    <LivePreview component={component} />
-                  </div>
-
-                  {/* Author Information and Remove Button */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div
-                      className="flex items-center gap-2 cursor-pointer group/author min-w-0 flex-1"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const userId =
-                          component.createdBy?._id || component.createdBy?.id;
-                        if (userId) {
-                          window.location.href = `/community/${userId}`;
-                        }
-                      }}
-                      title="View user profile"
-                    >
-                      <Avatar
-                        initials={
-                          component.createdBy?.name
-                            ?.charAt(0)
-                            .toUpperCase() || "U"
-                        }
-                        src={component.createdBy?.avatar}
-                        size="sm"
-                        className="flex-shrink-0"
-                        identifier={
-                          component.createdBy?.username ||
-                          component.createdBy?.name
-                        }
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium group-hover/author:underline truncate">
-                          {component.createdBy?.name || "Anonymous"}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {component.createdBy?.username || ""}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Remove from Favourites Button */}
-                    <button
-                      disabled={removingId === component.id}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleRemoveFavourite(component.id);
-                      }}
-                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-red-500/30 flex-shrink-0"
-                      title="Remove from favourites"
-                    >
-                      {removingId === component.id ? (
-                        <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Heart className="w-4 h-4" fill="currentColor" />
-                      )}
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    {removingId === component.id ? (
+                      <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Heart className="w-4 h-4" fill="currentColor" />
+                    )}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

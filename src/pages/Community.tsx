@@ -46,8 +46,9 @@ const CommunityList = () => {
     const fetchComponents = async () => {
       try {
         setLoading(true);
+        // Only fetch lightweight metadata fields for the list/grid
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/components`,
+          `${import.meta.env.VITE_API_URL}/api/components?fields=_id,title,type,badge,views,likeCount,commentCount,createdBy,author,category,description,preview,likedBy,comments,isPro,isFree,tags,createdAt,updatedAt`,
           {
             credentials: "include",
           }
@@ -63,9 +64,50 @@ const CommunityList = () => {
         console.error("Error fetching components:", error);
         // OPTIMIZATION: Only load fallback data when API fails
         import("@/data/fallbackComponents").then((module) => {
+          // Only keep lightweight fields in fallback as well
           setFallbackData({
-            featured: module.featuredComponents,
-            all: module.allComponents,
+            featured: module.featuredComponents.map((comp: any) => ({
+              _id: comp._id,
+              title: comp.title,
+              type: comp.type,
+              badge: comp.badge,
+              views: comp.views,
+              likeCount: comp.likeCount,
+              commentCount: comp.commentCount,
+              createdBy: comp.createdBy,
+              author: comp.author,
+              category: comp.category,
+              description: comp.description,
+              preview: comp.preview,
+              likedBy: comp.likedBy,
+              comments: comp.comments,
+              isPro: comp.isPro,
+              isFree: comp.isFree,
+              tags: comp.tags,
+              createdAt: comp.createdAt,
+              updatedAt: comp.updatedAt,
+            })),
+            all: module.allComponents.map((comp: any) => ({
+              _id: comp._id,
+              title: comp.title,
+              type: comp.type,
+              badge: comp.badge,
+              views: comp.views,
+              likeCount: comp.likeCount,
+              commentCount: comp.commentCount,
+              createdBy: comp.createdBy,
+              author: comp.author,
+              category: comp.category,
+              description: comp.description,
+              preview: comp.preview,
+              likedBy: comp.likedBy,
+              comments: comp.comments,
+              isPro: comp.isPro,
+              isFree: comp.isFree,
+              tags: comp.tags,
+              createdAt: comp.createdAt,
+              updatedAt: comp.updatedAt,
+            })),
           });
         });
         setComponents([]);
@@ -747,6 +789,7 @@ const CommunityList = () => {
                           className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                           style={{ backgroundColor: "#F4F5F6" }}
                         >
+                          {/* Do not pass code/htmlCode/cssCode to LivePreview in list view */}
                           <LivePreview component={component} />
                           <div className="absolute top-3 right-3 z-10">
                             <Badge
@@ -1062,6 +1105,7 @@ const CommunityList = () => {
                           className="h-64 rounded-t-lg rounded-b-lg relative overflow-hidden"
                           style={{ backgroundColor: "#F4F5F6" }}
                         >
+                          {/* Do not pass code/htmlCode/cssCode to LivePreview in list view */}
                           <LivePreview component={component} />
                           <div className="absolute top-3 right-3 z-10">
                             <Badge

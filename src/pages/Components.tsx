@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import AdCard from "../components/AdCard";
+import ComponentShowcaseCard from "../components/ComponentShowcaseCard";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -27,17 +28,13 @@ const Components = () => {
     "Radio buttons",
     "Tooltips",
   ];
+  // Only lightweight fields are present in the list/grid
   type ComponentItem = {
     _id: string;
     title: string;
     type: string;
-    code?: string;
     language?: string;
     badge?: "Free" | "Pro";
-    stats?: string;
-    htmlCode?: string;
-    cssCode?: string;
-    tailwind?: string;
     views?: number;
   };
   const [components, setComponents] = useState<ComponentItem[]>([]);
@@ -48,6 +45,9 @@ const Components = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [toastShown, setToastShown] = useState(false);
+
+  // NOTE: Full component details (code, htmlCode, cssCode, etc.) are NOT fetched here.
+  // Fetch full details in the detail page only.
 
   // Ref for scrolling to components grid on page change
   const componentsGridRef = useRef<HTMLDivElement>(null);
@@ -91,7 +91,7 @@ const Components = () => {
     }
   }, [user, authLoading, toast, toastShown]);
 
-  // Fetch components (now includes both user-uploaded and scraped from same endpoint)
+  // Fetch only lightweight metadata for components list/grid
   const fetchComponents = () => {
     setLoading(true);
     const cached = localStorage.getItem("componentListCache");
@@ -100,63 +100,41 @@ const Components = () => {
         const parsed = JSON.parse(cached);
         setComponents(parsed);
         setLoading(false);
-        // Also fetch in background to refresh cache
-        fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
+        // Background refresh for latest metadata
+        fetch(`${import.meta.env.VITE_API_URL}/api/components?fields=_id,title,type,language,badge,views`, {
           credentials: "include",
         })
           .then((res) => res.json())
           .then((data) => {
             setComponents(data);
-            // Cache only lightweight metadata (no code fields) to avoid quota issues
             try {
-              const lightweightData = data.map((item: ComponentItem) => ({
-                _id: item._id,
-                title: item.title,
-                type: item.type,
-                language: item.language,
-                badge: item.badge,
-                views: item.views,
-              }));
               localStorage.setItem(
                 "componentListCache",
-                JSON.stringify(lightweightData)
+                JSON.stringify(data)
               );
             } catch (storageError) {
-              // If still too large, clear the cache
-              console.warn("Cache size still too large, clearing cache");
               localStorage.removeItem("componentListCache");
             }
           })
           .catch((err) => console.error("Background refresh failed:", err));
         return;
       } catch {
-        // Ignore parse errors, fallback to fetch
         localStorage.removeItem("componentListCache");
       }
     }
-    fetch(`${import.meta.env.VITE_API_URL}/api/components`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/components?fields=_id,title,type,language,badge,views`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
         setComponents(data);
-        // Cache only lightweight metadata (no code fields) to avoid quota issues
         try {
-          const lightweightData = data.map((item: ComponentItem) => ({
-            _id: item._id,
-            title: item.title,
-            type: item.type,
-            language: item.language,
-            badge: item.badge,
-            views: item.views,
-          }));
           localStorage.setItem(
             "componentListCache",
-            JSON.stringify(lightweightData)
+            JSON.stringify(data)
           );
         } catch (storageError) {
-          // If still too large, skip caching
-          console.warn("Unable to cache components: storage quota exceeded");
+          localStorage.removeItem("componentListCache");
         }
         setLoading(false);
       })
@@ -267,358 +245,19 @@ const Components = () => {
 
   // OPTIMIZATION: OptimizedPreview component with lazy loading via Intersection Observer
   // This prevents rendering iframes (and loading external CDNs) until they're visible
+  // OptimizedPreview is now a placeholder in the list/grid, as code is not available here.
   const OptimizedPreview = React.memo(
     ({ componentItem }: { componentItem: ComponentItem }) => {
-      const [isVisible, setIsVisible] = useState(false);
-      const containerRef = useRef<HTMLDivElement>(null);
-
-      // OPTIMIZATION: Intersection Observer to detect when component enters viewport
-      useEffect(() => {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setIsVisible(true);
-                // Once visible, stop observing to prevent unnecessary checks
-                observer.disconnect();
-              }
-            });
-          },
-          {
-            rootMargin: "50px", // Start loading 50px before entering viewport
-            threshold: 0.1,
-          }
-        );
-
-        if (containerRef.current) {
-          observer.observe(containerRef.current);
-        }
-
-        return () => observer.disconnect();
-      }, []);
-
-      // OPTIMIZATION: Memoize srcDoc generation to prevent recreation on every render
-      const previewContent = useMemo(() => {
-        if (!isVisible) return null;
-
-        // Tailwind preview (language or technology)
-        if (
-          componentItem.language &&
-          (componentItem.language.toLowerCase() === "tailwind" ||
-            componentItem.language.toLowerCase() === "tailwindcss") &&
-          (componentItem.code || componentItem.tailwind)
-        ) {
-          const tailwindHtml =
-            componentItem.code || componentItem.tailwind || "";
-          const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <script src="https://cdn.tailwindcss.com"></script>
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                  overflow: hidden;
-                }
-              </style>
-            </head>
-            <body>
-              ${tailwindHtml}
-            </body>
-          </html>
-        `;
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // Direct full HTML document preview (zoomed out)
-        if (
-          typeof componentItem.code === "string" &&
-          componentItem.code.trim().startsWith("<!DOCTYPE html")
-        ) {
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={componentItem.code}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // React preview (iframe Babel)
-        if (
-          componentItem.language &&
-          componentItem.language.toLowerCase() === "react"
-        ) {
-          const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-              <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-              <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-              </style>
-            </head>
-            <body>
-              <div id="root"></div>
-              <script type="text/babel">
-                try {
-                  ${componentItem.code}
-                  if (typeof Component !== "undefined") {
-                    ReactDOM.createRoot(document.getElementById('root')).render(<Component />);
-                  }
-                } catch (e) {
-                  document.getElementById('root').innerHTML = '<pre style="color:red;">' + e.toString() + '</pre>';
-                }
-              </script>
-            </body>
-          </html>
-        `;
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // Multi preview
-        if (
-          componentItem.language &&
-          componentItem.language.toLowerCase() === "multi"
-        ) {
-          // Build srcDoc from separate fields if code field is missing
-          const srcDoc =
-            componentItem.code ||
-            `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-                ${componentItem.cssCode || ""}
-              </style>
-            </head>
-            <body>
-              ${componentItem.htmlCode || ""}
-            </body>
-          </html>
-        `;
-
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="border-0"
-              style={{
-                width: "100%",
-                height: "100%",
-                margin: 0,
-                padding: 0,
-                overflow: "hidden",
-                background: "transparent",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // CSS + HTML combined preview (if both present)
-        if (
-          componentItem.language &&
-          componentItem.language.toLowerCase() === "css" &&
-          componentItem.htmlCode &&
-          componentItem.cssCode
-        ) {
-          const srcDoc = `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body, html {
-                  width: 100%;
-                  height: 100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  background: transparent;
-                  overflow: hidden;
-                }
-                ${componentItem.cssCode}
-              </style>
-            </head>
-            <body>
-              ${componentItem.htmlCode}
-            </body>
-          </html>
-        `;
-          return (
-            <iframe
-              title="Preview"
-              srcDoc={srcDoc}
-              className="w-full h-full rounded-lg border-0"
-              style={{
-                margin: 0,
-                padding: 0,
-                background: "transparent",
-                width: "100%",
-                height: "100%",
-              }}
-              sandbox="allow-scripts allow-same-origin"
-            />
-          );
-        }
-
-        // Fallback: HTML/CSS/JS preview
-        const srcDoc = `<!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-              }
-              body, html {
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-                background: transparent;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              }
-              #preview-wrapper {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transform: scale(0.5);
-                transform-origin: center;
-              }
-              ${
-                componentItem.language &&
-                componentItem.language.toLowerCase() === "css"
-                  ? componentItem.code
-                  : ""
-              }
-            </style>
-          </head>
-          <body>
-            <div id="preview-wrapper">
-              ${
-                componentItem.language &&
-                componentItem.language.toLowerCase() === "html"
-                  ? componentItem.code
-                  : ""
-              }
-            </div>
-            <script>${
-              componentItem.language &&
-              componentItem.language.toLowerCase() === "javascript"
-                ? componentItem.code
-                : ""
-            }</script>
-          </body>
-        </html>`;
-        return (
-          <iframe
-            title="Preview"
-            srcDoc={srcDoc}
-            className="w-full h-full rounded-lg border-0"
-            style={{
-              margin: 0,
-              padding: 0,
-              background: "transparent",
-              width: "100%",
-              height: "100%",
-            }}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        );
-      }, [isVisible, componentItem]);
-
-      // OPTIMIZATION: Return placeholder until component is visible
-      if (!isVisible) {
-        return (
-          <div
-            ref={containerRef}
-            className="w-full h-full flex items-center justify-center"
-            style={{ minHeight: "200px" }}
-          >
-            <div className="text-muted-foreground text-sm">
-              Loading preview...
-            </div>
+      return (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{ minHeight: "200px" }}
+        >
+          <div className="text-muted-foreground text-sm">
+            Preview available on detail page
           </div>
-        );
-      }
-
-      return <>{previewContent}</>;
+        </div>
+      );
     }
   );
 
@@ -714,75 +353,18 @@ const Components = () => {
             // Regular component item
             const componentItem = item as ComponentItem;
             return (
-              <div
+              <ComponentShowcaseCard
                 key={componentItem._id}
+                componentItem={componentItem}
                 onClick={() =>
                   navigate(
                     `/components/${componentItem.type
                       ?.replace(/component/gi, "")
                       .trim()
-                      .replace(/^\w/, (c) => c.toUpperCase())}/${
-                      componentItem._id
-                    }`
+                      .replace(/^\w/, (c) => c.toUpperCase())}/${componentItem._id}`
                   )
                 }
-                className="cursor-pointer w-full"
-              >
-                <div
-                  className="flex w-full h-64 sm:h-72 lg:h-80 flex-col justify-end items-center gap-2 shrink-0 border relative overflow-hidden transition-all duration-[0.3s] ease-[ease] hover:border-[#FF479C] hover:shadow-[0_0_20px_rgba(255,154,201,0.3)] pt-2.5 pb-0 px-4 rounded-2xl sm:rounded-3xl border-solid border-[#3A3A3A] group"
-                  style={{ backgroundColor: "#F4F5F6" }}
-                >
-                  {/* Views moved to top left, not close to the border */}
-                  {/* Views removed from component card */}
-                  <div
-                    className="flex h-full flex-col justify-center items-center shrink-0 absolute w-full rounded-2xl sm:rounded-3xl left-0 top-0 group-hover:scale-105 transition-transform duration-[0.3s] ease-[ease] overflow-hidden"
-                    style={{ backgroundColor: "#F4F5F6" }}
-                  >
-                    {/* OPTIMIZATION: Use OptimizedPreview component with lazy loading */}
-                    {componentItem.language && (
-                      <div
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          overflow: "hidden",
-                          transform: "scale(0.6)",
-                          transformOrigin: "center",
-                        }}
-                      >
-                        <OptimizedPreview componentItem={componentItem} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex w-[calc(100%-2rem)] flex-col justify-center items-start absolute h-10 sm:h-11 z-10 left-4 bottom-2">
-                    <div className="flex justify-between items-center self-stretch mb-1 sm:mb-2.5">
-                      <h3 className="flex-[1_0_0] text-black text-sm sm:text-base font-semibold transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                        {/* Show cleaned type only, not title */}
-                        <span className="block text-base sm:text-lg font-semibold text-black">
-                          {componentItem.type
-                            ?.replace(/component/gi, "")
-                            .trim()
-                            .replace(/^\w/, (c) => c.toUpperCase())}
-                        </span>
-                      </h3>
-                      <div className="flex justify-center items-center rounded pl-2 sm:pl-3 pr-2 sm:pr-[11px] pt-[2px] sm:pt-[3px] pb-0.5 transition-all duration-300 ease-in-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-                        <span
-                          className={`text-xs sm:text-sm font-normal ${
-                            componentItem.badge === "Pro"
-                              ? "text-[#FF479C]"
-                              : "text-black"
-                          }`}
-                        >
-                          {componentItem.badge || "Free"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Admin delete button removed */}
-                </div>
-              </div>
+              />
             );
           })
         )}
