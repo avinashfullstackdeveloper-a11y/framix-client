@@ -5,11 +5,18 @@ import { Badge } from "../components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { Heart, ExternalLink, Trash2 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
-import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Avatar as ShadAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 import ComponentShowcaseCard from "@/components/ComponentShowcaseCard";
 
-import { normalizeComponentData, NormalizedComponent } from "@/lib/normalizeComponent";
+import {
+  normalizeComponentData,
+  NormalizedComponent,
+} from "@/lib/normalizeComponent";
 
 type FavouriteComponent = NormalizedComponent;
 
@@ -48,15 +55,23 @@ const Avatar = ({
   const textColor = getContrastTextColor(bgColor);
 
   return (
-    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 ${className}`}>
+    <ShadAvatar
+      className={`${sizeClasses[size]} border border-neutral-700 ${className}`}
+    >
       {typeof src === "string" && src ? (
-        <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+        <AvatarImage
+          key={src}
+          src={src}
+          alt={initials}
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
       ) : null}
       <AvatarFallback
         className="font-medium"
         style={{
           backgroundColor: bgColor,
-          color: textColor
+          color: textColor,
         }}
       >
         {initials}
@@ -466,7 +481,7 @@ const Favourite: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        
+
         // Map backend favourites to FavouriteComponent[]
         const mapped: FavouriteComponent[] = Array.isArray(data)
           ? data.map((fav) => {
@@ -627,7 +642,8 @@ const Favourite: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favourites.map((component) => {
               // Anonymous/scraped favourites: show as anonymous, no detail link
-              const isAnonymous = !!(component as { isAnonymous?: boolean }).isAnonymous;
+              const isAnonymous = !!(component as { isAnonymous?: boolean })
+                .isAnonymous;
               return (
                 <div key={component.id} className="relative">
                   <ComponentShowcaseCard
@@ -642,13 +658,9 @@ const Favourite: React.FC = () => {
                       tailwind: component.tailwindCode,
                       views: component.views,
                     }}
-                    onClick={
-                      isAnonymous
-                        ? undefined // No detail page for anonymous
-                        : () => {
-                            window.location.href = `/components/${component.type}/${component.id}`;
-                          }
-                    }
+                    onClick={() => {
+                      window.location.href = `/components/${component.type}/${component.id}`;
+                    }}
                   />
                   {isAnonymous && (
                     <span className="absolute top-3 left-3 z-20 px-2 py-1 bg-gray-700 text-xs text-white rounded">
