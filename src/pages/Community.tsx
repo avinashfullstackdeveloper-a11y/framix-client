@@ -190,11 +190,21 @@ const CommunityList = () => {
   }, [location.search]);
 
   // Pagination calculations
-  const itemsPerPage = 6;
+  const itemsPerPage = 21;
   const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedComponents = filteredComponents.slice(startIndex, endIndex);
+
+  // If page is out of range, reset to page 1
+  useEffect(() => {
+    if (filteredComponents.length > 0 && startIndex >= filteredComponents.length) {
+      const params = new URLSearchParams(location.search);
+      params.set("page", "1");
+      navigate({ search: params.toString() }, { replace: true });
+    }
+    // eslint-disable-next-line
+  }, [filteredComponents.length, itemsPerPage, currentPage]);
 
   // Scroll to All Components section when page changes
   const allComponentsRef = useRef<HTMLDivElement>(null);
