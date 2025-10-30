@@ -39,8 +39,13 @@ const ComponentsPage: React.FC = () => {
   const fetchComponents = async () => {
     setLoading(true);
     try {
-      const data = await apiRequest<ComponentItem[]>("/api/components");
-      setComponents(data);
+      // Fetch only community components with all necessary fields for preview
+      const data = await apiRequest<ComponentItem[] | { components: ComponentItem[]; pagination?: any }>(
+        "/api/components?publishSection=community&limit=1000&fields=_id,title,type,badge,views,code,htmlCode,cssCode,jsCode,tailwindCode,language,technology"
+      );
+      // Handle both array response and object with components property
+      const componentsArray = Array.isArray(data) ? data : data.components || [];
+      setComponents(componentsArray);
     } catch (err) {
       toast({
         title: "Failed to fetch components",

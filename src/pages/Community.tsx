@@ -75,11 +75,11 @@ const CommunityList = () => {
     const fetchComponents = async () => {
       try {
         setLoading(true);
-        // Only fetch lightweight metadata fields for the list/grid
+        // Fetch all components with code fields for preview rendering
         const response = await fetch(
           `${
             import.meta.env.VITE_API_URL
-          }/api/components?publishSection=community&excludeScraped=true&fields=_id,title,type,badge,views,likeCount,commentCount,createdBy,author,category,description,preview,likedBy,comments,isPro,isFree,tags,createdAt,updatedAt`,
+          }/api/components?publishSection=community&excludeScraped=true&limit=1000&fields=_id,title,type,badge,views,likeCount,commentCount,createdBy,author,category,description,preview,likedBy,comments,isPro,isFree,tags,createdAt,updatedAt,code,htmlCode,cssCode,jsCode,tailwindCode,language,technology`,
           {
             credentials: "include",
           }
@@ -90,7 +90,9 @@ const CommunityList = () => {
         }
 
         const data = await response.json();
-        setComponents(Array.isArray(data) ? data : []);
+        // Handle both array response and object with components property
+        const componentsArray = data.components || data;
+        setComponents(Array.isArray(componentsArray) ? componentsArray : []);
       } catch (error) {
         console.error("Error fetching components:", error);
         // OPTIMIZATION: Only load fallback data when API fails
@@ -1051,7 +1053,10 @@ const CommunityList = () => {
                         : "bg-secondary text-primary border-border hover:bg-primary/10"
                     }`}
                     onClick={() => {
-                      // setSelectedCategory(type); // Removed due to missing setter
+                      const params = new URLSearchParams(location.search);
+                      params.set("category", type);
+                      params.set("page", "1");
+                      navigate({ search: params.toString() });
                       setShowTypeFilter(false);
                     }}
                   >
