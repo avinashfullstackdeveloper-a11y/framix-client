@@ -17,9 +17,9 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 const AdminRoutes: React.FC = () => {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="flex flex-col md:flex-row min-h-screen w-full overflow-x-hidden">
       <AdminSidebar />
-      <main style={{ flex: 1, padding: "2rem" }}>
+      <main className="flex-1 w-full max-w-full px-2 py-4 md:px-8 md:py-8 overflow-x-auto">
         <Routes>
           <Route
             path="components"
