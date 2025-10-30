@@ -465,92 +465,94 @@ const ComponentDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Creator Profile Card at Top */}
-        {component.createdBy && (
-          <Card
-            className="max-w-2xl mx-auto mb-8 mt-0 hover:shadow-xl hover:border-primary/50 transition-all duration-300 cursor-pointer group"
-            onClick={() => {
-              if (component.createdBy?._id) {
-                navigate(`/community/user/${component.createdBy._id}`);
-              }
-            }}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                {(() => {
-                  const initials =
-                    component.createdBy?.name?.charAt(0).toUpperCase() || "U";
-                  const avatarUrl = component.createdBy?.avatar;
-                  const bgColor = generateColorFromString(
-                    component.createdBy?.email ||
-                      component.createdBy?.name ||
-                      initials
-                  );
-                  const textColor = getContrastTextColor(bgColor);
-                  return (
-                    <ShadAvatar className="w-14 h-14 font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      {typeof avatarUrl === "string" && avatarUrl ? (
-                        <AvatarImage
-                          key={avatarUrl}
-                          src={avatarUrl}
-                          alt={initials}
-                          crossOrigin="anonymous"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : null}
-                      <AvatarFallback
-                        style={{
-                          backgroundColor: bgColor,
-                          color: textColor,
-                        }}
-                      >
-                        {initials}
-                      </AvatarFallback>
-                    </ShadAvatar>
-                  );
-                })()}
-                <div className="flex-1 text-left">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="font-bold text-lg group-hover:text-primary transition-colors">
-                      {component.createdBy.name || "Anonymous"}
+        {/* Creator Profile Card at Top - Hidden for scraped/anonymous components */}
+        {component.createdBy &&
+          !component.isScraped &&
+          !component.isAnonymous && (
+            <Card
+              className="max-w-2xl mx-auto mb-8 mt-0 hover:shadow-xl hover:border-primary/50 transition-all duration-300 cursor-pointer group"
+              onClick={() => {
+                if (component.createdBy?._id) {
+                  navigate(`/community/user/${component.createdBy._id}`);
+                }
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  {(() => {
+                    const initials =
+                      component.createdBy?.name?.charAt(0).toUpperCase() || "U";
+                    const avatarUrl = component.createdBy?.avatar;
+                    const bgColor = generateColorFromString(
+                      component.createdBy?.email ||
+                        component.createdBy?.name ||
+                        initials
+                    );
+                    const textColor = getContrastTextColor(bgColor);
+                    return (
+                      <ShadAvatar className="w-14 h-14 font-bold text-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        {typeof avatarUrl === "string" && avatarUrl ? (
+                          <AvatarImage
+                            key={avatarUrl}
+                            src={avatarUrl}
+                            alt={initials}
+                            crossOrigin="anonymous"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : null}
+                        <AvatarFallback
+                          style={{
+                            backgroundColor: bgColor,
+                            color: textColor,
+                          }}
+                        >
+                          {initials}
+                        </AvatarFallback>
+                      </ShadAvatar>
+                    );
+                  })()}
+                  <div className="flex-1 text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="font-bold text-lg group-hover:text-primary transition-colors">
+                        {component.createdBy.name || "Anonymous"}
+                      </div>
+                      {component.creatorStatus && (
+                        <Badge variant="secondary" className="text-xs">
+                          {component.creatorStatus === "original" &&
+                            "✓ Original Creator"}
+                          {component.creatorStatus === "found" &&
+                            "Found & Shared"}
+                          {component.creatorStatus === "modified" &&
+                            "Found & Modified"}
+                        </Badge>
+                      )}
                     </div>
-                    {component.creatorStatus && (
-                      <Badge variant="secondary" className="text-xs">
-                        {component.creatorStatus === "original" &&
-                          "✓ Original Creator"}
-                        {component.creatorStatus === "found" &&
-                          "Found & Shared"}
-                        {component.creatorStatus === "modified" &&
-                          "Found & Modified"}
-                      </Badge>
-                    )}
+                    <div className="text-sm text-muted-foreground">
+                      {component.createdBy.email || ""}
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {component.createdBy.email || ""}
+                  <div className="flex items-center gap-2 text-muted-foreground group-hover:text-primary transition-colors">
+                    <span className="text-sm font-medium hidden sm:inline">
+                      View Profile
+                    </span>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground group-hover:text-primary transition-colors">
-                  <span className="text-sm font-medium hidden sm:inline">
-                    View Profile
-                  </span>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          )}
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -815,52 +817,124 @@ const ComponentDetail: React.FC = () => {
           </Card>
         </div>
 
-        {/* Stats and Actions */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-6 items-center justify-between">
-              <div className="flex items-center gap-8">
-                {/* Likes */}
+        {/* Stats and Actions - Hidden for scraped/anonymous components */}
+        {!component.isScraped && !component.isAnonymous && (
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row gap-6 items-center justify-between">
+                <div className="flex items-center gap-8">
+                  {/* Likes */}
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant={likedByMe ? "default" : "outline"}
+                      size="sm"
+                      disabled={likeLoading}
+                      onClick={async () => {
+                        setLikeLoading(true);
+                        try {
+                          const method = likedByMe ? "DELETE" : "POST";
+                          const url = `${
+                            import.meta.env.VITE_API_URL
+                          }/api/components/${id}/like`;
+                          const res = await fetch(url, {
+                            method,
+                            headers: { Authorization: `Bearer ${token}` },
+                            credentials: "include",
+                          });
+                          if (!res.ok) throw new Error("Failed to update like");
+                          setLikedByMe(!likedByMe);
+                          setLikesCount((prev) =>
+                            likedByMe ? prev - 1 : prev + 1
+                          );
+                        } catch (err) {
+                          console.error("[Like] Error:", err);
+                          toast({
+                            title: "Error",
+                            description: "Could not update like.",
+                            variant: "destructive",
+                          });
+                        } finally {
+                          setLikeLoading(false);
+                        }
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      {likeLoading ? (
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : likedByMe ? (
+                        <svg
+                          className="w-4 h-4 fill-current"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M10 18.35L8.55 17.03C3.4 12.36 0 9.28 0 5.5 0 2.42 2.42 0 5.5 0 7.24 0 8.91 0.81 10 2.09 11.09 0.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.5 20 9.28 16.6 12.36 11.45 17.04L10 18.35Z" />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                          />
+                        </svg>
+                      )}
+                      {likeLoading
+                        ? "Processing"
+                        : likedByMe
+                        ? "Liked"
+                        : "Like"}
+                    </Button>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold">{likesCount}</div>
+                      <div className="text-xs text-muted-foreground">Likes</div>
+                    </div>
+                  </div>
+
+                  {/* Comments Count */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold">
+                        {comments.length}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Comments
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-3">
                   <Button
-                    variant={likedByMe ? "default" : "outline"}
-                    size="sm"
-                    disabled={likeLoading}
-                    onClick={async () => {
-                      setLikeLoading(true);
-                      try {
-                        const method = likedByMe ? "DELETE" : "POST";
-                        const url = `${
-                          import.meta.env.VITE_API_URL
-                        }/api/components/${id}/like`;
-                        const res = await fetch(url, {
-                          method,
-                          headers: { Authorization: `Bearer ${token}` },
-                          credentials: "include",
-                        });
-                        if (!res.ok) throw new Error("Failed to update like");
-                        setLikedByMe(!likedByMe);
-                        setLikesCount((prev) =>
-                          likedByMe ? prev - 1 : prev + 1
-                        );
-                      } catch (err) {
-                        console.error("[Like] Error:", err);
-                        toast({
-                          title: "Error",
-                          description: "Could not update like.",
-                          variant: "destructive",
-                        });
-                      } finally {
-                        setLikeLoading(false);
-                      }
-                    }}
+                    variant={isFavourited ? "default" : "outline"}
+                    disabled={savingFavourite}
+                    onClick={handleToggleFavourite}
                     className="flex items-center gap-2"
                   >
-                    {likeLoading ? (
+                    {savingFavourite ? (
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : likedByMe ? (
+                    ) : isFavourited ? (
                       <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                        <path d="M10 18.35L8.55 17.03C3.4 12.36 0 9.28 0 5.5 0 2.42 2.42 0 5.5 0 7.24 0 8.91 0.81 10 2.09 11.09 0.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.5 20 9.28 16.6 12.36 11.45 17.04L10 18.35Z" />
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ) : (
                       <svg
@@ -873,23 +947,176 @@ const ComponentDetail: React.FC = () => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
                         />
                       </svg>
                     )}
-                    {likeLoading ? "Processing" : likedByMe ? "Liked" : "Like"}
+                    {savingFavourite
+                      ? "Saving..."
+                      : isFavourited
+                      ? "Favourited"
+                      : "Add to Favourites"}
                   </Button>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{likesCount}</div>
-                    <div className="text-xs text-muted-foreground">Likes</div>
+
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                      />
+                    </svg>
+                    Export
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Comments Section - Hidden for scraped/anonymous components */}
+        {!component.isScraped && !component.isAnonymous && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                Discussion ({comments.length})
+              </CardTitle>
+              <p className="text-muted-foreground text-sm">
+                Share your thoughts and feedback about this component
+              </p>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              {/* Comment Input */}
+              <div className="flex gap-4">
+                {(() => {
+                  const initials = user?.name?.charAt(0).toUpperCase() || "U";
+                  const avatarUrl = user?.avatar;
+                  const bgColor = generateColorFromString(
+                    user?.email || user?.name || initials
+                  );
+                  const textColor = getContrastTextColor(bgColor);
+                  return (
+                    <ShadAvatar className="w-10 h-10 font-semibold flex-shrink-0">
+                      {typeof avatarUrl === "string" && avatarUrl ? (
+                        <AvatarImage
+                          key={avatarUrl}
+                          src={avatarUrl}
+                          alt={initials}
+                          crossOrigin="anonymous"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : null}
+                      <AvatarFallback
+                        style={{
+                          backgroundColor: bgColor,
+                          color: textColor,
+                        }}
+                      >
+                        {initials}
+                      </AvatarFallback>
+                    </ShadAvatar>
+                  );
+                })()}
+                <div className="flex-1 space-y-3">
+                  <Textarea
+                    placeholder="Add a comment..."
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    disabled={commentsLoading}
+                    className="min-h-[100px] resize-none"
+                  />
+                  <div className="flex justify-between items-center">
+                    <span
+                      className={`text-xs ${
+                        commentText.length > 500
+                          ? "text-destructive"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {commentText.length}/500
+                    </span>
+                    <Button
+                      onClick={async () => {
+                        if (!commentText.trim()) return;
+                        setCommentsLoading(true);
+                        try {
+                          const res = await fetch(
+                            `${
+                              import.meta.env.VITE_API_URL
+                            }/api/components/${id}/comments`,
+                            {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                              },
+                              credentials: "include",
+                              body: JSON.stringify({ text: commentText }),
+                            }
+                          );
+                          if (!res.ok)
+                            throw new Error("Failed to post comment");
+                          const response = await res.json();
+                          if (response.success && response.comments) {
+                            setComments(response.comments);
+                          }
+                          setCommentText("");
+                        } catch (err) {
+                          console.error("[Comment] Error:", err);
+                          toast({
+                            title: "Error",
+                            description: "Could not post comment.",
+                            variant: "destructive",
+                          });
+                        } finally {
+                          setCommentsLoading(false);
+                        }
+                      }}
+                      disabled={
+                        commentsLoading ||
+                        !commentText.trim() ||
+                        commentText.length > 500
+                      }
+                    >
+                      {commentsLoading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                          Posting...
+                        </>
+                      ) : (
+                        "Post Comment"
+                      )}
+                    </Button>
                   </div>
                 </div>
+              </div>
 
-                {/* Comments Count */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+              {/* Comments List */}
+              <div className="space-y-6">
+                {comments.length === 0 ? (
+                  <div className="text-center py-8">
                     <svg
-                      className="w-5 h-5"
+                      className="w-12 h-12 text-muted-foreground mx-auto mb-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -901,493 +1128,291 @@ const ComponentDetail: React.FC = () => {
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       />
                     </svg>
+                    <p className="text-muted-foreground">No comments yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Be the first to share your thoughts!
+                    </p>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{comments.length}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Comments
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Button
-                  variant={isFavourited ? "default" : "outline"}
-                  disabled={savingFavourite}
-                  onClick={handleToggleFavourite}
-                  className="flex items-center gap-2"
-                >
-                  {savingFavourite ? (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  ) : isFavourited ? (
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                ) : (
+                  comments.map((comment) => (
+                    <div
+                      key={comment._id}
+                      className="flex gap-4 pb-6 border-b last:border-b-0 last:pb-0"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                      />
-                    </svg>
-                  )}
-                  {savingFavourite
-                    ? "Saving..."
-                    : isFavourited
-                    ? "Favourited"
-                    : "Add to Favourites"}
-                </Button>
-
-                <Button variant="outline" className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-                    />
-                  </svg>
-                  Export
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Comments Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-              Discussion ({comments.length})
-            </CardTitle>
-            <p className="text-muted-foreground text-sm">
-              Share your thoughts and feedback about this component
-            </p>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            {/* Comment Input */}
-            <div className="flex gap-4">
-              {(() => {
-                const initials = user?.name?.charAt(0).toUpperCase() || "U";
-                const avatarUrl = user?.avatar;
-                const bgColor = generateColorFromString(
-                  user?.email || user?.name || initials
-                );
-                const textColor = getContrastTextColor(bgColor);
-                return (
-                  <ShadAvatar className="w-10 h-10 font-semibold flex-shrink-0">
-                    {typeof avatarUrl === "string" && avatarUrl ? (
-                      <AvatarImage
-                        key={avatarUrl}
-                        src={avatarUrl}
-                        alt={initials}
-                        crossOrigin="anonymous"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : null}
-                    <AvatarFallback
-                      style={{
-                        backgroundColor: bgColor,
-                        color: textColor,
-                      }}
-                    >
-                      {initials}
-                    </AvatarFallback>
-                  </ShadAvatar>
-                );
-              })()}
-              <div className="flex-1 space-y-3">
-                <Textarea
-                  placeholder="Add a comment..."
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  disabled={commentsLoading}
-                  className="min-h-[100px] resize-none"
-                />
-                <div className="flex justify-between items-center">
-                  <span
-                    className={`text-xs ${
-                      commentText.length > 500
-                        ? "text-destructive"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {commentText.length}/500
-                  </span>
-                  <Button
-                    onClick={async () => {
-                      if (!commentText.trim()) return;
-                      setCommentsLoading(true);
-                      try {
-                        const res = await fetch(
-                          `${
-                            import.meta.env.VITE_API_URL
-                          }/api/components/${id}/comments`,
-                          {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                              Authorization: `Bearer ${token}`,
-                            },
-                            credentials: "include",
-                            body: JSON.stringify({ text: commentText }),
-                          }
+                      {/* Avatar for comment user */}
+                      {(() => {
+                        const initials =
+                          comment.user?.name?.charAt(0).toUpperCase() || "U";
+                        const avatarUrl = comment.user?.avatar;
+                        const bgColor = generateColorFromString(
+                          comment.user?.name || comment.user?._id || initials
                         );
-                        if (!res.ok) throw new Error("Failed to post comment");
-                        const response = await res.json();
-                        if (response.success && response.comments) {
-                          setComments(response.comments);
-                        }
-                        setCommentText("");
-                      } catch (err) {
-                        console.error("[Comment] Error:", err);
-                        toast({
-                          title: "Error",
-                          description: "Could not post comment.",
-                          variant: "destructive",
-                        });
-                      } finally {
-                        setCommentsLoading(false);
-                      }
-                    }}
-                    disabled={
-                      commentsLoading ||
-                      !commentText.trim() ||
-                      commentText.length > 500
-                    }
-                  >
-                    {commentsLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                        Posting...
-                      </>
-                    ) : (
-                      "Post Comment"
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
+                        const textColor = getContrastTextColor(bgColor);
+                        return (
+                          <ShadAvatar className="w-10 h-10 rounded-full font-semibold text-sm flex-shrink-0">
+                            {typeof avatarUrl === "string" && avatarUrl ? (
+                              <AvatarImage
+                                key={avatarUrl}
+                                src={avatarUrl}
+                                alt={initials}
+                                crossOrigin="anonymous"
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : null}
+                            <AvatarFallback
+                              style={{
+                                backgroundColor: bgColor,
+                                color: textColor,
+                              }}
+                            >
+                              {initials}
+                            </AvatarFallback>
+                          </ShadAvatar>
+                        );
+                      })()}
 
-            {/* Comments List */}
-            <div className="space-y-6">
-              {comments.length === 0 ? (
-                <div className="text-center py-8">
-                  <svg
-                    className="w-12 h-12 text-muted-foreground mx-auto mb-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    />
-                  </svg>
-                  <p className="text-muted-foreground">No comments yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Be the first to share your thoughts!
-                  </p>
-                </div>
-              ) : (
-                comments.map((comment) => (
-                  <div
-                    key={comment._id}
-                    className="flex gap-4 pb-6 border-b last:border-b-0 last:pb-0"
-                  >
-                    {/* Avatar for comment user */}
-                    {(() => {
-                      const initials =
-                        comment.user?.name?.charAt(0).toUpperCase() || "U";
-                      const avatarUrl = comment.user?.avatar;
-                      const bgColor = generateColorFromString(
-                        comment.user?.name || comment.user?._id || initials
-                      );
-                      const textColor = getContrastTextColor(bgColor);
-                      return (
-                        <ShadAvatar className="w-10 h-10 rounded-full font-semibold text-sm flex-shrink-0">
-                          {typeof avatarUrl === "string" && avatarUrl ? (
-                            <AvatarImage
-                              key={avatarUrl}
-                              src={avatarUrl}
-                              alt={initials}
-                              crossOrigin="anonymous"
-                              referrerPolicy="no-referrer"
-                            />
-                          ) : null}
-                          <AvatarFallback
-                            style={{
-                              backgroundColor: bgColor,
-                              color: textColor,
-                            }}
-                          >
-                            {initials}
-                          </AvatarFallback>
-                        </ShadAvatar>
-                      );
-                    })()}
-
-                    <div className="flex-1 min-w-0 space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">
-                            {comment.user?.name || "Anonymous User"}
-                          </span>
-                          {comment.timestamp && (
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(comment.timestamp).toLocaleDateString()}
+                      <div className="flex-1 min-w-0 space-y-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm">
+                              {comment.user?.name || "Anonymous User"}
                             </span>
+                            {comment.timestamp && (
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(
+                                  comment.timestamp
+                                ).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          {user && comment.user?._id === user.id && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => setDeletingCommentId(comment._id)}
+                            >
+                              Delete
+                            </Button>
                           )}
                         </div>
-                        {user && comment.user?._id === user.id && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                            onClick={() => setDeletingCommentId(comment._id)}
+
+                        <p className="text-sm text-foreground leading-relaxed">
+                          {comment.text}
+                        </p>
+
+                        <div className="flex items-center gap-4">
+                          <button
+                            className="text-xs text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
+                            onClick={() => {
+                              if (replyingTo === comment._id) {
+                                setReplyingTo(null);
+                                setReplyText("");
+                              } else {
+                                setReplyingTo(comment._id);
+                                setReplyText("");
+                              }
+                            }}
                           >
-                            Delete
-                          </Button>
-                        )}
-                      </div>
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                              />
+                            </svg>
+                            {replyingTo === comment._id ? "Cancel" : "Reply"}
+                          </button>
+                        </div>
 
-                      <p className="text-sm text-foreground leading-relaxed">
-                        {comment.text}
-                      </p>
-
-                      <div className="flex items-center gap-4">
-                        <button
-                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors flex items-center gap-1"
-                          onClick={() => {
-                            if (replyingTo === comment._id) {
-                              setReplyingTo(null);
-                              setReplyText("");
-                            } else {
-                              setReplyingTo(comment._id);
-                              setReplyText("");
-                            }
-                          }}
-                        >
-                          <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
-                            />
-                          </svg>
-                          {replyingTo === comment._id ? "Cancel" : "Reply"}
-                        </button>
-                      </div>
-
-                      {/* Reply Form */}
-                      {replyingTo === comment._id && (
-                        <div className="flex gap-3 pt-2">
-                          {/* Avatar for reply user (current user) */}
-                          {(() => {
-                            const initials =
-                              user?.name?.charAt(0).toUpperCase() || "U";
-                            const avatarUrl = user?.avatar;
-                            const bgColor = generateColorFromString(
-                              user?.email || user?.name || initials
-                            );
-                            const textColor = getContrastTextColor(bgColor);
-                            return (
-                              <ShadAvatar className="w-8 h-8 rounded-full font-semibold text-xs flex-shrink-0">
-                                {typeof avatarUrl === "string" && avatarUrl ? (
-                                  <AvatarImage
-                                    key={avatarUrl}
-                                    src={avatarUrl}
-                                    alt={initials}
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                ) : null}
-                                <AvatarFallback
-                                  style={{
-                                    backgroundColor: bgColor,
-                                    color: textColor,
+                        {/* Reply Form */}
+                        {replyingTo === comment._id && (
+                          <div className="flex gap-3 pt-2">
+                            {/* Avatar for reply user (current user) */}
+                            {(() => {
+                              const initials =
+                                user?.name?.charAt(0).toUpperCase() || "U";
+                              const avatarUrl = user?.avatar;
+                              const bgColor = generateColorFromString(
+                                user?.email || user?.name || initials
+                              );
+                              const textColor = getContrastTextColor(bgColor);
+                              return (
+                                <ShadAvatar className="w-8 h-8 rounded-full font-semibold text-xs flex-shrink-0">
+                                  {typeof avatarUrl === "string" &&
+                                  avatarUrl ? (
+                                    <AvatarImage
+                                      key={avatarUrl}
+                                      src={avatarUrl}
+                                      alt={initials}
+                                      crossOrigin="anonymous"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  ) : null}
+                                  <AvatarFallback
+                                    style={{
+                                      backgroundColor: bgColor,
+                                      color: textColor,
+                                    }}
+                                  >
+                                    {initials}
+                                  </AvatarFallback>
+                                </ShadAvatar>
+                              );
+                            })()}
+                            <div className="flex-1 space-y-2">
+                              <Input
+                                type="text"
+                                placeholder="Write a reply..."
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                disabled={commentsLoading}
+                                autoFocus
+                              />
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setReplyingTo(null);
+                                    setReplyText("");
                                   }}
                                 >
-                                  {initials}
-                                </AvatarFallback>
-                              </ShadAvatar>
-                            );
-                          })()}
-                          <div className="flex-1 space-y-2">
-                            <Input
-                              type="text"
-                              placeholder="Write a reply..."
-                              value={replyText}
-                              onChange={(e) => setReplyText(e.target.value)}
-                              disabled={commentsLoading}
-                              autoFocus
-                            />
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setReplyingTo(null);
-                                  setReplyText("");
-                                }}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={async () => {
-                                  if (!replyText.trim()) return;
-                                  setCommentsLoading(true);
-                                  try {
-                                    const res = await fetch(
-                                      `${
-                                        import.meta.env.VITE_API_URL
-                                      }/api/components/${id}/comments/${
-                                        comment._id
-                                      }/reply`,
-                                      {
-                                        method: "POST",
-                                        headers: {
-                                          "Content-Type": "application/json",
-                                          Authorization: `Bearer ${token}`,
-                                        },
-                                        credentials: "include",
-                                        body: JSON.stringify({
-                                          text: replyText,
-                                        }),
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={async () => {
+                                    if (!replyText.trim()) return;
+                                    setCommentsLoading(true);
+                                    try {
+                                      const res = await fetch(
+                                        `${
+                                          import.meta.env.VITE_API_URL
+                                        }/api/components/${id}/comments/${
+                                          comment._id
+                                        }/reply`,
+                                        {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${token}`,
+                                          },
+                                          credentials: "include",
+                                          body: JSON.stringify({
+                                            text: replyText,
+                                          }),
+                                        }
+                                      );
+                                      if (!res.ok)
+                                        throw new Error("Failed to post reply");
+                                      const response = await res.json();
+                                      if (
+                                        response.success &&
+                                        response.comments
+                                      ) {
+                                        setComments(response.comments);
                                       }
-                                    );
-                                    if (!res.ok)
-                                      throw new Error("Failed to post reply");
-                                    const response = await res.json();
-                                    if (response.success && response.comments) {
-                                      setComments(response.comments);
+                                      setReplyText("");
+                                      setReplyingTo(null);
+                                    } catch (err) {
+                                      console.error("[Reply] Error:", err);
+                                      toast({
+                                        title: "Error",
+                                        description: "Could not post reply.",
+                                        variant: "destructive",
+                                      });
+                                    } finally {
+                                      setCommentsLoading(false);
                                     }
-                                    setReplyText("");
-                                    setReplyingTo(null);
-                                  } catch (err) {
-                                    console.error("[Reply] Error:", err);
-                                    toast({
-                                      title: "Error",
-                                      description: "Could not post reply.",
-                                      variant: "destructive",
-                                    });
-                                  } finally {
-                                    setCommentsLoading(false);
+                                  }}
+                                  disabled={
+                                    commentsLoading || !replyText.trim()
                                   }
-                                }}
-                                disabled={commentsLoading || !replyText.trim()}
-                              >
-                                {commentsLoading ? "..." : "Reply"}
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Replies List */}
-                      {comment.replies && comment.replies.length > 0 && (
-                        <div className="space-y-4 border-l-2 border-border pl-4 ml-2 mt-4">
-                          {comment.replies.map((reply) => (
-                            <div key={reply._id} className="flex gap-3">
-                              {/* Avatar for reply author */}
-                              {(() => {
-                                const initials =
-                                  reply.user?.name?.charAt(0).toUpperCase() ||
-                                  "U";
-                                const avatarUrl = reply.user?.avatar;
-                                const bgColor = generateColorFromString(
-                                  reply.user?.name ||
-                                    reply.user?._id ||
-                                    initials
-                                );
-                                const textColor = getContrastTextColor(bgColor);
-                                return (
-                                  <ShadAvatar className="w-8 h-8 rounded-full font-semibold text-xs flex-shrink-0">
-                                    {typeof avatarUrl === "string" &&
-                                    avatarUrl ? (
-                                      <AvatarImage
-                                        key={avatarUrl}
-                                        src={avatarUrl}
-                                        alt={initials}
-                                        crossOrigin="anonymous"
-                                        referrerPolicy="no-referrer"
-                                      />
-                                    ) : null}
-                                    <AvatarFallback
-                                      style={{
-                                        backgroundColor: bgColor,
-                                        color: textColor,
-                                      }}
-                                    >
-                                      {initials}
-                                    </AvatarFallback>
-                                  </ShadAvatar>
-                                );
-                              })()}
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-medium text-sm">
-                                    {reply.user?.name || "Anonymous User"}
-                                  </span>
-                                  {reply.timestamp && (
-                                    <span className="text-xs text-muted-foreground">
-                                      {new Date(
-                                        reply.timestamp
-                                      ).toLocaleDateString()}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm text-foreground leading-relaxed">
-                                  {reply.text}
-                                </p>
+                                >
+                                  {commentsLoading ? "..." : "Reply"}
+                                </Button>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      )}
+                          </div>
+                        )}
+
+                        {/* Replies List */}
+                        {comment.replies && comment.replies.length > 0 && (
+                          <div className="space-y-4 border-l-2 border-border pl-4 ml-2 mt-4">
+                            {comment.replies.map((reply) => (
+                              <div key={reply._id} className="flex gap-3">
+                                {/* Avatar for reply author */}
+                                {(() => {
+                                  const initials =
+                                    reply.user?.name?.charAt(0).toUpperCase() ||
+                                    "U";
+                                  const avatarUrl = reply.user?.avatar;
+                                  const bgColor = generateColorFromString(
+                                    reply.user?.name ||
+                                      reply.user?._id ||
+                                      initials
+                                  );
+                                  const textColor =
+                                    getContrastTextColor(bgColor);
+                                  return (
+                                    <ShadAvatar className="w-8 h-8 rounded-full font-semibold text-xs flex-shrink-0">
+                                      {typeof avatarUrl === "string" &&
+                                      avatarUrl ? (
+                                        <AvatarImage
+                                          key={avatarUrl}
+                                          src={avatarUrl}
+                                          alt={initials}
+                                          crossOrigin="anonymous"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                      ) : null}
+                                      <AvatarFallback
+                                        style={{
+                                          backgroundColor: bgColor,
+                                          color: textColor,
+                                        }}
+                                      >
+                                        {initials}
+                                      </AvatarFallback>
+                                    </ShadAvatar>
+                                  );
+                                })()}
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="font-medium text-sm">
+                                      {reply.user?.name || "Anonymous User"}
+                                    </span>
+                                    {reply.timestamp && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {new Date(
+                                          reply.timestamp
+                                        ).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-foreground leading-relaxed">
+                                    {reply.text}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Delete Comment Confirmation Dialog */}
