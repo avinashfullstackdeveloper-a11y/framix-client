@@ -106,35 +106,11 @@ const Components = () => {
   }, [user, authLoading, toast, toastShown]);
 
   // Fetch only lightweight metadata for components list/grid with server-side pagination
-  // Utility to maximize type diversity in the array (for "All" filter)
-  function interleaveByType<T extends { type: string }>(arr: T[]): T[] {
-    if (arr.length <= 1) return arr;
-    // Group by type
-    const typeMap = new Map<string, T[]>();
-    arr.forEach(item => {
-      if (!typeMap.has(item.type)) typeMap.set(item.type, []);
-      typeMap.get(item.type)!.push(item);
-    });
-    // Interleave
-    const result: T[] = [];
-    const typeKeys = Array.from(typeMap.keys());
-    let added = true;
-    while (added) {
-      added = false;
-      for (const type of typeKeys) {
-        const group = typeMap.get(type)!;
-        if (group.length) {
-          result.push(group.shift()!);
-          added = true;
-        }
-      }
-    }
-    return result;
-  }
 
   const fetchComponents = useCallback((page: number, filter: string) => {
     setLoading(true);
-    const typeParam = filter !== "All" ? `&type=${encodeURIComponent(filter)}` : "";
+    const typeParam =
+      filter !== "All" ? `&type=${encodeURIComponent(filter)}` : "";
 
     fetch(
       `${
@@ -146,17 +122,13 @@ const Components = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        // Handle new paginated response format
+        // Use backend's interleaved, paginated results directly for 'All' filter
         if (data.components && data.pagination) {
-          const items = filter === "All" ? interleaveByType(data.components) : data.components;
-
-          setComponents(items);
+          setComponents(data.components);
           setTotalPages(data.pagination.totalPages);
         } else {
           // Fallback for old format (backward compatibility)
-          const items = filter === "All" ? interleaveByType(data) : data;
-
-          setComponents(items);
+          setComponents(data);
           // Calculate total pages from data length if using old format
           const calculatedPages = Math.ceil(data.length / 8);
           setTotalPages(calculatedPages);
