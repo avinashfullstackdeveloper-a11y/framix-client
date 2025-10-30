@@ -1,5 +1,9 @@
 import React from "react";
-import { Avatar as ShadAvatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Avatar as ShadAvatar,
+  AvatarImage,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 import { generateColorFromString, getContrastTextColor } from "@/lib/utils";
 
 // Types for better TypeScript support
@@ -72,21 +76,29 @@ const Avatar = ({
     md: "w-8 h-8 text-sm",
     lg: "w-24 h-24 text-2xl",
   };
-  
+
   // Generate dynamic colors based on identifier (username, email, etc.)
   const bgColor = generateColorFromString(identifier || initials);
   const textColor = getContrastTextColor(bgColor);
-  
+
   return (
-    <ShadAvatar className={`${sizeClasses[size]} border border-neutral-700 ${className}`}>
+    <ShadAvatar
+      className={`${sizeClasses[size]} border border-neutral-700 ${className}`}
+    >
       {typeof src === "string" && src ? (
-        <AvatarImage key={src} src={src} alt={initials} crossOrigin="anonymous" referrerPolicy="no-referrer" />
+        <AvatarImage
+          key={src}
+          src={src}
+          alt={initials}
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
       ) : null}
       <AvatarFallback
         className="font-medium"
         style={{
           backgroundColor: bgColor,
-          color: textColor
+          color: textColor,
         }}
       >
         {initials}
@@ -591,9 +603,7 @@ const SharedComponentsGrid = ({
 const ComponentFilter = () => {
   return (
     <div className="flex flex-wrap gap-3 mb-6">
-      <button
-        className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 bg-[#FF479C] text-white scale-105"
-      >
+      <button className="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 bg-[#FF479C] text-white scale-105">
         <span className="transition-transform duration-300 scale-110">
           <svg
             width="16"
@@ -623,7 +633,6 @@ export const CommunityUserProfile = ({
   goBackHandler,
 }: CommunityUserProfileProps) => {
   const params = useParams();
-  console.log("[CommunityUserProfile] useParams() result:", params);
   const userId =
     propUserId ||
     params.userId ||
@@ -636,86 +645,62 @@ export const CommunityUserProfile = ({
 
   React.useEffect(() => {
     let isMounted = true;
-    console.log("[CommunityUserProfile] useEffect triggered. userId:", userId);
 
     if (!userId) {
       setUser(null);
       setLoading(false);
-      console.warn("[CommunityUserProfile] No userId provided.");
       return;
     }
 
     setLoading(true);
 
-    // Log before fetch
-    console.log(
-      "[CommunityUserProfile] Fetching user and components for userId:",
-      userId
-    );
-
     Promise.all([
       fetch(`${import.meta.env.VITE_API_URL}/api/users/${userId}`)
-        .then((res) => {
-          console.log(
-            "[CommunityUserProfile] /api/users response status:",
-            res.status
-          );
-          return res.json();
-        })
+        .then((res) => res.json())
         .catch((err) => {
-          console.error(
-            "[CommunityUserProfile] Error fetching user info:",
-            err
-          );
+          console.error("Error fetching user info:", err);
           return null;
         }),
       fetch(
         `${import.meta.env.VITE_API_URL}/api/components?createdBy=${userId}`
       )
-        .then((res) => {
-          console.log(
-            "[CommunityUserProfile] /api/components response status:",
-            res.status
-          );
-          return res.json();
+        .then((res) => res.json())
+        .then((data) => {
+          // Handle API response structure: { components: [...], pagination: {...} }
+          return data.components || data || [];
         })
         .catch((err) => {
-          console.error(
-            "[CommunityUserProfile] Error fetching user components:",
-            err
-          );
+          console.error("Error fetching user components:", err);
           return [];
         }),
     ])
       .then(([userInfo, userComponents]) => {
-        // Log the raw API responses
-        console.log("[CommunityUserProfile] API userInfo:", userInfo);
-        console.log(
-          "[CommunityUserProfile] API userComponents:",
-          userComponents
-        );
-
         if (!isMounted) return;
 
         // Accept userInfo wrapped in { success: true, user: {...} }
         const userObj = userInfo && userInfo.user ? userInfo.user : userInfo;
         if (!userObj || userObj.error || !userObj._id) {
-          console.warn(
-            "[CommunityUserProfile] User not found or invalid userInfo:",
-            userInfo
-          );
           setUser(null);
           return;
         }
 
         // Only show components created by this user
+        // Handle both cases: createdBy as object or string
         const filteredComponents = Array.isArray(userComponents)
-          ? userComponents.filter(
-              (comp) =>
-                comp.createdBy &&
-                (comp.createdBy._id === userObj._id ||
-                  comp.createdBy === userObj._id)
-            )
+          ? userComponents.filter((comp) => {
+              if (!comp.createdBy) return false;
+
+              // If createdBy is an object with _id or id
+              if (typeof comp.createdBy === "object") {
+                return (
+                  comp.createdBy._id === userObj._id ||
+                  comp.createdBy.id === userObj._id
+                );
+              }
+
+              // If createdBy is a string
+              return comp.createdBy === userObj._id;
+            })
           : [];
 
         const finalUser = {
@@ -784,15 +769,10 @@ export const CommunityUserProfile = ({
             })
           ),
         };
-        // Log the final user state before rendering
-        console.log(
-          "[CommunityUserProfile] Final user state for rendering:",
-          finalUser
-        );
         setUser(finalUser);
       })
       .catch((err) => {
-        console.error("[CommunityUserProfile] Error in Promise.all:", err);
+        console.error("Error in Promise.all:", err);
         if (isMounted) setUser(null);
       })
       .finally(() => {
