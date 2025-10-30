@@ -1,5 +1,4 @@
 import { useAuth } from "../context/AuthContext";
-import { LiveProvider, LivePreview, LiveError } from "react-live";
 import React, {
   useEffect,
   useState,
@@ -64,6 +63,9 @@ const Components = () => {
   // Ref for scrolling to components grid on page change
   const componentsGridRef = useRef<HTMLDivElement>(null);
 
+  // Server-side pagination state
+  const [totalPages, setTotalPages] = useState(1);
+
   // Show welcome toast after OAuth login/registration
   useEffect(() => {
     // Wait for auth to finish loading
@@ -103,59 +105,69 @@ const Components = () => {
     }
   }, [user, authLoading, toast, toastShown]);
 
-  // Fetch only lightweight metadata for components list/grid
-  const fetchComponents = () => {
-    setLoading(true);
-    const cached = localStorage.getItem("componentListCache");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        setComponents(parsed);
-        setLoading(false);
-        // Background refresh for latest metadata
-        fetch(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/components?publishSection=component&fields=_id,title,type,language,badge,views`,
-          {
-            credentials: "include",
-          }
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            setComponents(data);
-            try {
-              localStorage.setItem("componentListCache", JSON.stringify(data));
-            } catch (storageError) {
-              localStorage.removeItem("componentListCache");
-            }
-          })
-          .catch((err) => console.error("Background refresh failed:", err));
-        return;
-      } catch {
-        localStorage.removeItem("componentListCache");
+  // Fetch only lightweight metadata for components list/grid with server-side pagination
+  // Utility to maximize type diversity in the array (for "All" filter)
+  function interleaveByType<T extends { type: string }>(arr: T[]): T[] {
+    if (arr.length <= 1) return arr;
+    // Group by type
+    const typeMap = new Map<string, T[]>();
+    arr.forEach(item => {
+      if (!typeMap.has(item.type)) typeMap.set(item.type, []);
+      typeMap.get(item.type)!.push(item);
+    });
+    // Interleave
+    const result: T[] = [];
+    const typeKeys = Array.from(typeMap.keys());
+    let added = true;
+    while (added) {
+      added = false;
+      for (const type of typeKeys) {
+        const group = typeMap.get(type)!;
+        if (group.length) {
+          result.push(group.shift()!);
+          added = true;
+        }
       }
     }
+    return result;
+  }
+
+  const fetchComponents = useCallback((page: number, filter: string) => {
+    setLoading(true);
+    const typeParam = filter !== "All" ? `&type=${encodeURIComponent(filter)}` : "";
+
     fetch(
       `${
         import.meta.env.VITE_API_URL
-      }/api/components?publishSection=component&fields=_id,title,type,language,badge,views`,
+      }/api/components?publishSection=component&fields=_id,title,type,language,badge,views,code,htmlCode,cssCode,tailwind&page=${page}&limit=8${typeParam}`,
       {
         credentials: "include",
       }
     )
       .then((res) => res.json())
       .then((data) => {
-        setComponents(data);
-        try {
-          localStorage.setItem("componentListCache", JSON.stringify(data));
-        } catch (storageError) {
-          localStorage.removeItem("componentListCache");
+        // Handle new paginated response format
+        if (data.components && data.pagination) {
+          const items = filter === "All" ? interleaveByType(data.components) : data.components;
+
+          setComponents(items);
+          setTotalPages(data.pagination.totalPages);
+        } else {
+          // Fallback for old format (backward compatibility)
+          const items = filter === "All" ? interleaveByType(data) : data;
+
+          setComponents(items);
+          // Calculate total pages from data length if using old format
+          const calculatedPages = Math.ceil(data.length / 8);
+          setTotalPages(calculatedPages);
         }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  };
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        setLoading(false);
+      });
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!user || user.role !== "admin") return;
@@ -178,9 +190,10 @@ const Components = () => {
     }
   };
 
+  // Fetch components when page or filter changes
   useEffect(() => {
-    fetchComponents();
-  }, []);
+    fetchComponents(currentPage, activeFilter);
+  }, [currentPage, activeFilter, fetchComponents]);
 
   // Sync currentPage and activeFilter with URL query param on mount and when URL changes
   useEffect(() => {
@@ -205,57 +218,16 @@ const Components = () => {
     }
   }, [currentPage]);
 
-  // OPTIMIZATION: Memoize filtered components to prevent recalculation on every render
-  const filteredComponents = useMemo(() => {
-    // Map filter tab to type values in DB
-    const filterTypeMap: Record<string, string[]> = {
-      Button: ["button", "buttons"],
-      "Toggle switch": ["toggle", "toggle switch", "toggleswitch"],
-      Checkbox: ["checkbox", "checkboxes"],
-      Card: ["card", "cards"],
-      Loader: ["loader", "loaders"],
-      Input: ["input", "inputs"],
-      Form: ["form", "forms"],
-      Pattern: ["pattern", "patterns"],
-      "Radio buttons": ["radio", "radio buttons", "radiobuttons"],
-      Tooltips: ["tooltip", "tooltips"],
-    };
-    return components.filter((item: ComponentItem) => {
-      if (activeFilter === "All") return true;
-      const type = item.type?.toLowerCase() || "";
-      const filterTypes = filterTypeMap[activeFilter];
-      if (filterTypes) {
-        // Match type field
-        if (filterTypes.some((ft) => type.includes(ft))) return true;
-        // Fallback: also check title for legacy/edge cases
-        if (
-          item.title &&
-          filterTypes.some((ft) => item.title.toLowerCase().includes(ft))
-        )
-          return true;
-        return false;
-      }
-      return true;
-    });
-  }, [components, activeFilter]);
-
-  // OPTIMIZATION: Pagination logic - 19 components per page (excluding ads)
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filteredComponents.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedComponents = filteredComponents.slice(startIndex, endIndex);
-
   // OPTIMIZATION: Memoize itemsWithAds array to prevent recalculation
   const itemsWithAds = useMemo(() => {
     const items: Array<
       | ComponentItem
       | { isAd: true; adIndex: number; adType: "300x250" | "160x300" }
     > = [];
-    paginatedComponents.forEach((component, index) => {
+    components.forEach((component, index) => {
       items.push(component);
       // Insert ad after every 6th component (index 5, 11, 17, etc.)
-      if ((index + 1) % 6 === 0 && index < paginatedComponents.length - 1) {
+      if ((index + 1) % 6 === 0 && index < components.length - 1) {
         // Alternate ad types: odd positions get 300x250, even positions get 160x300
         const adCount = Math.floor(index / 6);
         const adType = adCount % 2 === 0 ? "300x250" : "160x300";
@@ -267,25 +239,7 @@ const Components = () => {
       }
     });
     return items;
-  }, [paginatedComponents, currentPage]);
-
-  // OPTIMIZATION: OptimizedPreview component with lazy loading via Intersection Observer
-  // This prevents rendering iframes (and loading external CDNs) until they're visible
-  // OptimizedPreview is now a placeholder in the list/grid, as code is not available here.
-  const OptimizedPreview = React.memo(
-    ({ componentItem }: { componentItem: ComponentItem }) => {
-      return (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ minHeight: "200px" }}
-        >
-          <div className="text-muted-foreground text-sm">
-            Preview available on detail page
-          </div>
-        </div>
-      );
-    }
-  );
+  }, [components, currentPage]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -311,11 +265,12 @@ const Components = () => {
               key={filter}
               type="button"
               onClick={() => {
-                setActiveFilter(filter);
                 const params = new URLSearchParams(window.location.search);
                 params.set("page", "1");
                 params.set("filter", filter);
                 navigate({ search: params.toString() });
+                setCurrentPage(1);
+                setActiveFilter(filter);
               }}
               className={`flex w-auto min-w-20 sm:min-w-24 lg:w-28 h-8 sm:h-10 justify-center items-center border cursor-pointer transition-all duration-300 ease-in-out rounded-lg sm:rounded-[10px] border-solid ${
                 activeFilter === filter
@@ -416,6 +371,7 @@ const Components = () => {
               const params = new URLSearchParams(window.location.search);
               params.set("page", newPage.toString());
               navigate({ search: params.toString() });
+              setCurrentPage(newPage);
             }}
             disabled={currentPage === 1}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
@@ -437,6 +393,7 @@ const Components = () => {
               const params = new URLSearchParams(window.location.search);
               params.set("page", newPage.toString());
               navigate({ search: params.toString() });
+              setCurrentPage(newPage);
             }}
             disabled={currentPage === totalPages}
             className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all ${
