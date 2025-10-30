@@ -149,25 +149,13 @@ const Components = () => {
         // Handle new paginated response format
         if (data.components && data.pagination) {
           const items = filter === "All" ? interleaveByType(data.components) : data.components;
-          if (filter === "All") {
-            // TEMP LOG: print array of types shown in "All" tab
-            console.log(
-              '[Components.tsx] Types in "All" tab:',
-              items.map((c) => c.type)
-            );
-          }
+
           setComponents(items);
           setTotalPages(data.pagination.totalPages);
         } else {
           // Fallback for old format (backward compatibility)
           const items = filter === "All" ? interleaveByType(data) : data;
-          if (filter === "All") {
-            // TEMP LOG: print array of types shown in "All" tab
-            console.log(
-              '[Components.tsx] Types in "All" tab:',
-              items.map((c) => c.type)
-            );
-          }
+
           setComponents(items);
           // Calculate total pages from data length if using old format
           const calculatedPages = Math.ceil(data.length / 8);
