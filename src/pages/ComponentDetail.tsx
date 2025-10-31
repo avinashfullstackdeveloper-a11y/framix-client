@@ -565,13 +565,7 @@ const ComponentDetail: React.FC = () => {
           <Button
             variant="ghost"
             onClick={() => {
-              const params = new URLSearchParams(window.location.search);
-              const page = params.get("page");
-              if (page) {
-                navigate(`/community?page=${page}`);
-              } else {
-                navigate(-1);
-              }
+              navigate(-1);
             }}
             className="flex items-center gap-2"
           >
