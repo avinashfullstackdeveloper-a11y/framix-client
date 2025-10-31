@@ -748,13 +748,14 @@ const ComponentDetail: React.FC = () => {
                       const textColor = isLightColor(backgroundColor)
                         ? "#1f2937"
                         : "#f3f4f6";
+                      const captureRootStyle = `#capture-root { display: inline-block !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }`;
                       if (technology === "css") {
                         const hasCss = cssCode && cssCode.trim() !== "";
-                        srcDoc = `<!DOCTYPE html><html style="background: transparent;"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>* { margin: 0; padding: 0; box-sizing: border-box; } body, html {width: 100%;height: 100%;display: flex;align-items: center;justify-content: center;background: transparent;color: ${textColor};font-family: -apple-system, BlinkMacSystemFont, sans-serif;overflow: hidden;} ${
+                        srcDoc = `<!DOCTYPE html><html style="background: transparent;"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>* { margin: 0; padding: 0; box-sizing: border-box; } html, body { background: transparent; color: ${textColor}; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: visible; } ${captureRootStyle} ${
                           hasCss ? cssCode : ""
-                        }</style></head><body>${previewHtmlCode}</body></html>`;
+                        }</style></head><body><div id='capture-root'>${previewHtmlCode}</div></body></html>`;
                       } else if (technology === "tailwind") {
-                        srcDoc = `<!DOCTYPE html><html style="background: transparent;"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"></script><style>* { margin: 0; padding: 0; box-sizing: border-box; } body, html {width: 100%;height: 100%;display: flex;align-items: center;justify-content: center;background: transparent;color: ${textColor};font-family: -apple-system, BlinkMacSystemFont, sans-serif;overflow: hidden;}</style></head><body>${tailwindCode}</body></html>`;
+                        srcDoc = `<!DOCTYPE html><html style="background: transparent;"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"></script><style>* { margin: 0; padding: 0; box-sizing: border-box; } html, body { background: transparent; color: ${textColor}; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: visible; } ${captureRootStyle}</style></head><body><div id='capture-root'>${tailwindCode}</div></body></html>`;
                       }
                       try {
                         // Create a hidden iframe
@@ -774,12 +775,15 @@ const ComponentDetail: React.FC = () => {
                         await new Promise((resolve) => {
                           tempIframe.onload = () => resolve(true);
                         });
-                        // Use html-to-image on the iframe's body
+                        // Use html-to-image on the #capture-root div
                         const tempDoc = tempIframe.contentDocument;
                         if (!tempDoc)
                           throw new Error("Cannot access preview content");
-                        const body = tempDoc.body;
-                        const dataUrl = await htmlToImage.toPng(body, {
+                        const captureDiv =
+                          tempDoc.getElementById("capture-root");
+                        if (!captureDiv)
+                          throw new Error("Could not find component root");
+                        const dataUrl = await htmlToImage.toPng(captureDiv, {
                           cacheBust: true,
                         });
                         document.body.removeChild(tempIframe);
