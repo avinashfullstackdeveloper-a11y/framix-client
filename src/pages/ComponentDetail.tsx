@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { trackComponentView } from "@/lib/api";
 import { FigmaButton } from "../components/ui/FigmaButton";
+import * as htmlToImage from "html-to-image";
 import {
   Avatar as ShadAvatar,
   AvatarImage,
@@ -318,6 +319,9 @@ const ComponentDetail: React.FC = () => {
   };
 
   // Preview logic with custom background color
+  // Ref for preview iframe
+  const previewIframeRef = useRef<HTMLIFrameElement>(null);
+
   const renderPreview = () => {
     const textColor = isLightColor(backgroundColor) ? "#1f2937" : "#f3f4f6";
 
@@ -373,6 +377,7 @@ const ComponentDetail: React.FC = () => {
       `;
       return (
         <iframe
+          ref={previewIframeRef}
           srcDoc={srcDoc}
           className="w-full h-full border-0"
           style={{ background: "transparent" }}
@@ -420,6 +425,7 @@ const ComponentDetail: React.FC = () => {
         `;
       return (
         <iframe
+          ref={previewIframeRef}
           srcDoc={srcDoc}
           className="w-full h-full border-0"
           style={{ background: "transparent" }}
@@ -559,13 +565,7 @@ const ComponentDetail: React.FC = () => {
           <Button
             variant="ghost"
             onClick={() => {
-              const params = new URLSearchParams(window.location.search);
-              const page = params.get("page");
-              if (page) {
-                navigate(`/community?page=${page}`);
-              } else {
-                navigate(-1);
-              }
+              navigate(-1);
             }}
             className="flex items-center gap-2"
           >
@@ -736,19 +736,81 @@ const ComponentDetail: React.FC = () => {
                   </Button>
                   {/* Edit button removed: editor is always editable */}
                   <FigmaButton
-                    onClick={() => {
-                      let codeToCopy = "";
+                    onClick={async () => {
+                      // Get the srcDoc for the current preview
+                      let srcDoc = "";
+                      const textColor = isLightColor(backgroundColor)
+                        ? "#1f2937"
+                        : "#f3f4f6";
+                      const captureRootStyle = `#capture-root { display: inline-block !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; background: transparent !important; box-shadow: none !important; }`;
                       if (technology === "css") {
-                        codeToCopy = activeTab === "html" ? htmlCode : cssCode;
+                        const hasCss = cssCode && cssCode.trim() !== "";
+                        srcDoc = `<!DOCTYPE html><html style="background: transparent;"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>* { margin: 0; padding: 0; box-sizing: border-box; } html, body { background: transparent; color: ${textColor}; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: visible; } ${captureRootStyle} ${
+                          hasCss ? cssCode : ""
+                        }</style></head><body><div id='capture-root'>${previewHtmlCode}</div></body></html>`;
                       } else if (technology === "tailwind") {
-                        codeToCopy = tailwindCode;
+                        srcDoc = `<!DOCTYPE html><html style="background: transparent;"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script src="https://cdn.tailwindcss.com"></script><style>* { margin: 0; padding: 0; box-sizing: border-box; } html, body { background: transparent; color: ${textColor}; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: visible; } ${captureRootStyle}</style></head><body><div id='capture-root'>${tailwindCode}</div></body></html>`;
                       }
-                      navigator.clipboard.writeText(codeToCopy);
-                      toast({
-                        title: "Copied to Figma!",
-                        description: "Code copied for Figma.",
-                        variant: "default",
-                      });
+                      try {
+                        // Create a hidden iframe
+                        const tempIframe = document.createElement("iframe");
+                        tempIframe.style.position = "fixed";
+                        tempIframe.style.left = "-99999px";
+                        tempIframe.style.top = "-99999px";
+                        tempIframe.style.width = "800px";
+                        tempIframe.style.height = "600px";
+                        tempIframe.style.opacity = "0";
+                        tempIframe.style.pointerEvents = "none";
+                        tempIframe.style.zIndex = "-99999";
+                        tempIframe.sandbox = "allow-scripts allow-same-origin";
+                        document.body.appendChild(tempIframe);
+                        tempIframe.srcdoc = srcDoc;
+                        // Wait for iframe to load
+                        await new Promise((resolve) => {
+                          tempIframe.onload = () => resolve(true);
+                        });
+                        // Use html-to-image on the #capture-root div
+                        const tempDoc = tempIframe.contentDocument;
+                        if (!tempDoc)
+                          throw new Error("Cannot access preview content");
+                        const captureDiv =
+                          tempDoc.getElementById("capture-root");
+                        if (!captureDiv)
+                          throw new Error("Could not find component root");
+                        const dataUrl = await htmlToImage.toPng(captureDiv, {
+                          cacheBust: true,
+                        });
+                        document.body.removeChild(tempIframe);
+                        // Copy image to clipboard (if supported)
+                        if (navigator.clipboard && window.ClipboardItem) {
+                          const res = await fetch(dataUrl);
+                          const blob = await res.blob();
+                          await navigator.clipboard.write([
+                            new window.ClipboardItem({ [blob.type]: blob }),
+                          ]);
+                          toast({
+                            title: "Copied to Figma!",
+                            description:
+                              "Preview image copied. Paste in Figma (Ctrl+V).",
+                            variant: "default",
+                          });
+                        } else {
+                          // Fallback: open image in new tab
+                          window.open(dataUrl, "_blank");
+                          toast({
+                            title: "Image ready!",
+                            description:
+                              "Preview image opened. Right-click to copy and paste in Figma.",
+                            variant: "default",
+                          });
+                        }
+                      } catch (err) {
+                        toast({
+                          title: "Error",
+                          description: "Could not copy preview image.",
+                          variant: "destructive",
+                        });
+                      }
                     }}
                   />
                 </div>
@@ -1100,7 +1162,7 @@ const ComponentDetail: React.FC = () => {
                     >
                       {commentsLoading ? (
                         <>
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
                           Posting...
                         </>
                       ) : (

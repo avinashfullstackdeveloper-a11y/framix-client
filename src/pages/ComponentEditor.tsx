@@ -813,7 +813,7 @@ const ComponentEditor: React.FC = () => {
 
   const handleReset = () => {
     const template = getTemplateCode(componentType, technology);
-    console.log("Reset action, template:", template);
+
     if (technology === "css") {
       const htmlMatch = template.match(/<body>([\s\S]*?)<\/body>/);
       const styleMatch = template.match(/<style>([\s\S]*?)<\/style>/);
@@ -1062,7 +1062,6 @@ const ComponentEditor: React.FC = () => {
                         : "text-gray-500"
                     }`}
                     onClick={() => {
-                      console.log("Switching to HTML tab");
                       setActiveTab("html");
                     }}
                   >
@@ -1075,7 +1074,6 @@ const ComponentEditor: React.FC = () => {
                         : "text-gray-500"
                     }`}
                     onClick={() => {
-                      console.log("Switching to CSS tab");
                       setActiveTab("css");
                     }}
                   >

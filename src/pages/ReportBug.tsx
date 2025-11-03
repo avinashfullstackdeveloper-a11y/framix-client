@@ -23,11 +23,6 @@ const ReportBug: React.FC = () => {
     if (!title.trim() || !bugDescription.trim()) return;
     setLoading(true);
     try {
-      console.log("Submitting bug report:", {
-        title: title.trim(),
-        description: bugDescription.trim(),
-        username: user?.username || user?.name || undefined,
-      });
       const response = await apiRequest("/api/bug-reports", {
         method: "POST",
         body: JSON.stringify({
@@ -36,7 +31,6 @@ const ReportBug: React.FC = () => {
           username: user?.username || user?.name || undefined,
         }),
       });
-      console.log("Bug report submission response:", response);
       setFeedback({
         type: "success",
         message: "Bug report submitted successfully!",

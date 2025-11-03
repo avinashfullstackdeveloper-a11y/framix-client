@@ -531,7 +531,6 @@ const LandingPage = () => {
                                   <LearnMoreButton
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      console.log(`Learn more: ${card.title}`);
                                     }}
                                     className="max-md:text-sm max-sm:text-xs"
                                   />
