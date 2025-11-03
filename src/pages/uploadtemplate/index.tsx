@@ -88,7 +88,6 @@ const CombinedTemplateUpload: React.FC = () => {
   };
 
   const handleFigmaImport = () => {
-    console.log('Import from Figma clicked');
   };
 
   const handleAddDetails = () => {
@@ -151,7 +150,6 @@ const CombinedTemplateUpload: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    console.log('Final submission:', formData);
     // Handle final submission logic
   };
 

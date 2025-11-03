@@ -300,7 +300,6 @@ export default function PersonalInformation() {
           });
           if (res.ok) {
             const profile = await res.json();
-            console.log("DEBUG: /api/user/profile GET response", profile);
             if (profile && profile.user) {
               setProfileData((prev) => ({
                 ...prev,
